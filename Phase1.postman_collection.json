@@ -1,0 +1,1475 @@
+{
+	"info": {
+		"_postman_id": "2ae61b81-d10f-472a-b797-558764aec9ed",
+		"name": "Phase1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"item": [
+						{
+							"name": "Health Check Success",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"hello world\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}",
+									"host": [
+										"{{host}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"vrf_stat\": -1');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/register",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = Math.random().toString(36).substring(2, 15) +",
+											"        Math.random().toString(36).substring(2, 15);",
+											"const email = \"szccp.\" + uuid + \"@inbox.testmail.app\";",
+											"pm.environment.set(\"currentEmail\", email)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"to_email\": \"{{currentEmail}}\",\n    \"src_page\": \"REG\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/send_email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"send_email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step3",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest(pm.variables.replaceIn('{{mailbox_url}}'), function (err, response) {",
+											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"{{vrf_code}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/verify_email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"verify_email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"",
+											"pm.environment.set(\"currentPassword\", \"Secret123!\")"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/register",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reset Password",
+					"item": [
+						{
+							"name": "step1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"vrf_stat\": -1');",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/register",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "step2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"src_page\": \"RST\", \n    \"to_email\": \"{{currentEmail}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/send_email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"send_email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "step3",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest(pm.variables.replaceIn('{{mailbox_url}}'), function (err, response) {",
+											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"{{vrf_code}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/verify_email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"verify_email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "step4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 2001');",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"currentPassword\", \"NewSecret123!\")"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/reset_password",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"reset_password"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});",
+											"pm.environment.set(\"org_id\", pm.response.json()['data']['org_id']);",
+											"pm.environment.set(\"scc_id\", pm.response.json()['data']['scc_id']);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\", \n    \"password\": \"{{currentPassword}}\", \n    \"auto_login\": true\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/login",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Create Organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"organization\": {\n        \"name\": \"organization_{{$timestamp}}\", \n        \"plans\": \"\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/create_organization",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"create_organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join in Organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"tar_org_id\": \"organization_1619592503:1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/join_in_organization",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"join_in_organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Switch Organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 4, \n    \"org_id\": \"organization_1619592503:1\", \n    \"tar_org_id\": \"MyOrganization:4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/switch_organization",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"switch_organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Permission",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\",\n    \"tar_scc_id\": 4, \n    \"tar_role\": \"ADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/assign_permission_to_account",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"assign_permission_to_account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add New ECS Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 4,\n    \"org_id\": \"MyOrganization:4\",\n    \"ecs_data\": {\n        \"acc_id\": 385105545457, \n        \"biz\": \"AWS\", \n        \"auth_params\": {\n            \"aws_access_key_id\": \"AKIAVTKQUJDYYVD4ZYR6\", \n            \"aws_secret_access_key\": \"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\", \n            \"aws_session_token\": \"\", \n            \"expiration\": \"2021-04-21T00:00:00Z\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/add_new_ecs_account",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"add_new_ecs_account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get ECS Sub Accounts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/get_ecs_sub_accounts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"get_ecs_sub_accounts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Analyze Costs",
+			"item": [
+				{
+					"name": "Summary Line",
+					"item": [
+						{
+							"name": "Costs Analysis",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"scc_id\": {{scc_id}}, \n    \"org_id\": \"{{org_id}}\", \n    \"ecs_id\": \"6688610217252995452\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/analyze_cost",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"analyze_cost"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Monthly Cost Trends",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\", \n    \"ecs_id\": \"6688610217252995452\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/monthly_cost_diagram",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"monthly_cost_diagram"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cost Categories",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Got Status code\", function () {",
+											"    pm.expect(pm.response.text()).to.include('code');",
+											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\", \n    \"ecs_id\": \"6688610217252995452\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/cost_by_categories",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"cost_by_categories"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Account Efficiency",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\", \n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/efficiency_by_accounts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"efficiency_by_accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top Accounts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\", \n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/cost_by_accounts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"cost_by_accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Spend Analysis",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ecs_id\": \"6688610217252995452\",\n    \"org_id\": \"MyOrganization:1\",\n    \"params\": {\n        \"Granularity\": \"MONTHLY\",\n        \"GroupBy\": [{\"Type\": \"DIMENSION\", \"Key\": \"LINKED_ACCOUNT\"}],\n        \"Metrics\": [\"BLENDED_COST\", \"AMORTIZED_COST\"],\n        \"TimePeriod\": {\n            \"End\": \"2021-05-01\",\n            \"Start\": \"2020-11-01\"\n        }\n        \n    },\n    \"scc_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/spend_analysis",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"spend_analysis"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Trend and Notifications",
+			"item": [
+				{
+					"name": "Trend Diagram & Event Table",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1,\n    \"org_id\":\"MyOrganization:1\",\n    \"ecs_id\": \"6688610217252995452\",\n    \"st_dtm\": \"2021-01-01\",\n    \"nd_dtm\": \"2021-03-31\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/trend_diagram",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"trend_diagram"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Listeners",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1,\n    \"org_id\":\"MyOrganization:1\",\n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/view_listeners",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"view_listeners"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Instance Tags When Listener Definition",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1,\n    \"org_id\":\"MyOrganization:1\",\n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/get_instance_tags",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"get_instance_tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Define Listener",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1,\n    \"org_id\":\"MyOrganization:1\",\n    \"ecs_id\": \"6688610217252995452\",\n    \"listener\": {\n        \"biz\": \"AWS\",\n        \"description\": \"\",\n        \"inc_only\": true,\n        \"name\": \"test rule1\",\n        \"scope\": \"Weekly\",\n        \"tag_key\": \"Name\",\n        \"tag_val\": \"Hello\",\n        \"threshold\": \"10\",\n        \"username\": \"spt\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/define_listener",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"define_listener"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Listener",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1,\n    \"org_id\":\"MyOrganization:1\",\n    \"ecs_id\": \"6688610217252995452\",\n    \"listener\": {\n        \"biz\": \"AWS\",\n        \"created_utm\": 1619663407,\n        \"description\": \"\",\n        \"id\": \"aa037aba61ee2aaebb96170e4b5778ed\",\n        \"inc_only\": 1,\n        \"name\": \"test rule1\",\n        \"scope\": \"Weekly\",\n        \"status\": \"ON\",\n        \"tag_key\": \"Name\",\n        \"tag_val\": \"Hello\",\n        \"threshold\": 10,\n        \"username\": \"spt\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/edit_listener",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"edit_listener"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Listener",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1,\n    \"org_id\":\"MyOrganization:1\",\n    \"ecs_id\": \"6688610217252995452\",\n    \"listener_id\": \"aa037aba61ee2aaebb96170e4b5778ed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/delete_listener",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"delete_listener"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Spend Analysis",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ecs_id\": \"6688610217252995452\",\n    \"org_id\": \"MyOrganization:1\",\n    \"params\": {\n        \"Granularity\": \"MONTHLY\",\n        \"GroupBy\": [{\"Type\": \"DIMENSION\", \"Key\": \"LINKED_ACCOUNT\"}],\n        \"Metrics\": [\"BLENDED_COST\", \"AMORTIZED_COST\"],\n        \"TimePeriod\": {\n            \"End\": \"2021-05-01\",\n            \"Start\": \"2020-11-01\"\n        }\n        \n    },\n    \"scc_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/spend_analysis",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"spend_analysis"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Optimization",
+			"item": [
+				{
+					"name": "Compute Overview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\", \n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/compute_overview",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"compute_overview"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reservations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Got Status code\", function () {",
+									"    pm.expect(pm.response.text()).to.include('code');",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"code\":0');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": 1, \n    \"org_id\": \"MyOrganization:1\", \n    \"ecs_id\": \"6688610217252995452\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/reservations",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"reservations"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
