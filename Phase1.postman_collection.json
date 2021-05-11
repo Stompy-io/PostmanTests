@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a45e9314-cd63-4eb3-98e1-6f378a3a41fa",
+		"_postman_id": "d3007bbb-7652-44de-ab70-d58b8aa59822",
 		"name": "Phase1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -18,11 +18,14 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"pm.test(\"HTTP status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
+											"pm.test(\"Status code is 0\", function () {",
+											"    pm.expect(pm.response.json()['code']) == 0;",
+											"});",
 											"pm.test(\"Body matches string\", function () {",
-											"    pm.expect(pm.response.text()).to.include(\"hello world\");",
+											"    pm.expect(pm.response.json()['msg']) == \"hello world\";",
 											"});"
 										],
 										"type": "text/javascript"
@@ -48,14 +51,14 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});",
-											"pm.test(\"Body matches string\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"vrf_stat\": -1');",
+											"pm.test(\"Status code is -1\", function () {",
+											"    pm.expect(pm.response.json()['vrf_stat']) == -1;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -78,17 +81,17 @@
 							"response": []
 						},
 						{
-							"name": "Step2",
+							"name": "Step2 Send Verification Email",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});",
 											"",
 											""
@@ -134,13 +137,13 @@
 							"response": []
 						},
 						{
-							"name": "Step3",
+							"name": "Step3 Verify Code from Email",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.sendRequest(pm.variables.replaceIn('{{mailbox_url}}'), function (err, response) {",
+											"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=6d62066d-8646-4cde-9888-4452879d011e&namespace=szccp'), function (err, response) {",
 											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
 											"});"
 										],
@@ -151,13 +154,15 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});",
-											""
+											"pm.test(\"vrf code is 2001\", function () {",
+											"    pm.expect(pm.response.json()['vrf_stat']) == 2001;",
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -194,11 +199,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});",
 											""
 										],
@@ -252,14 +257,14 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});",
-											"pm.test(\"Body matches string\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"vrf_stat\": -1');",
+											"pm.test(\"vrf code is -1\", function () {",
+											"    pm.expect(pm.response.json()['vrf_stat']) == -1;",
 											"});",
 											""
 										],
@@ -289,11 +294,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -331,11 +336,14 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
+											"});",
+											"pm.test(\"vrf code is 2001\", function () {",
+											"    pm.expect(pm.response.json()['vrf_stat']) == 2001;",
 											"});",
 											""
 										],
@@ -346,7 +354,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.sendRequest(pm.variables.replaceIn('{{mailbox_url}}'), function (err, response) {",
+											"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=6d62066d-8646-4cde-9888-4452879d011e&namespace=szccp'), function (err, response) {",
 											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
 											"});"
 										],
@@ -385,11 +393,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
-											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 2001');",
+											"pm.test(\"vrf code is 2001\", function () {",
+											"    pm.expect(pm.response.json()['code']) == 2001;",
 											"});",
 											""
 										],
@@ -442,11 +450,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});",
 											"pm.environment.set(\"org_id\", pm.response.json()['data']['org_id']);",
 											"pm.environment.set(\"scc_id\", pm.response.json()['data']['scc_id']);",
@@ -514,11 +522,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});",
 									"pm.test(\"Body matches string\", function () {",
 									"    pm.expect(pm.response.text()).to.include(\"ecs_id\");",
@@ -570,11 +578,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -620,11 +628,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -662,11 +670,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -704,11 +712,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Got Status code\", function () {",
-											"    pm.expect(pm.response.text()).to.include('code');",
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+											"    pm.expect(pm.response.json()['code']) == 0;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -748,11 +756,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -790,11 +798,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -832,11 +840,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -899,11 +907,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -941,11 +949,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -983,11 +991,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1025,11 +1033,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});",
 									"pm.environment.set(\"listenerId\", pm.response.json()['data']['listener_id']);"
 								],
@@ -1077,11 +1085,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1128,11 +1136,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1170,11 +1178,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1237,11 +1245,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1279,11 +1287,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Got Status code\", function () {",
-									"    pm.expect(pm.response.text()).to.include('code');",
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.text()).to.include('\"code\": 0');",
+									"    pm.expect(pm.response.json()['code']) == 0;",
 									"});"
 								],
 								"type": "text/javascript"
