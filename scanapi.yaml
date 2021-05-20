@@ -1,7 +1,7 @@
 ---
 endpoints:
   - name: stompy api
-    path: http://dev.api.stompy.io/v1 # The API's base url
+    path: https://dev.api.stompy.io/v1 # The API's base url
     requests:
       - name: health_check_success # The name of the first request
         method: get # The HTTP method of the first request
