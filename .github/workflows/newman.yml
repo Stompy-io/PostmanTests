@@ -1,27 +1,48 @@
-name: Automate test in pipeline for postman
+# name: Automate test in pipeline for postman
 
+# on:
+#   push:
+#     branches:
+#       - task/207-automate-test-in-pipeline-for-postman
+#   schedule:
+#     - cron: '0 9 * * *'
+
+# jobs:
+#   newman:
+
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+
+#       - name: Run API Tests
+#         id: run-newman
+#         uses: anthonyvscode/newman-action@v1
+#         with:
+#           collection: Phase1.postman_collection.json
+#           reporters: cli
+
+#       - name: Output summary to console
+#         run: echo ${{ steps.run-newman.outputs.summary }}
+
+name: Run tests
 on:
-  push:
-    branches:
-      - task/207-automate-test-in-pipeline-for-postman
-  schedule:
-    - cron: '0 9 * * *'
+  pull_request:
+    types: [opened, synchronize]:
 
 jobs:
-  newman:
-
+  scanapi:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Run API Tests
-        id: run-newman
-        uses: anthonyvscode/newman-action@v1
+      - uses: actions/checkout@v2
+      - name: Run automated API tests
+        uses: scanapi/github-action@v1
         with:
-          collection: Phase1.postman_collection.json
-          reporters: cli
-
-      - name: Output summary to console
-        run: echo ${{ steps.run-newman.outputs.summary }}
+          arguments: "run ./scanapi.yaml"
+      - name: Upload scanapi-report.html
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: ScanAPI Report
+          path: scanapi-report.html
