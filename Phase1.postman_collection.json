@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d3007bbb-7652-44de-ab70-d58b8aa59822",
+		"_postman_id": "9fd985c6-82d9-431d-b864-4f1358bbab87",
 		"name": "Phase1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -214,8 +214,10 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"",
-											"pm.environment.set(\"currentPassword\", \"Secret123!\")"
+											"const uuid = Math.random().toString(36).substring(2, 15) +",
+											"        Math.random().toString(36).substring(2, 15);",
+											"pm.environment.set(\"currentPassword\", \"Secret123!\")",
+											"pm.environment.set(\"username\", uuid)"
 										],
 										"type": "text/javascript"
 									}
@@ -226,7 +228,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\"\n}",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\",\n    \"username\": \"{{username}}\",\n    \"organization\": \"Stompy\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
