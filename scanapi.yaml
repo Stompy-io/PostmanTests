@@ -1,0 +1,10 @@
+endpoints:
+  - name: scanapi-demo # The API's name of your API
+    path: http://demo.scanapi.dev/api/ # The API's base url
+    requests:
+      - name: list_all_devs # The name of the first request
+        path: devs/ # The path of the first request
+        method: get # The HTTP method of the first request
+        tests:
+          - name: status_code_is_200 # The name of the first test for this request
+            assert:  ${{ response.status_code == 200 }}  # The assertion
