@@ -1,0 +1,170 @@
+{
+	"info": {
+		"_postman_id": "3338f6b9-890c-42aa-8c15-67c97c3b5a62",
+		"name": "Phase1RegisterStep0-3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"HTTP status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Status code is 0\", function () {",
+							"    pm.expect(pm.response.json()['code']) == 0;",
+							"});",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.json()['msg']) == \"hello world\";",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Step1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"HTTP status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Status code is 0\", function () {",
+							"    pm.expect(pm.response.json()['code']) == 0;",
+							"});",
+							"pm.test(\"Status code is -1\", function () {",
+							"    pm.expect(pm.response.json()['vrf_stat']) == -1;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/register"
+			},
+			"response": []
+		},
+		{
+			"name": "Step2 Send Verification Email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"HTTP status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Status code is 0\", function () {",
+							"    pm.expect(pm.response.json()['code']) == 0;",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const uuid = Math.random().toString(36).substring(2, 15) +",
+							"        Math.random().toString(36).substring(2, 15);",
+							"const email = \"szccp.\" + uuid + \"@inbox.testmail.app\";",
+							"pm.environment.set(\"currentEmail\", email)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"to_email\": \"{{currentEmail}}\",\n    \"src_page\": \"REG\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/send_email"
+			},
+			"response": []
+		},
+		{
+			"name": "Step3 Verify Code from Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=6d62066d-8646-4cde-9888-4452879d011e&namespace=szccp'), function (err, response) {",
+							"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"HTTP status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Status code is 0\", function () {",
+							"    pm.expect(pm.response.json()['code']) == 0;",
+							"});",
+							"pm.test(\"vrf code is 2001\", function () {",
+							"    pm.expect(pm.response.json()['vrf_stat']) == 2001;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"{{vrf_code}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/verify_email"
+			},
+			"response": []
+		}
+	]
+}

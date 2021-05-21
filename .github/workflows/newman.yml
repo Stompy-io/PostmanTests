@@ -20,7 +20,8 @@ jobs:
         id: run-newman
         uses: anthonyvscode/newman-action@v1
         with:
-          collection: Phase1.postman_collection.json
+          collection: Phase1RegisterStep0-3.postman_collection.json
+          environment: develop.postman_environment.json
           reporters: cli
 
       - name: Output summary to console
