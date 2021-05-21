@@ -39,4 +39,4 @@ jobs:
     needs: newman
     runs-on: ubuntu-latest
     steps:
-      - run: curl ${{WORK_WECHAT_BOT}} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"
+      - run: curl "${{ WORK_WECHAT_BOT }}"" -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"
