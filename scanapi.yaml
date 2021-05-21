@@ -1,28 +1,36 @@
 ---
 endpoints:
   - name: stompy api
-    path: https://dev.api.stompy.io # The API's base url
+    path: http://dev.api.stompy.io/v1 # The API's base url
     requests:
       - name: health_check_success # The name of the first request
-        path: v1
+        path: /
+        retry:
+          max_retries: 3
         method: get # The HTTP method of the first request
         tests:
           - name: status_code_is_200 # The name of the first test for this request
             assert:  ${{ response.status_code == 200 }}  # The assertion
       - name: step1_register
-        path: v1/register
+        path: register
+        retry:
+          max_retries: 3
         method: get
         tests:
           - name: status_code_is_200
             assert: ${{ response.status_code == 200 }}
       - name: step2_send_verification_email
-        path: v1/send_email
+        path: send_email
+        retry:
+          max_retries: 3
         method: post
         tests:
           - name: status_code_is_200
             assert: ${{ response.status_code == 200 }}
       - name: step3_verify_code_from_email
-        path: v1/verify_email
+        path: verify_email
+        retry:
+          max_retries: 3
         method: post
         tests:
           - name: status_code_is_200
