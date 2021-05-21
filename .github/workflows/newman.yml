@@ -3,9 +3,9 @@ name: Automate test in pipeline for postman
 on:
   push:
     branches:
-      - task/207-automate-test-in-pipeline-for-postman
+      - develop
   schedule:
-    - cron: '20 8 * * *'
+    - cron: '40 8 * * *'
 
 jobs:
   newman:
