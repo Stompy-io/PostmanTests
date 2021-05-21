@@ -5,7 +5,7 @@ on:
     branches:
       - task/207-automate-test-in-pipeline-for-postman
   schedule:
-    - cron: '43 14 * * *'
+    - cron: '0 9 * * *'
 
 jobs:
   newman:
@@ -16,16 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # - name: Install dependencies
-      #   run: |
-      #     npm install newman
-      #     npm install newman-reporter-html
-
-      - name: Running the test by newman
-        run: |
-          npm install newman
-          npm install newman-reporter-html
-          newman run Phase1RegisterStep0-3.postman_collection.json -e develop.postman_environment.json -r html
+      - name: Run API Tests
+        id: run-newman
+        uses: anthonyvscode/newman-action@v1
+        with:
+          collection: Phase1RegisterStep0-3.postman_collection.json
+          environment: develop.postman_environment.json
+          reporter: html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
