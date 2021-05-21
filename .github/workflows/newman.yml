@@ -1,0 +1,42 @@
+name: Automate test in pipeline for postman
+
+on:
+  push:
+    branches:
+      - develop
+  schedule:
+    - cron: '50 8 * * *'
+
+jobs:
+  newman:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: setup-node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-html
+
+      - name: Running the test by newman
+        run: newman run Phase1.postman_collection.json -e develop.postman_environment.json -g StompyIO.postman_globals.json -r html
+
+      - name: Output the run Details
+        uses: actions/upload-artifact@v2
+        with:
+          name: newman's Report
+          path: newman
+
+  test:
+    needs: newman
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl ${{ secrets.WORK_WECHAT_BOT }} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"
