@@ -16,13 +16,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install dependencies
+      # - name: Install dependencies
+      #   run: |
+      #     npm install newman
+      #     npm install newman-reporter-html
+
+      - name: Running the test by newman
         run: |
           npm install newman
           npm install newman-reporter-html
-
-      - name: Running the test by newman
-        run: newman run Phase1RegisterStep0-3.postman_collection.json -e develop.postman_environment.json -r html
+          newman run Phase1RegisterStep0-3.postman_collection.json -e develop.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
