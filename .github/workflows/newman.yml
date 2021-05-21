@@ -27,5 +27,5 @@ jobs:
       - name: Output the run Details
         uses: actions/upload-artifact@v2
         with:
-          name: newman's Report
-          path: newman
+          name: htmlResults
+          path: ./htmlResults.html
