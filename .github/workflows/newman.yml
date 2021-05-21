@@ -23,8 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install newman
-          npm install newman-reporter-html
+          npm install -g newman
+          npm install -g newman-reporter-html
 
       - name: Running the test by newman
         run: newman run Phase1RegisterStep0-3.postman_collection.json -e develop.postman_environment.json -r html
