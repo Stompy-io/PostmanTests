@@ -15,11 +15,6 @@
 			"key": "bucketName",
 			"value": "stompy-dev1-bucket1",
 			"enabled": true
-		},
-		{
-			"key": "host",
-			"value": "https://dev.api.stompy.io/v1",
-			"enabled": true
 		}
 	],
 	"name": "StompyIO Globals",
