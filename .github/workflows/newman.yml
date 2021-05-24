@@ -3,7 +3,7 @@ name: Automate test in pipeline for postman
 on:
   push:
     branches:
-      - develop
+      - task/207-automate-test-in-pipeline-for-postmans
   schedule:
     - cron: '50 8 * * *'
 
@@ -21,13 +21,11 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Install dependencies
+      - name: Install dependencies && Running the test by newman
         run: |
           npm install -g newman
           npm install -g newman-reporter-html
-
-      - name: Running the test by newman
-        run: newman run Phase1.postman_collection.json -e develop.postman_environment.json -g StompyIO.postman_globals.json -r html
+          newman run Phase1.postman_collection.json -e develop.postman_environment.json -g StompyIO.postman_globals.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
