@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "9fd985c6-82d9-431d-b864-4f1358bbab87",
+		"_postman_id": "8d86b68b-20ec-4641-b363-1fa0119a1757",
 		"name": "Phase1",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
@@ -22,11 +22,20 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).equals(0);",
 											"});",
 											"pm.test(\"Body matches string\", function () {",
 											"    pm.expect(pm.response.json()['msg']) == \"hello world\";",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"host\", \"http://dev.api.stompy.io/v1\");"
 										],
 										"type": "text/javascript"
 									}
@@ -35,12 +44,7 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "{{host}}",
-									"host": [
-										"{{host}}"
-									]
-								}
+								"url": "{{host}}"
 							},
 							"response": []
 						},
@@ -63,20 +67,21 @@
 										],
 										"type": "text/javascript"
 									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
 								}
 							],
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "{{host}}/register",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"register"
-									]
-								}
+								"url": "{{host}}/register"
 							},
 							"response": []
 						},
@@ -105,7 +110,7 @@
 										"exec": [
 											"const uuid = Math.random().toString(36).substring(2, 15) +",
 											"        Math.random().toString(36).substring(2, 15);",
-											"const email = \"szccp.\" + uuid + \"@inbox.testmail.app\";",
+											"const email = \"9m6u5.\" + uuid + \"@inbox.testmail.app\";",
 											"pm.environment.set(\"currentEmail\", email)"
 										],
 										"type": "text/javascript"
@@ -124,26 +129,20 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/send_email",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"send_email"
-									]
-								}
+								"url": "{{host}}/send_email"
 							},
 							"response": []
 						},
 						{
-							"name": "Step3 Verify Code from Email",
+							"name": "Step3 VRF_code Wrong",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=6d62066d-8646-4cde-9888-4452879d011e&namespace=szccp'), function (err, response) {",
+											"console.log(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=2316c80e-fa32-48e9-93e0-e11e2516ce32&namespace=9m6u5'));",
+											"",
+											"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=2316c80e-fa32-48e9-93e0-e11e2516ce32&namespace=9m6u5'), function (err, response) {",
 											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
 											"});"
 										],
@@ -158,10 +157,11 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.test(\"vrf code is 2001\", function () {",
-											"    pm.expect(pm.response.json()['vrf_stat']) == 2001;",
+											"    pm.expect(pm.response.json()['vrf_stat']).to.equal(2001);",
+											"    pm.globals.get(\"variable_key\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -180,15 +180,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/verify_email",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"verify_email"
-									]
-								}
+								"url": "{{host}}/verify_email"
 							},
 							"response": []
 						},
@@ -235,15 +227,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/register",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"register"
-									]
-								}
+								"url": "{{host}}/register"
 							},
 							"response": []
 						}
@@ -277,15 +261,7 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "{{host}}/register",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"register"
-									]
-								}
+								"url": "{{host}}/register"
 							},
 							"response": []
 						},
@@ -319,15 +295,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/send_email",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"send_email"
-									]
-								}
+								"url": "{{host}}/send_email"
 							},
 							"response": []
 						},
@@ -376,15 +344,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/verify_email",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"verify_email"
-									]
-								}
+								"url": "{{host}}/verify_email"
 							},
 							"response": []
 						},
@@ -399,7 +359,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"vrf code is 2001\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 2001;",
+											"    pm.expect(pm.response.json()['code']) .to.equal( 2001);",
 											"});",
 											""
 										],
@@ -428,15 +388,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/reset_password",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"reset_password"
-									]
-								}
+								"url": "{{host}}/reset_password"
 							},
 							"response": []
 						}
@@ -456,7 +408,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.environment.set(\"org_id\", pm.response.json()['data']['org_id']);",
 											"pm.environment.set(\"scc_id\", pm.response.json()['data']['scc_id']);",
@@ -478,15 +430,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/login",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"login"
-									]
-								}
+								"url": "{{host}}/login"
 							},
 							"response": []
 						}
@@ -560,16 +504,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/cloudformation-templates/iam-role",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"cloudformation-templates",
-								"iam-role"
-							]
-						}
+						"url": "{{host}}/cloudformation-templates/iam-role"
 					},
 					"response": []
 				},
@@ -603,15 +538,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/cloud-accounts",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"cloud-accounts"
-							]
-						}
+						"url": "{{host}}/cloud-accounts"
 					},
 					"response": []
 				}
@@ -653,15 +580,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/analyze_cost",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"analyze_cost"
-									]
-								}
+								"url": "{{host}}/analyze_cost"
 							},
 							"response": []
 						},
@@ -695,15 +614,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/monthly_cost_diagram",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"monthly_cost_diagram"
-									]
-								}
+								"url": "{{host}}/monthly_cost_diagram"
 							},
 							"response": []
 						},
@@ -737,15 +648,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "{{host}}/cost_by_categories",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"cost_by_categories"
-									]
-								}
+								"url": "{{host}}/cost_by_categories"
 							},
 							"response": []
 						}
@@ -762,7 +665,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0) ;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -781,15 +684,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/efficiency_by_accounts",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"efficiency_by_accounts"
-							]
-						}
+						"url": "{{host}}/efficiency_by_accounts"
 					},
 					"response": []
 				},
@@ -804,7 +699,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -823,15 +718,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/cost_by_accounts",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"cost_by_accounts"
-							]
-						}
+						"url": "{{host}}/cost_by_accounts"
 					},
 					"response": []
 				},
@@ -865,15 +752,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/spend_analysis",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"spend_analysis"
-							]
-						}
+						"url": "{{host}}/spend_analysis"
 					},
 					"response": []
 				}
@@ -913,7 +792,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -932,15 +811,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/trend_diagram",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"trend_diagram"
-							]
-						}
+						"url": "{{host}}/trend_diagram"
 					},
 					"response": []
 				},
@@ -955,7 +826,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -974,15 +845,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/view_listeners",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"view_listeners"
-							]
-						}
+						"url": "{{host}}/view_listeners"
 					},
 					"response": []
 				},
@@ -997,7 +860,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1016,15 +879,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/get_instance_tags",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"get_instance_tags"
-							]
-						}
+						"url": "{{host}}/get_instance_tags"
 					},
 					"response": []
 				},
@@ -1039,7 +894,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});",
 									"pm.environment.set(\"listenerId\", pm.response.json()['data']['listener_id']);"
 								],
@@ -1068,15 +923,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/define_listener",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"define_listener"
-							]
-						}
+						"url": "{{host}}/define_listener"
 					},
 					"response": []
 				},
@@ -1119,15 +966,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/edit_listener",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"edit_listener"
-							]
-						}
+						"url": "{{host}}/edit_listener"
 					},
 					"response": []
 				},
@@ -1161,15 +1000,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/delete_listener",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"delete_listener"
-							]
-						}
+						"url": "{{host}}/delete_listener"
 					},
 					"response": []
 				},
@@ -1203,15 +1034,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/spend_analysis",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"spend_analysis"
-							]
-						}
+						"url": "{{host}}/spend_analysis"
 					},
 					"response": []
 				}
@@ -1251,7 +1074,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0) ;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1270,15 +1093,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/compute_overview",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"compute_overview"
-							]
-						}
+						"url": "{{host}}/compute_overview"
 					},
 					"response": []
 				},
@@ -1293,7 +1108,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1312,15 +1127,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{host}}/reservations",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"reservations"
-							]
-						}
+						"url": "{{host}}/reservations"
 					},
 					"response": []
 				}
