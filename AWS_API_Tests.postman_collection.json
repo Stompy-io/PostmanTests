@@ -45,6 +45,44 @@
 			"response": []
 		},
 		{
+			"name": "AWS Services",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/services/?cloud_account_id={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"services",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Purchase Recommendation",
 			"event": [
 				{
@@ -327,6 +365,49 @@
 						{
 							"key": "groupby",
 							"value": "subscription"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=service",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "groupby",
+							"value": "service"
 						}
 					]
 				}
