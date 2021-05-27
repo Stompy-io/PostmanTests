@@ -247,6 +247,45 @@
 			"response": []
 		},
 		{
+			"name": "Coverage Chart - RDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Coverage Table",
 			"event": [
 				{
@@ -296,7 +335,7 @@
 			"response": []
 		},
 		{
-			"name": "Coverage Table RDS",
+			"name": "Coverage Table - RDS",
 			"event": [
 				{
 					"listen": "test",
@@ -394,6 +433,64 @@
 			"response": []
 		},
 		{
+			"name": "Utilization Chart - Yearly",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var moment = require('moment');",
+							"",
+							"pm.collectionVariables.set('aYearAgo', moment().subtract(1,'years').format(\"YYYY-MM-DD\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date={{aYearAgo}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "granularity",
+							"value": "daily"
+						},
+						{
+							"key": "start_date",
+							"value": "{{aYearAgo}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Utilization Table",
 			"event": [
 				{
@@ -402,6 +499,16 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has instanceType\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.results[0].instanceType;",
+							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"});",
+							"pm.test(\"Has instanceType\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.results[0].instanceType;",
+							"    pm.expect(pm.response.json().results[0].subscriptionId).to.exist;",
 							"});"
 						],
 						"type": "text/javascript"
@@ -430,6 +537,64 @@
 						{
 							"key": "groupby",
 							"value": "subscription"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Table - RDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has instanceType\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.results[0].instanceType;",
+							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"",
+							"});",
+							"pm.test(\"Has instanceType\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.results[0].instanceType;",
+							"    pm.expect(pm.response.json().results[0].subscriptionId).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription&service=RDS",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "groupby",
+							"value": "subscription"
+						},
+						{
+							"key": "service",
+							"value": "RDS"
 						}
 					]
 				}
@@ -478,6 +643,12 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "aYearAgo",
+			"value": ""
 		}
 	]
 }
