@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9fd985c6-82d9-431d-b864-4f1358bbab87",
+		"_postman_id": "1f440d01-64a8-43a7-83a4-9198011830c4",
 		"name": "Phase1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,11 +22,20 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).equals(0);",
 											"});",
 											"pm.test(\"Body matches string\", function () {",
-											"    pm.expect(pm.response.json()['msg']) == \"hello world\";",
+											"    pm.expect(pm.response.json()['msg']).to.equal( \"hello world\");",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -45,7 +54,7 @@
 							"response": []
 						},
 						{
-							"name": "Step1",
+							"name": "Step1 GET Register Start",
 							"event": [
 								{
 									"listen": "test",
@@ -55,11 +64,20 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.test(\"Status code is -1\", function () {",
-											"    pm.expect(pm.response.json()['vrf_stat']) == -1;",
+											"    pm.expect(pm.response.json()['data']['vrf_stat']).to.equal(-1);",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -81,7 +99,7 @@
 							"response": []
 						},
 						{
-							"name": "Step2 Send Verification Email",
+							"name": "Step2 POST Verification Email",
 							"event": [
 								{
 									"listen": "test",
@@ -91,7 +109,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"",
 											""
@@ -103,9 +121,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"const uuid = Math.random().toString(36).substring(2, 15) +",
-											"        Math.random().toString(36).substring(2, 15);",
-											"const email = \"szccp.\" + uuid + \"@inbox.testmail.app\";",
+											"const email = \"9m6u5.\" + pm.variables.replaceIn('{{$randomUUID}}') + \"@inbox.testmail.app\";",
 											"pm.environment.set(\"currentEmail\", email)"
 										],
 										"type": "text/javascript"
@@ -137,15 +153,132 @@
 							"response": []
 						},
 						{
-							"name": "Step3 Verify Code from Email",
+							"name": "GetVRFCodeFromEmail",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=6d62066d-8646-4cde-9888-4452879d011e&namespace=szccp'), function (err, response) {",
-											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
-											"});"
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const html_str = pm.response.json()['emails'][0]['html'];",
+											"html_str.replace(/\\/n/, '');",
+											"const $ = cheerio.load(html_str);",
+											"const v_code = $('#vrf_code').text()",
+											"",
+											"pm.test(\"Verification Code is 4-digit\", ()=>{",
+											"    pm.expect(v_code).to.match(/\\d{4}/);",
+											"})",
+											"pm.environment.set(\"vrf_code\", v_code)",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://api.testmail.app/api/json?apikey=2316c80e-fa32-48e9-93e0-e11e2516ce32&namespace=9m6u5",
+									"protocol": "https",
+									"host": [
+										"api",
+										"testmail",
+										"app"
+									],
+									"path": [
+										"api",
+										"json"
+									],
+									"query": [
+										{
+											"key": "apikey",
+											"value": "2316c80e-fa32-48e9-93e0-e11e2516ce32"
+										},
+										{
+											"key": "namespace",
+											"value": "9m6u5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step3 VRF_code Wrong",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"HTTP status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Status code is not 0\", function () {",
+											"    pm.expect(pm.response.json()['code']).to.not.equal(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"bcde\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/verify_email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"verify_email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step3 VRF_code Correct",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -158,11 +291,12 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.test(\"vrf code is 2001\", function () {",
-											"    pm.expect(pm.response.json()['vrf_stat']) == 2001;",
-											"});"
+											"    pm.expect(pm.response.json()['data']['vrf_stat']).to.equal(2001);",
+											"});",
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -203,7 +337,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											""
 										],
@@ -214,10 +348,8 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"const uuid = Math.random().toString(36).substring(2, 15) +",
-											"        Math.random().toString(36).substring(2, 15);",
-											"pm.environment.set(\"currentPassword\", \"Secret123!\")",
-											"pm.environment.set(\"username\", uuid)"
+											"pm.environment.set(\"currentPassword\", \"Secret123!\");",
+											"pm.environment.set(\"username\", pm.variables.replaceIn('{{$randomUUID}}'));"
 										],
 										"type": "text/javascript"
 									}
@@ -263,10 +395,10 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.test(\"vrf code is -1\", function () {",
-											"    pm.expect(pm.response.json()['vrf_stat']) == -1;",
+											"    pm.expect(pm.response.json()['data']['vrf_stat']).to.equal(-1);",
 											"});",
 											""
 										],
@@ -300,7 +432,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -332,6 +464,72 @@
 							"response": []
 						},
 						{
+							"name": "GetVRFCodeFromEmail",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const html_str = pm.response.json()['emails'][0]['html'];",
+											"html_str.replace(/\\/n/, '');",
+											"const $ = cheerio.load(html_str);",
+											"const v_code = $('#vrf_code').text()",
+											"pm.test(\"Verification Code is 4-digit\", ()=>{",
+											"    pm.expect(v_code).to.match(/\\d{4}/);",
+											"})",
+											"pm.environment.set(\"vrf_code\", v_code)",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://api.testmail.app/api/json?apikey=2316c80e-fa32-48e9-93e0-e11e2516ce32&namespace=9m6u5",
+									"protocol": "https",
+									"host": [
+										"api",
+										"testmail",
+										"app"
+									],
+									"path": [
+										"api",
+										"json"
+									],
+									"query": [
+										{
+											"key": "apikey",
+											"value": "2316c80e-fa32-48e9-93e0-e11e2516ce32"
+										},
+										{
+											"key": "namespace",
+											"value": "9m6u5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "step3",
 							"event": [
 								{
@@ -342,10 +540,10 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.test(\"vrf code is 2001\", function () {",
-											"    pm.expect(pm.response.json()['vrf_stat']) == 2001;",
+											"    pm.expect(pm.response.json()['vrf_stat']).to.equal(2001);",
 											"});",
 											""
 										],
@@ -356,9 +554,7 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"pm.sendRequest(pm.variables.replaceIn('https://api.testmail.app/api/json?apikey=6d62066d-8646-4cde-9888-4452879d011e&namespace=szccp'), function (err, response) {",
-											"    pm.environment.set(\"vrf_code\", response.json()['emails'][0]['text'].replace(/\\n/g, \"\"));",
-											"});"
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -399,7 +595,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"vrf code is 2001\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 2001;",
+											"    pm.expect(pm.response.json()['code']).to.equal(2001);",
 											"});",
 											""
 										],
@@ -456,7 +652,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});",
 											"pm.environment.set(\"org_id\", pm.response.json()['data']['org_id']);",
 											"pm.environment.set(\"scc_id\", pm.response.json()['data']['scc_id']);",
@@ -528,7 +724,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']) .to.equal(0);",
 									"});",
 									"pm.test(\"Body matches string\", function () {",
 									"    pm.expect(pm.response.text()).to.include(\"ecs_id\");",
@@ -584,7 +780,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']) .to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -634,8 +830,17 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -676,7 +881,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']) .to.equal(0);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -718,7 +923,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
-											"    pm.expect(pm.response.json()['code']) == 0;",
+											"    pm.expect(pm.response.json()['code']).to.equal(0);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -762,7 +967,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0) ;",
 									"});"
 								],
 								"type": "text/javascript"
@@ -804,7 +1009,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -846,7 +1051,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -913,7 +1118,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -955,7 +1160,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -997,7 +1202,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1039,7 +1244,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});",
 									"pm.environment.set(\"listenerId\", pm.response.json()['data']['listener_id']);"
 								],
@@ -1091,7 +1296,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1142,7 +1347,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1184,7 +1389,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1251,7 +1456,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1293,7 +1498,7 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"pm.test(\"Status code is 0\", function () {",
-									"    pm.expect(pm.response.json()['code']) == 0;",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"
