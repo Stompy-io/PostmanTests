@@ -226,14 +226,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
 						"aws",
 						"ce",
-						"get-reservation-recommendation",
+						"get-reservation-coverage",
 						""
 					],
 					"query": [
@@ -265,20 +265,24 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
 						"aws",
 						"ce",
-						"get-reservation-recommendation",
+						"get-reservation-coverage",
 						""
 					],
 					"query": [
 						{
 							"key": "cloud_account_id",
 							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "service",
+							"value": "RDS"
 						}
 					]
 				}
@@ -433,6 +437,143 @@
 			"response": []
 		},
 		{
+			"name": "Utilization Chart - with Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "granularity",
+							"value": "daily"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Chart - Redshift with Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=Redshift&granularity=daily",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "service",
+							"value": "Redshift"
+						},
+						{
+							"key": "granularity",
+							"value": "daily"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Chart - RDS with Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=RDS&granularity=daily",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"aws",
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "service",
+							"value": "RDS"
+						},
+						{
+							"key": "granularity",
+							"value": "daily"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Utilization Chart - Yearly",
 			"event": [
 				{
@@ -441,6 +582,10 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"Got a UnrealizedSavings Value\",()=>{",
+							"    pm.expect(pm.response.json()['results']['Summary']['UnrealizedSavings']);",
 							"});"
 						],
 						"type": "text/javascript"
