@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"admin@stompy.io\", \n    \"password\": \"A@dmin2021\", \n    \"auto_login\": true\n}\n",
+					"raw": "{\n    \"email\": \"noel@stompy.io\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
