@@ -108,8 +108,8 @@
 											"const currentUUID = pm.variables.replaceIn('{{$randomUUID}}');",
 											"const email = pm.collectionVariables.get('test_email_namespace') +\".\" + currentUUID + ",
 											"    pm.collectionVariables.get(\"test_email_domain\");",
-											"pm.environment.set(\"currentEmail\", email)",
-											""
+											"pm.environment.set(\"currentEmail\", email);",
+											"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 										],
 										"type": "text/javascript"
 									}
@@ -206,7 +206,7 @@
 							"response": []
 						},
 						{
-							"name": "GET VRFCode From Email Copy",
+							"name": "GET VRFCode From Email",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -247,7 +247,7 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}",
+									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}&timestamp_from={{timeStamp}}&livequery=true",
 									"protocol": "https",
 									"host": [
 										"api",
@@ -266,6 +266,19 @@
 										{
 											"key": "namespace",
 											"value": "{{test_email_namespace}}"
+										},
+										{
+											"key": "timestamp_from",
+											"value": "{{timeStamp}}"
+										},
+										{
+											"key": "livequery",
+											"value": "true"
+										},
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
 										}
 									]
 								}
@@ -434,7 +447,9 @@
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
 											"    pm.expect(pm.response.json()['code']).to.equal(0);",
-											"});"
+											"});",
+											"",
+											"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 										],
 										"type": "text/javascript"
 									}
@@ -506,7 +521,7 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}",
+									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}&timestamp_from={{timeStamp}}&livequery=true",
 									"protocol": "https",
 									"host": [
 										"api",
@@ -525,6 +540,14 @@
 										{
 											"key": "namespace",
 											"value": "{{test_email_namespace}}"
+										},
+										{
+											"key": "timestamp_from",
+											"value": "{{timeStamp}}"
+										},
+										{
+											"key": "livequery",
+											"value": "true"
 										}
 									]
 								}
@@ -1589,7 +1612,7 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://dev.api.stompy.io/v1"
+			"value": "http://prod.flask.api.stompy.io"
 		},
 		{
 			"key": "test_email_api_key",

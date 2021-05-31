@@ -1,0 +1,902 @@
+{
+	"info": {
+		"_postman_id": "cf612fcf-5a06-4891-a0dd-a0e1ae451ce0",
+		"name": "Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"item": [
+				{
+					"name": "Auth Health Check Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).equals(0);",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.json()['msg']).to.equal( \"hello world\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}",
+							"host": [
+								"{{host}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Register GET /register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.test(\"Status code is -1\", function () {",
+									"    pm.expect(pm.response.json()['data']['vrf_stat']).to.equal(-1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Verify Email POST /verifymail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const email = pm.variables.get('test_email_namespace')+\".\" + pm.variables.replaceIn('{{$randomUUID}}') + pm.variables.get(\"test_email_domain\");",
+									"pm.environment.set(\"currentEmail\", email);",
+									"pm.globals.set(\"testUserEmail\", email);",
+									"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to_email\": \"{{currentEmail}}\",\n    \"src_page\": \"REG\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/send_email",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"send_email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET VRFCode From Email",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const html_str = pm.response.json()['emails'][0]['html'];",
+									"html_str.replace(/\\/n/, '');",
+									"const $ = cheerio.load(html_str);",
+									"const v_code = $('#vrf_code').text()",
+									"pm.test(\"Verification Code is 4-digit\", ()=>{",
+									"    pm.expect(v_code).to.match(/\\d{4}/);",
+									"})",
+									"pm.environment.set(\"vrf_code\", v_code)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{test_email_api}}?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}&timestamp_from={{timeStamp}}&livequery=true",
+							"protocol": "https",
+							"host": [
+								"{{test_email_api}}"
+							],
+							"query": [
+								{
+									"key": "apikey",
+									"value": "{{test_email_api_key}}"
+								},
+								{
+									"key": "namespace",
+									"value": "{{test_email_namespace}}"
+								},
+								{
+									"key": "timestamp_from",
+									"value": "{{timeStamp}}"
+								},
+								{
+									"key": "livequery",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Wrong VRF_code",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is not 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(2002);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"bcdefg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/verify_email",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"verify_email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Correct VRF_code",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.test(\"vrf code is 2001\", function () {",
+									"    pm.expect(pm.response.json()['data']['vrf_stat']).to.equal(2001);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"{{vrf_code}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/verify_email",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"verify_email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /register Success New User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"currentPassword\", \"Secret123!\")",
+									"const username = pm.variables.replaceIn('{{$randomUUID}}');",
+									"pm.environment.set(\"username\", username);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\",\n    \"username\": \"{{username}}\",\n    \"organization\": \"Stompy\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "First Time Login POST /login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.environment.set(\"org_id\", pm.response.json()['data']['org_id']);",
+									"pm.environment.set(\"scc_id\", pm.response.json()['data']['scc_id']);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\", \n    \"password\": \"{{currentPassword}}\", \n    \"auto_login\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Create New ECS Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']) .to.equal(0);",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"ecs_id\");",
+									"});",
+									"pm.environment.set(\"ecs_id\", pm.response.json()['data']['ecs_id']);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set('bucketName', 'stompy-dev1-bucket1')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": {{scc_id}},\n    \"org_id\": \"{{org_id}}\",\n    \"bucket\": \"{{bucketName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/cloudformation-templates/iam-role",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"cloudformation-templates",
+								"iam-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save New ECS Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']) .to.equal(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set('testARN','arn:aws:iam::385105545457:role/stompy-iam-role-stack-22315084633-StompyFinOpsRole-D7IZKZZ41JO5');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scc_id\": {{scc_id}},\n    \"org_id\": \"{{org_id}}\",\n    \"ecs_id\": \"{{ecs_id}}\",\n    \"bucket\": \"{{bucketName}}\",\n    \"arn\": \"{{testARN}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/cloud-accounts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"cloud-accounts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reset Password",
+			"item": [
+				{
+					"name": "RST Page Send Verify Email POST /send_email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.test(\"vrf code is -1\", function () {",
+									"    pm.expect(pm.response.json()['data']['vrf_stat']).to.equal(-1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RST Page Send Verify Email POST /send_email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"src_page\": \"RST\", \n    \"to_email\": \"{{currentEmail}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/send_email",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"send_email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET VRFCode From Email",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const html_str = pm.response.json()['emails'][0]['html'];",
+									"html_str.replace(/\\/n/, '');",
+									"const $ = cheerio.load(html_str);",
+									"const v_code = $('#vrf_code').text()",
+									"pm.test(\"Verification Code is 4-digit\", ()=>{",
+									"    pm.expect(v_code).to.match(/\\d{4}/);",
+									"})",
+									"pm.environment.set(\"vrf_code\", v_code)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_domain}}&timestamp_from={{timeStamp}}&livequery=true",
+							"protocol": "https",
+							"host": [
+								"api",
+								"testmail",
+								"app"
+							],
+							"path": [
+								"api",
+								"json"
+							],
+							"query": [
+								{
+									"key": "apikey",
+									"value": "{{test_email_api_key}}"
+								},
+								{
+									"key": "namespace",
+									"value": "{{test_email_domain}}"
+								},
+								{
+									"key": "timestamp_from",
+									"value": "{{timeStamp}}"
+								},
+								{
+									"key": "livequery",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Correct VRFCode for Reset POST /verify_email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.test(\"vrf code is 2001\", function () {",
+									"    pm.expect(pm.response.json()['vrf_stat']).to.equal(2001);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"vrf_cph\": \"{{vrf_code}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/verify_email",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"verify_email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Password POST /reset_password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"vrf code is 2001\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(2001);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"currentPassword\", \"NewSecret123!\")",
+									"pm.globals.set('testPassword', \"NewSecret123!\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/reset_password",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"reset_password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login POST /login again",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status code is 0\", function () {",
+									"    pm.expect(pm.response.json()['code']).to.equal(0);",
+									"});",
+									"pm.environment.set(\"org_id\", pm.response.json()['data']['org_id']);",
+									"pm.environment.set(\"scc_id\", pm.response.json()['data']['scc_id']);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\", \n    \"password\": \"{{currentPassword}}\", \n    \"auto_login\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "test_email_api",
+			"value": "api.testmail.app/api/json"
+		},
+		{
+			"key": "test_email_api_key",
+			"value": "2316c80e-fa32-48e9-93e0-e11e2516ce32"
+		},
+		{
+			"key": "test_email_namespace",
+			"value": "9m6u5"
+		},
+		{
+			"key": "host",
+			"value": "http://dev.flask.api.stompy.io"
+		},
+		{
+			"key": "test_email_domain",
+			"value": "@inbox.testmail.app"
+		}
+	]
+}

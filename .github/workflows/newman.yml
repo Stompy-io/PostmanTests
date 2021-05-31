@@ -27,7 +27,12 @@ jobs:
           npm install -g newman-reporter-html
 
       - name: Running the test by newman
-        run: newman run Phase1.postman_collection.json 
+        run: |
+            newman run Phase1.postman_collection.json
+            newman run Authentication.postman_collection.json
+            newman run Trend\ and\ Notifications.postman_collection.json
+            newman run Optimization.postman_collection.json
+            newman run Analyze\ Costs.postman_collection.json
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
