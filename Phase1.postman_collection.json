@@ -54,7 +54,7 @@
 							"response": []
 						},
 						{
-							"name": "Start Register GET /register",
+							"name": "Start Register /register",
 							"event": [
 								{
 									"listen": "test",
@@ -99,7 +99,7 @@
 							"response": []
 						},
 						{
-							"name": "Send Verify Email POST /verifymail",
+							"name": "Send Verify Email /verifymail",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -108,8 +108,8 @@
 											"const currentUUID = pm.variables.replaceIn('{{$randomUUID}}');",
 											"const email = pm.collectionVariables.get('test_email_namespace') +\".\" + currentUUID + ",
 											"    pm.collectionVariables.get(\"test_email_domain\");",
-											"pm.environment.set(\"currentEmail\", email)",
-											""
+											"pm.environment.set(\"currentEmail\", email);",
+											"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 										],
 										"type": "text/javascript"
 									}
@@ -154,7 +154,7 @@
 							"response": []
 						},
 						{
-							"name": "If VRF_code Wrong POST /verify_email",
+							"name": "VRF_code Wrong /verify_email",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -206,7 +206,7 @@
 							"response": []
 						},
 						{
-							"name": "GET VRFCode From Email Copy",
+							"name": "Get VRF_code From Email",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -247,7 +247,7 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}",
+									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}&timestamp_from={{timeStamp}}&livequery=true",
 									"protocol": "https",
 									"host": [
 										"api",
@@ -266,6 +266,19 @@
 										{
 											"key": "namespace",
 											"value": "{{test_email_namespace}}"
+										},
+										{
+											"key": "timestamp_from",
+											"value": "{{timeStamp}}"
+										},
+										{
+											"key": "livequery",
+											"value": "true"
+										},
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
 										}
 									]
 								}
@@ -273,7 +286,7 @@
 							"response": []
 						},
 						{
-							"name": "If VRF_code Correct POST /verify_email",
+							"name": "If VRF_code Correct /verify_email",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -328,7 +341,7 @@
 							"response": []
 						},
 						{
-							"name": "Success Register POST /register",
+							"name": "Success Register  /register",
 							"event": [
 								{
 									"listen": "test",
@@ -386,7 +399,7 @@
 					"name": "Reset Password",
 					"item": [
 						{
-							"name": "Start Register GET /register",
+							"name": "Start Register /register",
 							"event": [
 								{
 									"listen": "test",
@@ -423,7 +436,7 @@
 							"response": []
 						},
 						{
-							"name": "RST Page Send Verify Email POST /send_email",
+							"name": "RST Page Send Verify Email /send_email",
 							"event": [
 								{
 									"listen": "test",
@@ -434,7 +447,9 @@
 											"});",
 											"pm.test(\"Status code is 0\", function () {",
 											"    pm.expect(pm.response.json()['code']).to.equal(0);",
-											"});"
+											"});",
+											"",
+											"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 										],
 										"type": "text/javascript"
 									}
@@ -465,7 +480,7 @@
 							"response": []
 						},
 						{
-							"name": "GET VRFCode From Email",
+							"name": "Get VRF_code From Email",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -506,7 +521,7 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}",
+									"raw": "https://api.testmail.app/api/json?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}&timestamp_from={{timeStamp}}&livequery=true",
 									"protocol": "https",
 									"host": [
 										"api",
@@ -525,6 +540,14 @@
 										{
 											"key": "namespace",
 											"value": "{{test_email_namespace}}"
+										},
+										{
+											"key": "timestamp_from",
+											"value": "{{timeStamp}}"
+										},
+										{
+											"key": "livequery",
+											"value": "true"
 										}
 									]
 								}
@@ -587,7 +610,7 @@
 							"response": []
 						},
 						{
-							"name": "New Password POST /reset_password",
+							"name": "New Password  /reset_password",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -644,7 +667,7 @@
 					"name": "Login",
 					"item": [
 						{
-							"name": "login POST /login",
+							"name": "Login New Password /login",
 							"event": [
 								{
 									"listen": "test",
@@ -834,7 +857,7 @@
 					"name": "Summary Line",
 					"item": [
 						{
-							"name": "Costs Analysis POST /analyze_cost",
+							"name": "Costs Analysis /analyze_cost",
 							"event": [
 								{
 									"listen": "test",
@@ -885,7 +908,7 @@
 							"response": []
 						},
 						{
-							"name": "Monthly Cost Trends POST /monthly_cost_diagram",
+							"name": "Monthly Cost Trends /monthly_cost_diagram",
 							"event": [
 								{
 									"listen": "test",
@@ -927,7 +950,7 @@
 							"response": []
 						},
 						{
-							"name": "Cost Categories POST /cost_by_categories",
+							"name": "Cost Categories /cost_by_categories",
 							"event": [
 								{
 									"listen": "test",
@@ -971,7 +994,7 @@
 					]
 				},
 				{
-					"name": "Account Efficiency POST /efficiency_by_accounts",
+					"name": "Account Efficiency /efficiency_by_accounts",
 					"event": [
 						{
 							"listen": "test",
@@ -1013,7 +1036,7 @@
 					"response": []
 				},
 				{
-					"name": "Top Accounts POST /cost_by_accounts",
+					"name": "Top Accounts /cost_by_accounts",
 					"event": [
 						{
 							"listen": "test",
@@ -1122,7 +1145,7 @@
 			"name": "Trend and Notifications",
 			"item": [
 				{
-					"name": "Trend Diagram & Event Table POST /trend_diagram",
+					"name": "Trend Diagram & Event Table /trend_diagram",
 					"event": [
 						{
 							"listen": "test",
@@ -1164,7 +1187,7 @@
 					"response": []
 				},
 				{
-					"name": "View Listeners POST /view_listeners",
+					"name": "View Listeners /view_listeners",
 					"event": [
 						{
 							"listen": "test",
@@ -1206,7 +1229,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Instance Tags When Listener Definition POST /get_instance_tags",
+					"name": "Get Instance Tags When Listener Definition /get_instance_tags",
 					"event": [
 						{
 							"listen": "test",
@@ -1248,7 +1271,7 @@
 					"response": []
 				},
 				{
-					"name": "Define Listener POST /define_listener",
+					"name": "Define Listener /define_listener",
 					"event": [
 						{
 							"listen": "test",
@@ -1300,7 +1323,7 @@
 					"response": []
 				},
 				{
-					"name": "Edit Listener POST /edit_listener",
+					"name": "Edit Listener /edit_listener",
 					"event": [
 						{
 							"listen": "test",
@@ -1351,7 +1374,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Listener POST delete_listener",
+					"name": "Delete Listener delete_listener",
 					"event": [
 						{
 							"listen": "test",
@@ -1393,7 +1416,7 @@
 					"response": []
 				},
 				{
-					"name": "Spend Analysis POST /spend_analysis",
+					"name": "Spend Analysis /spend_analysis",
 					"event": [
 						{
 							"listen": "test",
@@ -1460,7 +1483,7 @@
 			"name": "Optimization",
 			"item": [
 				{
-					"name": "Compute Overview POST /compute_overview",
+					"name": "Compute Overview /compute_overview",
 					"event": [
 						{
 							"listen": "test",
@@ -1502,7 +1525,7 @@
 					"response": []
 				},
 				{
-					"name": "Reservations POST /reservations",
+					"name": "Reservations /reservations",
 					"event": [
 						{
 							"listen": "test",
@@ -1589,7 +1612,7 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://dev.api.stompy.io/v1"
+			"value": "http://v1.flask.api.stompy.io"
 		},
 		{
 			"key": "test_email_api_key",
