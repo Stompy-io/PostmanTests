@@ -24,12 +24,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/organizations/list-accounts/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/organizations/list-accounts/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"organizations",
 						"list-accounts",
 						""
@@ -63,12 +62,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/services/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/services/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"services",
 						""
 					],
@@ -101,12 +99,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-purchase-recommendation",
 						""
@@ -144,12 +141,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-purchase-recommendation",
 						""
@@ -183,12 +179,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
+					"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-recommendation",
 						""
@@ -226,12 +221,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -265,12 +259,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -314,12 +307,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -369,12 +361,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance&service=RDS",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -416,12 +407,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -455,12 +445,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -498,12 +487,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=Redshift&granularity=daily",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=Redshift&granularity=daily",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -545,12 +533,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=RDS&granularity=daily",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=RDS&granularity=daily",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -607,12 +594,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date={{aYearAgo}}",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date={{aYearAgo}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -664,12 +650,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -718,12 +703,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription&service=RDS",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -765,12 +749,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=service",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=service",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -790,10 +773,38 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "aYearAgo",
 			"value": ""
+		},
+		{
+			"key": "host_aws",
+			"value": "https://v1.aws.api.stompy.io"
+		},
+		{
+			"key": "cloud_account_id",
+			"value": "4208028608559802998"
 		}
 	]
 }
