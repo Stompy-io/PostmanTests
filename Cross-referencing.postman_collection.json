@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"noel@stompy.io\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
+					"raw": "{\n    \"email\": \"{{testUser}}\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -103,7 +103,7 @@
 							"pm.test(\"Status code is 0\", function () {",
 							"    pm.expect(pm.response.json()['code']).to.equal(0);",
 							"});",
-							"pm.collectionVariables.set('waste_13_months'. pm.response.json()['data']['waste_last_13_months']);"
+							"pm.collectionVariables.set('waste_13_months', pm.response.json()['data']['waste_last_13_months']);"
 						],
 						"type": "text/javascript"
 					}
@@ -236,9 +236,12 @@
 			"value": "http://v1.flask.api.stompy.io"
 		},
 		{
-			"key": "host",
-			"value": "http://dev.flask.api.stompy.io",
-			"disabled": true
+			"key": "testUser",
+			"value": "cavemoh105@64ge.com"
+		},
+		{
+			"key": "waste_13_months",
+			"value": ""
 		}
 	]
 }

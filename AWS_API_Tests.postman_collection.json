@@ -389,7 +389,7 @@
 			"response": []
 		},
 		{
-			"name": "Utilization Chart",
+			"name": "Utilization Chart (deprecated)",
 			"event": [
 				{
 					"listen": "test",
@@ -435,6 +435,10 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has 5 services\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.results.length == 5;",
 							"});"
 						],
 						"type": "text/javascript"
@@ -477,6 +481,9 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has 1 service\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -523,6 +530,9 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has 1 service\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -631,15 +641,8 @@
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
-							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].subscriptionId).to.exist;",
+							"pm.test(\"Has 5 services\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(5);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -685,14 +688,16 @@
 							"});",
 							"pm.test(\"Has instanceType\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"    pm.expect(pm.response.json().results.Subscriptions[0].instanceType).to.exist;",
 							"",
 							"});",
 							"pm.test(\"Has instanceType\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].subscriptionId).to.exist;",
+							"    pm.expect(pm.response.json().results.Subscriptions[0].subscriptionId).to.exist;",
+							"});",
+							"pm.test(\"Has 1 service\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.results.length == 1;",
 							"});"
 						],
 						"type": "text/javascript"

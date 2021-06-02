@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dc032bca-a9b7-4a41-a06b-bb2a4d2d62c7",
+		"_postman_id": "d82a0232-8eed-4855-b26e-edcf73fc17ad",
 		"name": "Trend and Notifications",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"cavemoh105@64ge.com\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
+					"raw": "{\n    \"email\": \"{{testUser}}\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -428,6 +428,10 @@
 		{
 			"key": "host",
 			"value": "http://v1.flask.api.stompy.io"
+		},
+		{
+			"key": "testUser",
+			"value": "cavemoh105@64ge.com"
 		}
 	]
 }

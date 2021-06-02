@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c63e5d21-b881-4186-900f-98317113c33d",
+		"_postman_id": "95694a17-8c9b-4089-b6aa-8f7255d6d93f",
 		"name": "Analyze Costs",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -74,7 +74,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"cavemoh105@64ge.com\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
+							"raw": "{\n    \"email\": \"{{testUser}}\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -386,6 +386,10 @@
 		{
 			"key": "host",
 			"value": "http://v1.flask.api.stompy.io"
+		},
+		{
+			"key": "testUser",
+			"value": "cavemoh105@64ge.com"
 		}
 	]
 }

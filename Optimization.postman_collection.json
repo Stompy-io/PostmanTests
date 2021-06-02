@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f4624be4-278f-4d08-86f3-99602038feee",
+		"_postman_id": "cb906027-34f1-48a9-ba5f-be897693a29c",
 		"name": "Optimization",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"cavemoh105@64ge.com\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
+					"raw": "{\n    \"email\": \"{{testUser}}\", \n    \"password\": \"Secret123!\", \n    \"auto_login\": true\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -199,6 +199,10 @@
 		{
 			"key": "host",
 			"value": "http://v1.flask.api.stompy.io"
+		},
+		{
+			"key": "testUser",
+			"value": "cavemoh105@64ge.com"
 		}
 	]
 }
