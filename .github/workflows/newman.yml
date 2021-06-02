@@ -34,6 +34,8 @@ jobs:
           newman run Optimization.postman_collection.json
           newman run Analyze\ Costs.postman_collection.json
           newman run AWS_API_Tests.postman_collection.json
+          newman run Notifier\ API.postman_collection.json
+
           
           
 
