@@ -1,4 +1,4 @@
-name: Automate test in pipeline for postman
+name: v1 flask analyze cost test in pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '50 8 * * *'
 
 jobs:
-  newman:
+  v1_analyze_cost_test:
 
     runs-on: ubuntu-latest
 
@@ -26,19 +26,9 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the test by newman
+      - name: Running the flask authentication test
         run: |
-          newman run Phase1.postman_collection.json
-          newman run Authentication.postman_collection.json
-          newman run Trend\ and\ Notifications.postman_collection.json
-          newman run Optimization.postman_collection.json
-          newman run Analyze\ Costs.postman_collection.json
-          newman run AWS_API_Tests.postman_collection.json
-          newman run Notifier\ API.postman_collection.json
-          newman run Cross-referencing.postman_collection.json
-
-          
-          
+          newman run Analyze\ Costs.postman_collection.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
@@ -46,8 +36,8 @@ jobs:
           name: newman's Report
           path: newman
 
-  test:
-    needs: newman
+  teWeComm_Notificationst:
+    needs: v1_analyze_cost_test
     runs-on: ubuntu-latest
     steps:
       - run: curl ${{ secrets.WORK_WECHAT_BOT }} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"
