@@ -1,4 +1,4 @@
-name: dev flask optimization automated test in pipeline
+name: dev flask trends and notification automated test in pipeline
 
 on:
   push:
@@ -26,9 +26,9 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask optimization test
+      - name: Running the flask trends and notification test
         run: |
-          newman run Optimization.postman_collection.json -e Develop.postman_environment.json -r html
+          newman run Trend\ and\ Notifications.postman_collection.json -e Develop.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2

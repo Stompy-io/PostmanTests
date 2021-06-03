@@ -1,4 +1,4 @@
-name: v1 aws authentication automated test in pipeline
+name: v1 aws automated test in pipeline
 
 on:
   push:

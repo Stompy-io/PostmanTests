@@ -26,7 +26,7 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask authentication test
+      - name: Running the flask analyze cost test
         run: |
           newman run Analyze\ Costs.postman_collection.json -e Develop.postman_environment.json -r html
 
