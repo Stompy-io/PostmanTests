@@ -118,7 +118,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const email = pm.variables.get('test_email_namespace')+\".\" + pm.variables.replaceIn('{{$randomUUID}}') + pm.variables.get(\"test_email_domain\");",
+									"const email = pm.variables.get('test_email_namespace')+\".\" + pm.variables.replaceIn('{{$guid}}') + pm.variables.get(\"test_email_domain\");",
 									"pm.environment.set(\"currentEmail\", email);",
 									"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 								],

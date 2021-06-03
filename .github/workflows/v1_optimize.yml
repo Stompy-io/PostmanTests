@@ -26,7 +26,7 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask authentication test
+      - name: Running the flask optimization test
         run: |
           newman run Optimization.postman_collection.json -r html
 
