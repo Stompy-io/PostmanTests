@@ -24,12 +24,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/organizations/list-accounts/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/organizations/list-accounts/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"organizations",
 						"list-accounts",
 						""
@@ -63,12 +62,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/services/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/services/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"services",
 						""
 					],
@@ -101,12 +99,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-purchase-recommendation",
 						""
@@ -144,12 +141,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-purchase-recommendation",
 						""
@@ -183,12 +179,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
+					"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-recommendation",
 						""
@@ -226,12 +221,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -265,12 +259,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -300,9 +293,7 @@
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
 							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"    pm.expect(pm.response.json().results[0].Instances[0].instanceType).to.exist;",
 							"",
 							"});"
 						],
@@ -314,12 +305,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -349,14 +339,10 @@
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
 							"pm.test(\"Has instanceType$\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
 							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
 							"",
 							"});",
 							"pm.test(\"Has databaseEngine\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
 							"    pm.expect(pm.response.json().results[0].databaseEngine).to.exist;",
 							"",
 							"});"
@@ -369,12 +355,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance&service=RDS",
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-coverage",
 						""
@@ -398,7 +383,7 @@
 			"response": []
 		},
 		{
-			"name": "Utilization Chart",
+			"name": "Utilization Chart (deprecated)",
 			"event": [
 				{
 					"listen": "test",
@@ -416,12 +401,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -445,6 +429,12 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has 5 services\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(5);",
+							"});",
+							"pm.test(\"Not identical values\", function () {",
+							"    pm.expect(pm.response.json().results[3].Summary.TotalAmortizedFee).to.not.equal(pm.response.json().results[1].Summary.TotalAmortizedFee);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -455,12 +445,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -488,6 +477,9 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has 1 service\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -498,12 +490,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=Redshift&granularity=daily",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=Redshift&granularity=daily",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -535,6 +526,9 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has 1 service\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -545,12 +539,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=RDS&granularity=daily",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=RDS&granularity=daily",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -585,7 +578,7 @@
 							"});",
 							"",
 							"pm.test(\"Got a UnrealizedSavings Value\",()=>{",
-							"    pm.expect(pm.response.json()['results']['Summary']['UnrealizedSavings']);",
+							"    pm.expect(pm.response.json()['results'][1]['Summary']['UnrealizedSavings']);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -607,12 +600,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date={{aYearAgo}}",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date={{aYearAgo}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -645,15 +637,11 @@
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"pm.test(\"Has 5 services\", function () {",
+							"    pm.expect(pm.response.json().results.length).to.equal(5);",
 							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].subscriptionId).to.exist;",
+							"pm.test(\"Not identical values\", function () {",
+							"    pm.expect(pm.response.json().results[3].TotalAmortizedFee).to.not.equal(pm.response.json().results[1].TotalAmortizedFee);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -664,12 +652,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -699,15 +686,14 @@
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
 							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"    pm.expect(pm.response.json().results[0].Subscriptions[0].instanceType).to.exist;",
 							"",
 							"});",
 							"pm.test(\"Has instanceType\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    jsonData.results[0].instanceType;",
-							"    pm.expect(pm.response.json().results[0].subscriptionId).to.exist;",
+							"    pm.expect(pm.response.json().results[0].Subscriptions[0].subscriptionId).to.exist;",
+							"});",
+							"pm.test(\"Has 1 service\", function () {",
+							"    pm.expect(jsonData.results.length).to.equal(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -718,12 +704,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription&service=RDS",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription&service=RDS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -765,12 +750,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/aws/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=service",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=service",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
-						"aws",
 						"ce",
 						"get-reservation-utilization",
 						""
@@ -790,10 +774,38 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "aYearAgo",
 			"value": ""
+		},
+		{
+			"key": "host_aws",
+			"value": "https://v1.aws.api.stompy.io"
+		},
+		{
+			"key": "cloud_account_id",
+			"value": "4208028608559802998"
 		}
 	]
 }
