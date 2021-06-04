@@ -511,9 +511,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"//dev arn",
-									"// pm.environment.set('testARN','arn:aws:iam::385105545457:role/stompy-iam-role-stack-22315084633-StompyFinOpsRole-D7IZKZZ41JO5');",
-									"pm.environment.set('testARN','arn:aws:iam::385105545457:role/stompy-iam-role-stack-42080286085-StompyFinOpsRole-1M2MP3SMF6ZQ8');"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -949,6 +947,10 @@
 		{
 			"key": "test_email_domain",
 			"value": "@inbox.testmail.app"
+		},
+		{
+			"key": "testARN",
+			"value": "arn:aws:iam::385105545457:role/stompy-iam-role-stack-42080286085-StompyFinOpsRole-1M2MP3SMF6ZQ8"
 		}
 	]
 }

@@ -36,7 +36,7 @@ jobs:
           name: newman's Report
           path: newman
 
-  teWeComm_Notificationst:
+  WeComm_Notification:
     needs: v1_analyze_cost_test
     runs-on: ubuntu-latest
     steps:
