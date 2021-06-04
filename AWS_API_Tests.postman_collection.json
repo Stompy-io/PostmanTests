@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "29e4a23e-b03d-40cb-947e-089f08db68f2",
+		"_postman_id": "b8546c78-742e-47a0-90ba-f1eadb84f2e1",
 		"name": "AWS_API_Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -241,7 +241,203 @@
 			"response": []
 		},
 		{
+			"name": "Coverage Chart EC2 April",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&start_date=2021-04-01&end_date=2021-04-30&service=EC2",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "start_date",
+							"value": "2021-04-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2021-04-30"
+						},
+						{
+							"key": "service",
+							"value": "EC2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coverage Chart EC2 Yearly",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let moment = require('moment');",
+							"let lastDayLastMonth = moment().startOf('month').subtract(1 ,'days');",
+							"let aYearBefore = lastDayLastMonth.subtract(1, 'years');",
+							"pm.collectionVariables.set();"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&start_date=2020-05-01&end_date=2021-05-30",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "start_date",
+							"value": "2020-05-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2021-05-30"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coverage Chart EC2 Too Early Fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&start_date=2020-05-01&end_date=2021-05-30",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "start_date",
+							"value": "2020-05-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2021-05-30"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Coverage Chart - RDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "service",
+							"value": "RDS"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coverage Chart - RDS Copy",
 			"event": [
 				{
 					"listen": "test",
@@ -293,7 +489,7 @@
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
 							"pm.test(\"Has instanceType\", function () {",
-							"    pm.expect(pm.response.json().results[0].Instances[0].instanceType).to.exist;",
+							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
 							"",
 							"});"
 						],
@@ -338,12 +534,12 @@
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
-							"pm.test(\"Has instanceType$\", function () {",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
+							"pm.test(\"Has instanceType\", function () {",
+							"    pm.expect(pm.response.json().results[0]['Instances'].instanceType).to.exist;",
 							"",
 							"});",
 							"pm.test(\"Has databaseEngine\", function () {",
-							"    pm.expect(pm.response.json().results[0].databaseEngine).to.exist;",
+							"    pm.expect(pm.response.json().results[0]['Instances'].databaseEngine).to.exist;",
 							"",
 							"});"
 						],
@@ -480,6 +676,9 @@
 							"});",
 							"pm.test(\"Has 1 service\", function () {",
 							"    pm.expect(pm.response.json().results.length).to.equal(1);",
+							"});",
+							"pm.test(\"No data returned\",()=>{",
+							"    pm.expect(pm.response.json().results[0]).to.not.have.property('UtilizationsByTime');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -529,7 +728,8 @@
 							"});",
 							"pm.test(\"Has 1 service\", function () {",
 							"    pm.expect(pm.response.json().results.length).to.equal(1);",
-							"});"
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -567,7 +767,7 @@
 			"response": []
 		},
 		{
-			"name": "Utilization Chart - Yearly",
+			"name": "Utilization Chart - EC2 May Match",
 			"event": [
 				{
 					"listen": "test",
@@ -577,9 +777,16 @@
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
 							"",
-							"pm.test(\"Got a UnrealizedSavings Value\",()=>{",
-							"    pm.expect(pm.response.json()['results'][1]['Summary']['UnrealizedSavings']);",
-							"});"
+							"pm.test(\"2021-05-11 match\",()=>{",
+							"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2021-05-11\",\"75.44\"]);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"2021-05-18 match\",()=>{",
+							"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2021-05-18\",\"22.22\"]);",
+							"    ",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -588,9 +795,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"var moment = require('moment');",
-							"",
-							"pm.collectionVariables.set('aYearAgo', moment().subtract(1,'years').format(\"YYYY-MM-DD\"));"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -600,7 +805,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date={{aYearAgo}}",
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date=2021-05-01&end_date=2021-05-31&service=EC2",
 					"host": [
 						"{{host_aws}}"
 					],
@@ -620,7 +825,93 @@
 						},
 						{
 							"key": "start_date",
-							"value": "{{aYearAgo}}"
+							"value": "2021-05-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2021-05-31"
+						},
+						{
+							"key": "service",
+							"value": "EC2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Chart - RDS December Match",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test('first data is 12-03', ()=>{",
+							"     pm.expect(pm.response.json()['results'][0]['UtilizationsByTime'][0][0])",
+							"      .to.equal('2020-12-03');",
+							"})",
+							"",
+							"pm.test(\"2020-12-03 match\",()=>{",
+							"     pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2020-12-03\",\"82.88\"]);",
+							"});",
+							"",
+							"",
+							"pm.test(\"2021-12-29 match\",()=>{",
+							"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2020-12-29\",\"86.70\"]);",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date=2020-12-01&end_date=2020-12-31&service=RDS",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-utilization",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "granularity",
+							"value": "daily"
+						},
+						{
+							"key": "start_date",
+							"value": "2020-12-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2020-12-31"
+						},
+						{
+							"key": "service",
+							"value": "RDS"
 						}
 					]
 				}
@@ -640,8 +931,14 @@
 							"pm.test(\"Has 5 services\", function () {",
 							"    pm.expect(pm.response.json().results.length).to.equal(5);",
 							"});",
+							"",
 							"pm.test(\"Not identical values\", function () {",
-							"    pm.expect(pm.response.json().results[3].TotalAmortizedFee).to.not.equal(pm.response.json().results[1].TotalAmortizedFee);",
+							"    pm.expect(pm.response.json().results[3].TotalAmortizedFee).to.satisfy(",
+							"        (fee)=>{",
+							"            return (fee!=pm.response.json().results[1].TotalAmortizedFee ",
+							"            || fee!=pm.response.json().results[2].TotalAmortizedFee)",
+							"        }",
+							"    );",
 							"});"
 						],
 						"type": "text/javascript"
@@ -693,7 +990,7 @@
 							"    pm.expect(pm.response.json().results[0].Subscriptions[0].subscriptionId).to.exist;",
 							"});",
 							"pm.test(\"Has 1 service\", function () {",
-							"    pm.expect(jsonData.results.length).to.equal(1);",
+							"    pm.expect(pm.response.json().results.length).to.equal(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -806,6 +1103,9 @@
 		{
 			"key": "cloud_account_id",
 			"value": "4208028608559802998"
+		},
+		{
+			"value": ""
 		}
 	]
 }
