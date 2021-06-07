@@ -118,7 +118,12 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const email = pm.variables.get('test_email_namespace')+\".\" + pm.variables.replaceIn('{{$guid}}') + pm.variables.get(\"test_email_domain\");",
+									"const test_mail_pairs = pm.collectionVariables.get('test_mail_pairs');",
+									"const index = Math.floor(Math.random()*(test_mail_pairs.length));",
+									"const namespace = test_mail_pairs[index][0];",
+									"pm.environment.set('test_email_namespace', namespace);",
+									"pm.environment.set('test_email_api_key', test_mail_pairs[index][1]);",
+									"const email = namespace+\".\" + pm.variables.replaceIn('{{$guid}}') + pm.variables.get(\"test_email_domain\");",
 									"pm.environment.set(\"currentEmail\", email);",
 									"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 								],
@@ -913,7 +918,12 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"const api_dict = [['grhng','b3973677-a2e5-4afd-95e5-2c56fbffe501'],",
+					"                    ['z4hqx', 'd757bd5c-ec29-43ba-9a71-e489f3ebd41b'],",
+					"                    ['29z7n', 'cb5e5893-8022-4101-b082-f9e4d210e1a8'],",
+					"                    ['jzpwr', 'efde665c-1ccd-4531-8113-dfaacd2d7dc5'],",
+					"                    ['klild', 'e751c3aa-4d29-4178-b2d8-057cb0c23a67']]",
+					"pm.collectionVariables.set(\"test_mail_pairs\",api_dict);"
 				]
 			}
 		},
@@ -933,14 +943,6 @@
 			"value": "api.testmail.app/api/json"
 		},
 		{
-			"key": "test_email_api_key",
-			"value": "2316c80e-fa32-48e9-93e0-e11e2516ce32"
-		},
-		{
-			"key": "test_email_namespace",
-			"value": "9m6u5"
-		},
-		{
 			"key": "host",
 			"value": "http://v1.flask.api.stompy.io"
 		},
@@ -951,6 +953,10 @@
 		{
 			"key": "testARN",
 			"value": "arn:aws:iam::385105545457:role/stompy-iam-role-stack-42080286085-StompyFinOpsRole-1M2MP3SMF6ZQ8"
+		},
+		{
+			"key": "test_mail_pairs",
+			"value": ""
 		}
 	]
 }
