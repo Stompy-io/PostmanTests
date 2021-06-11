@@ -14,6 +14,16 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"results has Id, name, isRoot\",()=>{",
+							"    let results = pm.response.json().results;",
+							"    if (results != undefined && results.length){",
+							"        //check the last element in the array so that we don't only check first element",
+							"        pm.expect(results[results.length-1]).to.have.property('Id');",
+							"        pm.expect(results[0]).to.have.property('Name');",
+							"        pm.expect(results[results.length-1]).to.have.property('isRoot');",
+							"    }",
 							"});"
 						],
 						"type": "text/javascript"
@@ -161,6 +171,167 @@
 			"response": []
 		},
 		{
+			"name": "Coverage Chart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"Has results\", ()=>{",
+							"    pm.expect(pm.response.json()).to.have.property('results');",
+							"})",
+							"",
+							"let results = pm.response.json().results;",
+							"pm.test(\"Has 5 services\", function () {",
+							"    pm.expect(results.length).to.equal(5);",
+							"});",
+							"",
+							"pm.test(\"Each service has Coverage\", function () {",
+							"    for(let i = 0; i<results.length; i++){",
+							"        pm.expect(results[i]).to.have.property('Coverage');",
+							"    }",
+							"});",
+							"",
+							"pm.test('default is 7 days',()=>{",
+							"   for(let i = 0; i<results.length; i++){",
+							"       let this_service_coverage = results[i].Coverage;",
+							"       if(this_service_coverage.length !== 0){",
+							"            pm.expect(this_service_coverage.length).to.equal(7);",
+							"       } ",
+							"    }  ",
+							"});",
+							"",
+							"pm.test(\"Not identical values\", function () {",
+							"    pm.expect(pm.response.json().results).to.satisfy( (results)=>{",
+							"        let coverage_rds, coverage_ec2;",
+							"        for(let i = 0; i<results.length;i++ ){",
+							"            if (results[i].Service == \"Amazon Relational Database Service\"){",
+							"                coverage_rds = results[i].Coverage;",
+							"            }",
+							"            if (results[i].Service == 'Amazon Elastic Compute Cloud - Compute'){",
+							"                coverage_ec2 = results[i].Coverage;",
+							"            }",
+							"        }",
+							"        return (coverage_rds!=coverage_ec2);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coverage Table",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"Has results\", ()=>{",
+							"    pm.expect(pm.response.json()).to.have.property('results');",
+							"})",
+							"",
+							"let results = pm.response.json().results;",
+							"pm.test(\"Has instanceType\", function () {",
+							"    pm.expect(results[0].Instances[0].instanceType).to.exist;",
+							"",
+							"});",
+							"",
+							"pm.test(\"Has region\", function () {",
+							"    pm.expect(results[0].Instances[0].region).to.exist;",
+							"",
+							"});",
+							"",
+							"pm.test(\"Has ReservedHours\", function () {",
+							"    pm.expect(results[0].Instances[0].ReservedHours).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Has OnDemandHours\", function () {",
+							"    pm.expect(results[0].Instances[0].OnDemandHours).to.exist;",
+							"",
+							"});",
+							"",
+							"pm.test(\"Has CoveragePercentage\", function () {",
+							"    pm.expect(results[0].Instances[0].CoveragePercentage).to.exist;",
+							"",
+							"});",
+							"",
+							"pm.test(\"Has OnDemandCost\", function () {",
+							"    pm.expect(results[0].Instances[0].OnDemandCost).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Coverage == ReservedHours/(ReservedHours + OnDemandHours) *100)\", ()=>{",
+							"    let coverage = parseFloat(results[0].Instances[0].CoveragePercentage);",
+							"    let reserved_hours = parseFloat(results[0].Instances[0].ReservedHours);",
+							"    let on_demand = parseFloat(results[0].Instances[0].OnDemandHours);",
+							"    let myCoverage = reserved_hours/(reserved_hours+on_demand)*100;",
+							"    console.log(\"myCoverage\"+typeof(myCoverage)+\"coverage\"+typeof(coverage));",
+							"    pm.expect(coverage).to.be.closeTo(myCoverage, 0.01);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "groupby",
+							"value": "instance"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Recommendation Table",
 			"event": [
 				{
@@ -203,7 +374,7 @@
 			"response": []
 		},
 		{
-			"name": "Coverage Chart",
+			"name": "Trends Diagram",
 			"event": [
 				{
 					"listen": "test",
@@ -211,94 +382,61 @@
 						"exec": [
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Chart EC2 April",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&start_date=2021-04-01&end_date=2021-04-30&service=EC2",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "start_date",
-							"value": "2021-04-01"
-						},
-						{
-							"key": "end_date",
-							"value": "2021-04-30"
-						},
-						{
-							"key": "service",
-							"value": "EC2"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Chart EC2 Yearly",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"Has 3 accounts\", ()=>{",
+							"    pm.expect(pm.response.json().Diagram.length).to.equal(3);",
+							"});",
+							"",
+							"pm.test(\"Has as many data points as given date\", ()=>{",
+							"    pm.expect(pm.response.json().Diagram[0].data.length).to.equal(7);",
+							"});",
+							"",
+							"pm.test(\"Table lists top 10\", ()=>{",
+							"    pm.expect(pm.response.json()['Table'].length).to.be.at.most(10);",
+							"});",
+							"",
+							"pm.test(\"AllTable has changes > 10%\",()=>{",
+							"    let all_table = pm.response.json().AllTable;",
+							"    for(let i = 0; i<all_table.length; i++){",
+							"        let change = parseFloat(all_table[i].Change);",
+							"        pm.expect(change).to.be.above(10);",
+							"    }",
+							"    ",
+							"})",
+							"",
+							"let table = pm.response.json()['Table'];",
+							"",
+							"pm.test(\"Table from high diff to low\", ()=>{",
+							"    ",
+							"    let prev = parseInt(table[0]['Diff']);",
+							"    for(let i = 1; i<table.length; i++){",
+							"        let curr = parseInt(table[i]['Diff']);",
+							"        pm.expect(prev).to.be.at.least(curr);",
+							"        prev = curr;",
+							"    }",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"Table Change Rate is Correct\", ()=>{",
+							"     for(let i = 0; i<table.length; i++){",
+							"        let diff = parseFloat(table[i]['Diff']);",
+							"        let change = parseFloat(table[i].Change);",
+							"        let precost = parseFloat(table[i]['PreCost']);",
+							"        let myChange = diff/precost*100;",
+							"        pm.expect(change).to.be.closeTo(myChange,0.01);",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Table Diff is Correct\", ()=>{",
+							"     for(let i = 0; i<table.length; i++){",
+							"        let diff = parseFloat(table[i]['Diff']);",
+							"        let cost = parseFloat(table[i]['Cost']);",
+							"        let precost = parseFloat(table[i]['PreCost']);",
+							"        let my_diff = cost - precost;",
+							"        pm.expect(diff).be.closeTo(my_diff,0.01);",
+							"    }",
 							"});"
 						],
 						"type": "text/javascript"
@@ -309,9 +447,10 @@
 					"script": {
 						"exec": [
 							"let moment = require('moment');",
-							"let lastDayLastMonth = moment().startOf('month').subtract(1 ,'days');",
-							"let aYearBefore = lastDayLastMonth.subtract(1, 'years');",
-							"pm.collectionVariables.set();"
+							"let yesterday = moment().subtract(1,'days').format('YYYY-MM-DD');",
+							"pm.environment.set('yesterday', yesterday);",
+							"let weekAgo = moment().subtract(8,'days').format('YYYY-MM-DD');",
+							"pm.environment.set('a_week_ago', weekAgo);"
 						],
 						"type": "text/javascript"
 					}
@@ -321,13 +460,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&start_date=2020-05-01&end_date=2021-05-30",
+					"raw": "{{host_aws}}/ce/get-trend-diagram/?cloud_account_id={{cloud_account_id}}&start_date={{a_week_ago}}&end_date={{yesterday}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
 						"ce",
-						"get-reservation-coverage",
+						"get-trend-diagram",
 						""
 					],
 					"query": [
@@ -337,279 +476,11 @@
 						},
 						{
 							"key": "start_date",
-							"value": "2020-05-01"
+							"value": "{{a_week_ago}}"
 						},
 						{
 							"key": "end_date",
-							"value": "2021-05-30"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Chart EC2 Too Early Fail",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&start_date=2020-05-01&end_date=2021-05-30",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "start_date",
-							"value": "2020-05-01"
-						},
-						{
-							"key": "end_date",
-							"value": "2021-05-30"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Chart - RDS",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "service",
-							"value": "RDS"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Chart - RDS Copy",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&service=RDS",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "service",
-							"value": "RDS"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Table",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    pm.expect(pm.response.json().results[0].instanceType).to.exist;",
-							"",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "groupby",
-							"value": "instance"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Coverage Table - RDS",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    pm.expect(pm.response.json().results[0]['Instances'].instanceType).to.exist;",
-							"",
-							"});",
-							"pm.test(\"Has databaseEngine\", function () {",
-							"    pm.expect(pm.response.json().results[0]['Instances'].databaseEngine).to.exist;",
-							"",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-coverage/?cloud_account_id={{cloud_account_id}}&groupby=instance&service=RDS",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-coverage",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "groupby",
-							"value": "instance"
-						},
-						{
-							"key": "service",
-							"value": "RDS"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Utilization Chart (deprecated)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
+							"value": "{{yesterday}}"
 						}
 					]
 				}
@@ -626,11 +497,66 @@
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
+							"let results = pm.response.json().results;",
+							"",
 							"pm.test(\"Has 5 services\", function () {",
-							"    pm.expect(pm.response.json().results.length).to.equal(5);",
+							"    pm.expect(results.length).to.equal(5);",
 							"});",
+							"",
+							"pm.test(\"Has Utilization Percentage\", function () {",
+							"    for(let i = 0; i<results.length;i++){",
+							"            if (results[i].Summary !== undefined){",
+							"                pm.expect(results[i].Summary).to.have.property('UtilizationPercentage');",
+							"            }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Has TotalAmortizedFee\", function () {",
+							"    for(let i = 0; i<results.length;i++){",
+							"            if (results[i].Summary !== undefined){",
+							"                pm.expect(results[i].Summary).to.have.property('TotalAmortizedFee');",
+							"            }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Has UnrealizedSavings\", function () {",
+							"    for(let i = 0; i<results.length;i++){",
+							"            if (results[i].Summary !== undefined){",
+							"                pm.expect(results[i].Summary).to.have",
+							"                .property('UnrealizedSavings');",
+							"            }",
+							"    }",
+							"});",
+							"",
 							"pm.test(\"Not identical values\", function () {",
-							"    pm.expect(pm.response.json().results[3].Summary.TotalAmortizedFee).to.not.equal(pm.response.json().results[1].Summary.TotalAmortizedFee);",
+							"    pm.expect(pm.response.json().results).to.satisfy( (results)=>{",
+							"        let fee1, fee2;",
+							"        let savings1, savings2;",
+							"        for(let i = 0; i<results.length;i++){",
+							"            //if there are data with summary",
+							"            if (results[i].Summary !== undefined){",
+							"                if(fee1 === undefined){",
+							"                    fee1 = results[i].Summary.TotalAmortizedFee;",
+							"                    savings1 = results[i].Summary.UnrealizedSavings;",
+							"                }else if(fee2 === undefined){",
+							"                    fee2 = results[i].Summary.TotalAmortizedFee;",
+							"                    savings2 = results[i].Summary.UnrealizedSavings;",
+							"                    //if both data are the same, fail",
+							"                    return (fee1 != fee2) || (savings1 != savings2);",
+							"                }",
+							"            }",
+							"        }",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Has UtilizationByTime\",()=>{",
+							"    pm.expect(results).to.satisfy( (result)=>{",
+							"        for(let i = 0; i<results.length;i++){",
+							"            if ('UtilizationsByTime' in results[i]){",
+							"                return true;",
+							"            }",
+							"        }",
+							"    });",
 							"});"
 						],
 						"type": "text/javascript"
@@ -665,260 +591,6 @@
 			"response": []
 		},
 		{
-			"name": "Utilization Chart - Redshift with Summary",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"pm.test(\"Has 1 service\", function () {",
-							"    pm.expect(pm.response.json().results.length).to.equal(1);",
-							"});",
-							"pm.test(\"No data returned\",()=>{",
-							"    pm.expect(pm.response.json().results[0]).to.not.have.property('UtilizationsByTime');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=Redshift&granularity=daily",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "service",
-							"value": "Redshift"
-						},
-						{
-							"key": "granularity",
-							"value": "daily"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Utilization Chart - RDS with Summary",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"pm.test(\"Has 1 service\", function () {",
-							"    pm.expect(pm.response.json().results.length).to.equal(1);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&service=RDS&granularity=daily",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "service",
-							"value": "RDS"
-						},
-						{
-							"key": "granularity",
-							"value": "daily"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Utilization Chart - EC2 May Match",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"",
-							"pm.test(\"2021-05-11 match\",()=>{",
-							"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2021-05-11\",\"75.44\"]);",
-							"    ",
-							"});",
-							"",
-							"pm.test(\"2021-05-18 match\",()=>{",
-							"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2021-05-18\",\"22.22\"]);",
-							"    ",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date=2021-05-01&end_date=2021-05-31&service=EC2",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "granularity",
-							"value": "daily"
-						},
-						{
-							"key": "start_date",
-							"value": "2021-05-01"
-						},
-						{
-							"key": "end_date",
-							"value": "2021-05-31"
-						},
-						{
-							"key": "service",
-							"value": "EC2"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Utilization Chart - RDS December Match",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"",
-							"pm.test('first data is 12-03', ()=>{",
-							"     pm.expect(pm.response.json()['results'][0]['UtilizationsByTime'][0][0])",
-							"      .to.equal('2020-12-03');",
-							"})",
-							"",
-							"pm.test(\"2020-12-03 match\",()=>{",
-							"     pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2020-12-03\",\"82.88\"]);",
-							"});",
-							"",
-							"",
-							"pm.test(\"2021-12-29 match\",()=>{",
-							"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2020-12-29\",\"86.70\"]);",
-							"    ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&granularity=daily&start_date=2020-12-01&end_date=2020-12-31&service=RDS",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "granularity",
-							"value": "daily"
-						},
-						{
-							"key": "start_date",
-							"value": "2020-12-01"
-						},
-						{
-							"key": "end_date",
-							"value": "2020-12-31"
-						},
-						{
-							"key": "service",
-							"value": "RDS"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Utilization Table",
 			"event": [
 				{
@@ -928,17 +600,97 @@
 							"pm.test(\"Status code is 200 or 204\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 							"});",
+							"pm.test(\"Has results\", ()=>{",
+							"    pm.expect(pm.response.json()).to.have.property('results');",
+							"})",
+							"",
+							"let results = pm.response.json().results;",
 							"pm.test(\"Has 5 services\", function () {",
 							"    pm.expect(pm.response.json().results.length).to.equal(5);",
 							"});",
 							"",
+							"pm.test(\"Each service has TotalAmortizedFee\", function () {",
+							"    for(let i = 0; i<results.length; i++){",
+							"        pm.expect(results[i]).to.have.property('TotalAmortizedFee');",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Each service has Subscriptions\", function () {",
+							"    for(let i = 0; i<results.length; i++){",
+							"        pm.expect(results[i]).to.have.property('Subscriptions');",
+							"    }",
+							"});",
+							"",
+							"//obtain the first non-empty subscription",
+							"let sample_subscriptions;",
+							"for(let i = 0; i<results.length; i++){",
+							"    if(results[i].Subscriptions.length>0){",
+							"        sample_subscriptions = results[i].Subscriptions;",
+							"        break;",
+							"    }   ",
+							"}",
+							"",
+							"pm.test('Subscriptions has account name',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('accountName');",
+							"});",
+							"pm.test('Subscriptions has subscription id',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('subscriptionId');",
+							"});",
+							"pm.test('Subscriptions has instance type',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('instanceType');",
+							"});",
+							"",
+							"pm.test('Subscriptions has Reserved Used Hours',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('ReservedUsedHours');",
+							"});",
+							"pm.test('Subscriptions has Reserved Unused Hours',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('ReservedUnusedHours');",
+							"});",
+							"pm.test('Subscriptions has Utilization Percentage',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('UtilizationPercentage');",
+							"});",
+							"pm.test('Subscriptions has Net RI Savings',()=>{",
+							"   pm.expect(sample_subscriptions[0]).to.have.property('NetRISavings');",
+							"});",
+							"",
+							"",
 							"pm.test(\"Not identical values\", function () {",
-							"    pm.expect(pm.response.json().results[3].TotalAmortizedFee).to.satisfy(",
-							"        (fee)=>{",
-							"            return (fee!=pm.response.json().results[1].TotalAmortizedFee ",
-							"            || fee!=pm.response.json().results[2].TotalAmortizedFee)",
+							"    pm.expect(pm.response.json().results).to.satisfy( (results)=>{",
+							"        let fee1, fee2;",
+							"        let sub1, sub2;",
+							"        for(let i = 0; i<results.length;i++){",
+							"            //if there are data in subscription",
+							"            if (results[i].Subscriptions.length>0){",
+							"                if(fee1 === undefined){",
+							"                    fee1 = results[i].TotalAmortizedFee;",
+							"                    sub1 = results[i].Subscriptions;",
+							"                }else if(fee2 === undefined){",
+							"                    fee2 = results[i].TotalAmortizedFee;",
+							"                    sub2 = results[i].Subscriptions;",
+							"                    //if both data are the same, fail",
+							"                    return (fee1 != fee2) || (sub1 != sub2);",
+							"                }",
+							"            }",
 							"        }",
-							"    );",
+							"    });",
+							"});",
+							"pm.test(\"UtilizationPercentage =  reservation hours used/(reservation hours used+reservation hours unused)* 100% \",()=>{",
+							"    pm.expect(sample_subscriptions).to.satisfy( (sample_subscriptions)=>{",
+							"        for(let i = 0; i<sample_subscriptions.length;i++){",
+							"            //utilization percentage",
+							"            let util_percent = parseFloat(sample_subscriptions[i].UtilizationPercentage);",
+							"            //reserved unused",
+							"            let reserve_un =  parseFloat(sample_subscriptions[i].ReservedUnusedHours);",
+							"            //reserved used",
+							"            let reserve_used = parseFloat(sample_subscriptions[i].ReservedUsedHours);",
+							"            let my_perc = (reserve_used/(reserve_un +reserve_used)*100).toFixed(2);",
+							"            // console.log(\"used:{\"+ reserve_used+\"}, unused:{\" + reserve_un +\"}, myperc: {\"+my_perc+\"}\");",
+							"            if (my_perc != util_percent){",
+							"                return false;",
+							"            }",
+							"        }",
+							"        return true;",
+							"    });",
 							"});"
 						],
 						"type": "text/javascript"
@@ -966,104 +718,6 @@
 						{
 							"key": "groupby",
 							"value": "subscription"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Utilization Table - RDS",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    pm.expect(pm.response.json().results[0].Subscriptions[0].instanceType).to.exist;",
-							"",
-							"});",
-							"pm.test(\"Has instanceType\", function () {",
-							"    pm.expect(pm.response.json().results[0].Subscriptions[0].subscriptionId).to.exist;",
-							"});",
-							"pm.test(\"Has 1 service\", function () {",
-							"    pm.expect(pm.response.json().results.length).to.equal(1);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=subscription&service=RDS",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "groupby",
-							"value": "subscription"
-						},
-						{
-							"key": "service",
-							"value": "RDS"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Utilization Summary",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-utilization/?cloud_account_id={{cloud_account_id}}&groupby=service",
-					"host": [
-						"{{host_aws}}"
-					],
-					"path": [
-						"ce",
-						"get-reservation-utilization",
-						""
-					],
-					"query": [
-						{
-							"key": "cloud_account_id",
-							"value": "{{cloud_account_id}}"
-						},
-						{
-							"key": "groupby",
-							"value": "service"
 						}
 					]
 				}

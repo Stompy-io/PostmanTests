@@ -133,7 +133,7 @@
 			"response": []
 		},
 		{
-			"name": "View Listeners /view_listeners",
+			"name": "View Listeners /view_listeners Copy",
 			"event": [
 				{
 					"listen": "test",
@@ -238,7 +238,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"pm.environment.set(\"listenerName\", \"sampleListener\");"
+							"pm.environment.set(\"listenerName\", \"PredefinedDaily\");"
 						],
 						"type": "text/javascript"
 					}
@@ -249,7 +249,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"scc_id\": {{scc_id}}, \n    \"org_id\": \"{{org_id}}\", \n    \"ecs_id\": \"{{ecs_id}}\",\n    \"listener\": {\n        \"biz\": \"AWS\",\n        \"description\": \"\",\n        \"inc_only\": true,\n        \"name\": \"{{listenerName}}\",\n        \"scope\": \"Weekly\",\n        \"tag_key\": \"Name\",\n        \"tag_val\": \"Hello\",\n        \"threshold\": \"10\",\n        \"username\": \"spt\"\n    }\n}",
+					"raw": "{\n    \"scc_id\": {{scc_id}}, \n    \"org_id\": \"{{org_id}}\", \n    \"ecs_id\": \"{{ecs_id}}\",\n    \"listener\": {\n        \"biz\": \"AWS\",\n        \"description\": \"test\",\n        \"inc_only\": true,\n        \"name\": \"{{listenerName}}\",\n        \"scope\": \"Daily\",\n        \"tag_key\": \"Name\",\n        \"tag_val\": \"Hello\",\n        \"threshold\": \"0.1\",\n        \"username\": \"spt\"\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -342,7 +342,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"scc_id\": {{scc_id}}, \n    \"org_id\": \"{{org_id}}\", \n    \"ecs_id\": \"{{ecs_id}}\",\n    \"listener_id\": \"aa037aba61ee2aaebb96170e4b5778ed\"\n}",
+					"raw": "{\n    \"scc_id\": {{scc_id}}, \n    \"org_id\": \"{{org_id}}\", \n    \"ecs_id\": \"{{ecs_id}}\",\n    \"listener_id\": \"{{listenerId}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

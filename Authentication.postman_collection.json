@@ -224,7 +224,7 @@
 					"response": []
 				},
 				{
-					"name": "Wrong VRF_code /verify_email Copy",
+					"name": "Wrong VRF_code /verify_email",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -602,6 +602,15 @@
 									"    pm.expect(pm.response.json()['code']).to.equal(0);",
 									"});",
 									"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript"
 							}
