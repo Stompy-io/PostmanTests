@@ -1,14 +1,14 @@
-name: dev flask trends and notification automated test in pipeline
+name: flask cross-referencing automated test in pipeline
 
 on:
   push:
     branches:
-      - develop
+      - release/beta
   schedule:
     - cron: '50 8 * * *'
 
 jobs:
-  dev_optimization_test:
+  cross_test:
 
     runs-on: ubuntu-latest
 
@@ -26,9 +26,9 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask trends and notification test
+      - name: Running the flask cross referencing test
         run: |
-          newman run Trend\ and\ Notifications.postman_collection.json -e Develop.postman_environment.json -r html
+          newman run Cross-referencing.postman_collection.json -e Beta.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
@@ -37,7 +37,7 @@ jobs:
           path: newman
 
   WeComm_Notification:
-    needs: dev_optimization_test
+    needs: cross_test
     runs-on: ubuntu-latest
     steps:
       - run: curl ${{ secrets.WORK_WECHAT_BOT }} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"

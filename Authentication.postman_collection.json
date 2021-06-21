@@ -952,16 +952,8 @@
 			"value": "api.testmail.app/api/json"
 		},
 		{
-			"key": "host",
-			"value": "http://v1.flask.api.stompy.io"
-		},
-		{
 			"key": "test_email_domain",
 			"value": "@inbox.testmail.app"
-		},
-		{
-			"key": "testARN",
-			"value": "arn:aws:iam::385105545457:role/stompy-iam-role-stack-42080286085-StompyFinOpsRole-1M2MP3SMF6ZQ8"
 		},
 		{
 			"key": "test_mail_pairs",

@@ -175,7 +175,7 @@
 							"    let Redshift_sum =  getSum(all_time_ri_waste_data['Redshift']);",
 							"",
 							"    let ri_waste_sum = ec2_sum + ElastiCache_sum + ElasticSearch_sum + RDS_sum+ Redshift_sum;",
-							"    pm.expect(ri_waste_sum).to.be.closeTo(pm.collectionVariables.get('waste_13_months'), 0.9);",
+							"    pm.expect(ri_waste_sum).to.be.closeTo(pm.collectionVariables.get('waste_13_months'), 2);",
 							"",
 							"    ",
 							"    ",

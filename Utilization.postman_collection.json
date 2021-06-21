@@ -74,8 +74,8 @@
 							"    );",
 							"});",
 							"",
-							"pm.test(\"Has 7 days default\", function () {",
-							"    pm.expect(pm.response.json().results[0].UtilizationsByTime.length).to.equal(7);",
+							"pm.test(\"Has 6 days default\", function () {",
+							"    pm.expect(pm.response.json().results[0].UtilizationsByTime.length).to.equal(6);",
 							"});",
 							""
 						],
@@ -337,8 +337,8 @@
 							"pm.test(\"Has 1 service\", function () {",
 							"    pm.expect(pm.response.json().results.length).to.equal(1);",
 							"});",
-							"pm.test(\"Has 7 days default\", function () {",
-							"    pm.expect(pm.response.json().results[0].UtilizationsByTime.length).to.equal(7);",
+							"pm.test(\"Has 6 days default\", function () {",
+							"    pm.expect(pm.response.json().results[0].UtilizationsByTime.length).to.equal(6);",
 							"});",
 							""
 						],
@@ -833,9 +833,9 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200 or 204\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-							"});"
+							"// pm.test(\"Status code is 200 or 204\", function () {",
+							"//     pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"// });"
 						],
 						"type": "text/javascript"
 					}
