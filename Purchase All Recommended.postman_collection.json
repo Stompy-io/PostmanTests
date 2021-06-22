@@ -53,7 +53,7 @@
 							"})",
 							"",
 							"//Set up input for preview",
-							"",
+							"let instance_list = [];",
 							"let result_list = pm.response.json().results.grand_result;",
 							"let r_id, raw_service, service, instances;",
 							"for (let i = 0; i<result_list.length; i++){",
