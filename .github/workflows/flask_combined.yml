@@ -3,7 +3,7 @@ name: dev flask combined automated test in pipeline
 on:
   push:
     branches:
-      - release/stage
+      - develop
   schedule:
     - cron: '50 8 * * *'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Running the flask combined test
         run: |
-          newman run Phase1.postman_collection.json -e Stage.postman_environment.json -r html --env-var "testARN=${{secrets.stage_arn}}"
+          newman run Phase1.postman_collection.json -e Develop.postman_environment.json -r html --env-var "testARN=${{secrets.dev_arn}}"
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2

@@ -3,7 +3,7 @@ name: dev aws util test in pipeline
 on:
   push:
     branches:
-      - release/stage
+      - develop
   schedule:
     - cron: '50 8 * * *'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Running the aws utilization test
         run: |
-          newman run Utilization.postman_collection.json -e Stage.postman_environment.json -r html
+          newman run Utilization.postman_collection.json -e Develop.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
