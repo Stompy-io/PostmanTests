@@ -3,7 +3,7 @@ name: dev aws coverage test in pipeline
 on:
   push:
     branches:
-      - release/beta
+      - release/stage
   schedule:
     - cron: '50 8 * * *'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Running the aws coverage test
         run: |
-          newman run Coverage.postman_collection.json -e Beta.postman_environment.json -r html
+          newman run Coverage.postman_collection.json -e Stage.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2

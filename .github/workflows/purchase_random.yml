@@ -1,4 +1,4 @@
-name: dev flask combined automated test in pipeline
+name: aws purchase random recommended test in pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '50 8 * * *'
 
 jobs:
-  flask_combined_test:
+  purchase_random_test:
 
     runs-on: ubuntu-latest
 
@@ -26,9 +26,9 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask combined test
+      - name: Running the aws purchase random test
         run: |
-          newman run Phase1.postman_collection.json -e Stage.postman_environment.json -r html --env-var "testARN=${{secrets.stage_arn}}"
+          newman run Purchase\ Random.postman_collection.json -e Stage.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
@@ -37,7 +37,7 @@ jobs:
           path: newman
 
   WeComm_Notification:
-    needs: flask_combined_test
+    needs: purchase_random_test
     runs-on: ubuntu-latest
     steps:
       - run: curl ${{ secrets.WORK_WECHAT_BOT }} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"
