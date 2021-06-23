@@ -1,4 +1,4 @@
-name: v1 flask combined automated test in pipeline
+name: aws purchase preview test in pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '50 8 * * *'
 
 jobs:
-  v1_flask_combined_test:
+  purchase_preview_test:
 
     runs-on: ubuntu-latest
 
@@ -26,9 +26,9 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask combined test
+      - name: Running the aws purchase preview test
         run: |
-          newman run Phase1.postman_collection.json -r html
+          newman run Purchase\ Preview.postman_collection.json -e Develop.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
@@ -37,7 +37,7 @@ jobs:
           path: newman
 
   WeComm_Notification:
-    needs: v1_flask_combined_test
+    needs: purchase_preview_test
     runs-on: ubuntu-latest
     steps:
       - run: curl ${{ secrets.WORK_WECHAT_BOT }} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"

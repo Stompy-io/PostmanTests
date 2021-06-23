@@ -1,0 +1,572 @@
+{
+	"info": {
+		"_postman_id": "9a6fe97e-44f2-4545-9925-98a7c6f5482f",
+		"name": "Purchase All Recommended",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Recommendation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const EC2_ORDER = 0;",
+							"const RDS_ORDER = 1;",
+							"//ELASTICACHE",
+							"const EC_ORDER = 2;",
+							"//REDSHIFT ",
+							"const RSH_ORDER = 3;",
+							"//ELASTISEARCH",
+							"const ES_ORDER = 4;",
+							"",
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"In Order\",()=>{",
+							"    let results = pm.response.json().results.grand_result;",
+							"    //no data for es now",
+							"    for(let i = 0; i<results.length-1;i++){",
+							"        switch(i){",
+							"            case EC2_ORDER:",
+							"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
+							"                break;",
+							"",
+							"            case RDS_ORDER:",
+							"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
+							"                break;",
+							"            case EC_ORDER:",
+							"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
+							"                break;",
+							"            case RSH_ORDER:",
+							"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
+							"                break;",
+							"                //when the mismatch is fixed, currently no Service key",
+							"            // case ES_ORDER:",
+							"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
+							"            //     break;",
+							"        }",
+							"    }",
+							"",
+							"})",
+							"",
+							"//Set up input for preview",
+							"let instance_list = [];",
+							"let result_list = pm.response.json().results.grand_result;",
+							"let r_id, raw_service, service, instances;",
+							"for (let i = 0; i<result_list.length; i++){",
+							"    //RecommendationId",
+							"    r_id = result_list[i].RecommendationId;",
+							"    raw_service = result_list[i].Service;",
+							"    service = pm.environment.get(\"service_dict\")[raw_service];",
+							"    if( r_id == undefined){",
+							"        continue;",
+							"    }",
+							"    instances = result_list[i].RecommendationDetails;",
+							"    let curr_instance, region, instance_type, count;",
+							"    for(let j = 0; j<instances.length; j++){",
+							"        curr_instance = instances[j];",
+							"        region = curr_instance.Region;",
+							"        instance_type = curr_instance.RecommendedInstanceType;",
+							"        count = curr_instance.RecommendedNumberOfInstances;",
+							"        let info, dict;",
+							"       ",
+							"        switch(i){",
+							"            case EC2_ORDER:",
+							"                info = curr_instance.Platform;",
+							"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
+							"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
+							"                \"Region\":region,\"RecommendationId\":r_id};",
+							"                instance_list.push(dict);",
+							"                break;",
+							"            case RDS_ORDER:",
+							"                info = curr_instance.ProductDescription;",
+							"                multiAZ = curr_instance.MultiAZ;",
+							"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
+							"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
+							"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
+							"                instance_list.push(dict);",
+							"                break;",
+							"            case EC_ORDER:",
+							"                info = curr_instance.ProductDescription;",
+							"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
+							"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+							"                instance_list.push(dict);",
+							"                break;",
+							"            case RSH_ORDER:",
+							"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
+							"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+							"                instance_list.push(dict);",
+							"                break;",
+							"            case ES_ORDER:",
+							"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
+							"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+							"                instance_list.push(dict);",
+							"                break;",
+							"        }",
+							"    }  ",
+							"}",
+							"",
+							"pm.environment.set(\"instance_list\", JSON.stringify(instance_list));",
+							"console.log(pm.environment.get(\"instance_list\"));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const serviceDict = {",
+							"    \"Amazon Elastic Compute Cloud - Compute\":\"EC2\",",
+							"    \"Amazon Relational Database Service\":\"RDS\",",
+							"    \"Amazon ElastiCache\": \"ElastiCache\" ,",
+							"    \"Amazon Redshift\": \"Redshift\" ,",
+							"    \"Amazon ElastiSearch\": \"ES\"",
+							"};",
+							"",
+							"pm.environment.set(\"service_dict\", serviceDict);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Purchase All Preview",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has results\", ()=>{",
+							"    pm.expect(pm.response.json()).to.have.property('results');",
+							"});",
+							"",
+							"let results = pm.response.json().results;",
+							"let request_list = JSON.parse(pm.environment.get(\"instance_list\"));",
+							"pm.test(\"Same Amount of instances\",()=>{",
+							"    pm.expect(results.length).to.equal(request_list.length);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cloud_account_id\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\": \n   {{instance_list}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_aws}}/services/ri-offerings/purchase/",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						"ri-offerings",
+						"purchase",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "!!Purchase All",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Has results\", ()=>{",
+							"    pm.expect(pm.response.json()).to.have.property('results');",
+							"});",
+							"",
+							"let results = pm.response.json().results;",
+							"let request_list = pm.environment.get(\"instance_list\");",
+							"pm.test(\"Same Amount of instances\",()=>{",
+							"    let request_list = JSON.parse(pm.environment.get(\"instance_list\"));",
+							"    pm.expect(results.length).to.equal(request_list.length);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cloud_account_id\": {{cloud_account_id}},\n  \"Preview\": false,\n  \"Instances\":\n  {{instance_list}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_aws}}/services/ri-offerings/purchase/",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						"ri-offerings",
+						"purchase",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommendation Cleared",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"pm.test(\"Bought service goes away\",()=>{",
+							"    let result = pm.response.json().results.grand_result;",
+							"    for (let i = 0; i< result.length; i++){",
+							"        //no recommendation for this service in the first place",
+							"        if(result[i].RecommendationDetails == undefined){",
+							"            continue;",
+							"        }",
+							"        pm.expect(result[i].RecommendationDetails.length).to.equal(0);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-purchase-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "period",
+							"value": "SEVEN_DAYS"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Purchases Made",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"",
+							"let id_list = [];",
+							"for (let i = 0; i< pm.response.json().length;i++){",
+							"    id_list.push(pm.response.json()[i].id);",
+							"}",
+							"pm.environment.set(\"purchase_id_list\", id_list) ;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/services/purchases/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						"purchases",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Billings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_user}}/bills/?cloud_account_id={{cloud_account_id}}",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"bills",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clear Purchase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let curr_list = pm.environment.get(\"purchase_id_list\");",
+							"let curr_id = curr_list.shift();",
+							"pm.environment.set(\"purchase_id\", curr_id)",
+							"pm.environment.set(\"purchase_id_list\", curr_list);",
+							"",
+							"if(curr_list.length != 0){",
+							"    postman.setNextRequest(\"Clear Purchase\");",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/services/purchases/{{purchase_id}}/",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						"purchases",
+						"{{purchase_id}}",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Purcahses Cleared",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});",
+							"pm.test(\"Response is an empty list\", ()=>{",
+							"    pm.expect(pm.response.json().length).to.equal(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/services/purchases/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						"purchases",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const serviceDict = {",
+					"    \"Amazon Elastic Compute Cloud - Compute\":\"EC2\",",
+					"    \"Amazon Relational Database Service\":\"RDS\",",
+					"    \"Amazon ElastiCache\": \"ElastiCache\" ,",
+					"    \"Amazon Redshift\": \"Redshift\" ,",
+					"    \"Amazon ElastiSearch\": \"ES\"",
+					"};",
+					"",
+					"pm.environment.set(\"service_dict\", serviceDict);",
+					"",
+					"",
+					"let region_dict ={ // Only needed by ES preview comparison",
+					"    'us-east-1': 'US East (N. Virginia)',",
+					"    'us-east-2': 'US East (Ohio)',",
+					"    'us-west-1': 'US West (N. California)',",
+					"    'us-west-2': 'US West (Oregon)',",
+					"    'af-south-1': 'Africa (Cape Town)',",
+					"    'ap-east-1': 'Asia Pacific (Hong Kong)',",
+					"    'ap-south-1': 'Asia Pacific (Mumbai)',",
+					"    'ap-northeast-3': 'Asia Pacific (Osaka)',",
+					"    'ap-northeast-2': 'Asia Pacific (Seoul)',",
+					"    'ap-southeast-1': 'Asia Pacific (Singapore)',",
+					"    'ap-southeast-2': 'Asia Pacific (Sydney)',",
+					"    'ap-northeast-1': 'Asia Pacific (Tokyo)',",
+					"    'ca-central-1': 'Canada (Central)',",
+					"    'eu-central-1': 'Europe (Frankfurt)',",
+					"    'eu-west-1': 'Europe (Ireland)',",
+					"    'eu-west-2': 'Europe (London)',",
+					"    'eu-south-1': 'Europe (Milan)',",
+					"    'eu-west-3': 'Europe (Paris)',",
+					"    'eu-north-1': 'Europe (Stockholm)',",
+					"    'me-south-1': 'Middle East (Bahrain)',",
+					"    'sa-east-1': 'South America (São Paulo)'",
+					"}",
+					"pm.collectionVariables.set(\"region_dict\", region_dict);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const serviceDict = {",
+					"    \"Amazon Elastic Compute Cloud - Compute\":\"EC2\",",
+					"    \"Amazon Relational Database Service\":\"RDS\",",
+					"    \"Amazon ElastiCache\": \"ElastiCache\" ,",
+					"    \"Amazon Redshift\": \"Redshift\" ,",
+					"    \"Amazon ElastiSearch\": \"ES\"",
+					"};",
+					"",
+					"pm.environment.set(\"service_dict\", serviceDict);"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "region_dict",
+			"value": ""
+		}
+	]
+}

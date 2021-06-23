@@ -105,9 +105,12 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											"const currentUUID = pm.variables.replaceIn('{{$randomUUID}}');",
-											"const email = pm.collectionVariables.get('test_email_namespace') +\".\" + currentUUID + ",
-											"    pm.collectionVariables.get(\"test_email_domain\");",
+											"const test_mail_pairs = pm.collectionVariables.get('test_mail_pairs');",
+											"const index = Math.floor(Math.random()*(test_mail_pairs.length));",
+											"const namespace = test_mail_pairs[index][0];",
+											"pm.environment.set('test_email_namespace', namespace);",
+											"pm.environment.set('test_email_api_key', test_mail_pairs[index][1]);",
+											"const email = namespace+\".\" + pm.variables.replaceIn('{{$guid}}') + pm.variables.get(\"test_email_domain\");",
 											"pm.environment.set(\"currentEmail\", email);",
 											"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 										],
@@ -1595,7 +1598,12 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"const api_dict = [['ftm8x','be915d57-78e8-42ef-905a-d56e84a94bdf'],",
+					"                    ['rw1ta', '00e9dd78-915d-49c7-a86b-7a01bc7e7aa4'],",
+					"                    ['eguzv', '853bbc59-1190-4c3d-b19b-fd9b42ec6099'],",
+					"                    ['7b984', '5e234310-2865-473f-b270-8900052450c8'],",
+					"                    ['p7r7y', '65ec4353-0149-4308-ab5d-ef20facafa5d']]",
+					"pm.collectionVariables.set(\"test_mail_pairs\",api_dict);"
 				]
 			}
 		},
@@ -1629,6 +1637,10 @@
 		{
 			"key": "testARN",
 			"value": "arn:aws:iam::385105545457:role/stompy-iam-role-stack-42080286085-StompyFinOpsRole-1M2MP3SMF6ZQ8"
+		},
+		{
+			"key": "test_mail_pairs",
+			"value": ""
 		}
 	]
 }

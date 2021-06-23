@@ -1,4 +1,4 @@
-name: dev flask authentication automated test in pipeline
+name: notifier api test in pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '50 8 * * *'
 
 jobs:
-  dev_authentication_test:
+  notifier_test:
 
     runs-on: ubuntu-latest
 
@@ -26,9 +26,9 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-html
 
-      - name: Running the flask authentication test
+      - name: Running the  notifier api test
         run: |
-          newman run Authentication.postman_collection.json -e Develop.postman_environment.json -r html
+          newman run Notifier\ API.postman_collection.json -e Develop.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
@@ -37,7 +37,7 @@ jobs:
           path: newman
 
   WeComm_Notification:
-    needs: dev_authentication_test
+    needs: notifier_test
     runs-on: ubuntu-latest
     steps:
       - run: curl ${{ secrets.WORK_WECHAT_BOT }} -H 'Content-Type:application/json' -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"api test result\n>Please go to the actions to check the result:[actions](https://github.com/Stompy-io/PostmanTests/actions)\"}}"

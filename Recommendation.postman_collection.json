@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "849cd3e8-fdc0-49fc-be6c-a17c4b81714c",
+		"name": "Recommendation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Purchase Recommendation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-purchase-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "period",
+							"value": "SEVEN_DAYS"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Purchase Recommendation - missing param",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-purchase-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommendation Table",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 or 204\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}&groupby=subscription",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "cloud_account_id",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "groupby",
+							"value": "subscription"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
