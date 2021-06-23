@@ -3,7 +3,7 @@ name: dev flask trends and notification automated test in pipeline
 on:
   push:
     branches:
-      - develop
+      - release/prod
   schedule:
     - cron: '50 8 * * *'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Running the flask trends and notification test
         run: |
-          newman run Trend\ and\ Notifications.postman_collection.json -e Develop.postman_environment.json -r html
+          newman run Trend\ and\ Notifications.postman_collection.json -e Prod.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2

@@ -3,7 +3,7 @@ name: flask authentication automated test in pipeline
 on:
   push:
     branches:
-      - develop
+      - release/prod
   schedule:
     - cron: '50 8 * * *'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Running the flask authentication test
         run: |
-          newman run Authentication.postman_collection.json -e Develop.postman_environment.json -r html --env-var "testARN=${{secrets.DEV_ARN}}"
+          newman run Authentication.postman_collection.json -e Prod.postman_environment.json -r html --env-var "testARN=${{secrets.PROD_ARN}}"
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2

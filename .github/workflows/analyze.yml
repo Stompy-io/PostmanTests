@@ -3,7 +3,7 @@ name: analyze cost test in pipeline
 on:
   push:
     branches:
-      - develop
+      - release/prod
   schedule:
     - cron: '50 8 * * *'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Running the flask analyze cost test
         run: |
-          newman run Analyze\ Costs.postman_collection.json -e Develop.postman_environment.json -r html
+          newman run Analyze\ Costs.postman_collection.json -e Prod.postman_environment.json -r html
 
       - name: Output the run Details
         uses: actions/upload-artifact@v2
