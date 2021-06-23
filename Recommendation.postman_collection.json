@@ -20,17 +20,24 @@
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "{{host_aws}}/ce/get-reservation-purchase-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
+					"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}&period=SEVEN_DAYS",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
 						"ce",
-						"get-reservation-purchase-recommendation",
+						"get-reservation-recommendation",
 						""
 					],
 					"query": [

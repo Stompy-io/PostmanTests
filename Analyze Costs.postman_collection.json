@@ -331,6 +331,10 @@
 							"});",
 							"pm.test(\"Status code is 0\", function () {",
 							"    pm.expect(pm.response.json()['code']).to.equal(0);",
+							"});",
+							"",
+							"pm.test(\"Data has exactly 7*3 points\", function () {",
+							"    pm.expect(pm.response.json()['data'].length).to.equal(21);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -342,7 +346,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"ecs_id\": \"{{ecs_id}}\",\n    \"org_id\": \"{{org_id}}\",\n    \"params\": {\n        \"Granularity\": \"MONTHLY\",\n        \"GroupBy\": [{\"Type\": \"DIMENSION\", \"Key\": \"LINKED_ACCOUNT\"}],\n        \"Metrics\": [\"BLENDED_COST\", \"AMORTIZED_COST\"],\n        \"TimePeriod\": {\n            \"End\": \"2021-05-01\",\n            \"Start\": \"2020-11-01\"\n        }\n        \n    },\n    \"scc_id\": {{scc_id}}\n}",
+					"raw": "{\n    \"ecs_id\": \"{{ecs_id}}\",\n    \"org_id\": \"{{org_id}}\",\n    \"scc_id\": \"{{scc_id}}\",\n    \"params\":{\n        \"TimePeriod\": {\n            \"Start\":\"2021-05-11\",\n            \"End\":\"2021-05-17\"\n            },\n        \"Granularity\":\"DAILY\",\n        \"Metrics\":[\n            \"UNBLENDED_COST\",\n            \"AMORTIZED_COST\"\n        ],\n        \"GroupBy\":\n        [{\n            \"Type\":\"DIMENSION\",\n            \"Key\":\"LINKED_ACCOUNT\"\n        }]\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -380,16 +384,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "host",
-			"value": "http://v1.flask.api.stompy.io"
-		},
-		{
-			"key": "testUser",
-			"value": "cavemoh105@64ge.com"
 		}
 	]
 }
