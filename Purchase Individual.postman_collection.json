@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "One EC2",
+			"name": "Set up",
 			"item": [
 				{
 					"name": "Services",
@@ -74,28 +74,28 @@
 									"const ES_ORDER = 4;",
 									"",
 									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
 									"});",
 									"",
-									"pm.test(\"In Order\",()=>{",
+									"pm.test(\"In Order\", () => {",
 									"    let results = pm.response.json().results.grand_result;",
 									"    //no d",
-									"    for(let i = 0; i<results.length-1;i++){",
-									"        switch(i){",
+									"    for (let i = 0; i < results.length - 1; i++) {",
+									"        switch (i) {",
 									"            case EC2_ORDER:",
 									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
 									"                break;",
 									"",
 									"            case RDS_ORDER:",
-									"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
+									"                pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
 									"                break;",
 									"            case EC_ORDER:",
 									"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
 									"                break;",
 									"            case RSH_ORDER:",
-									"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
+									"                pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
 									"                break;",
-									"                //when the mismatch is fixed, currently no Service key",
+									"            //when the mismatch is fixed, currently no Service key",
 									"            // case ES_ORDER:",
 									"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
 									"            //     break;",
@@ -105,7 +105,9 @@
 									"})",
 									"",
 									"//Set up input for preview",
-									"",
+									"let annual_total = [];",
+									"let one_est_monthly = [];",
+									"let one_instance_list = [];",
 									"let ec2_list = [];",
 									"let rds_list = [];",
 									"let ec_list = [];",
@@ -113,64 +115,103 @@
 									"let es_list = [];",
 									"let result_list = pm.response.json().results.grand_result;",
 									"let r_id, raw_service, service, instances;",
-									"for (let i = 0; i<result_list.length; i++){",
-									"    //RecommendationId",
+									"for (let i = 0; i < result_list.length; i++) {",
+									"    //RecommendationId, if undefined, no recommendation, skip",
 									"    r_id = result_list[i].RecommendationId;",
-									"    raw_service = result_list[i].Service;",
-									"    service = pm.environment.get(\"service_dict\")[raw_service];",
-									"    if( r_id == undefined){",
+									"    if (r_id == undefined) {",
 									"        continue;",
 									"    }",
+									"    //find out corresponding sesrvice name",
+									"    raw_service = result_list[i].Service;",
+									"    service = pm.environment.get(\"service_dict\")[raw_service];",
+									"    //store annual savings of a service by order",
+									"    annual_total.push(result_list[i].Summary.EstimatedAnnualSavings);",
+									"    //each instance detail is inside",
 									"    instances = result_list[i].RecommendationDetails;",
 									"    let curr_instance, region, instance_type, count;",
-									"    for(let j = 0; j<instances.length; j++){",
+									"    //an random index for each service",
+									"    let index = Math.floor(Math.random() * instances.length);",
+									"    for (let j = 0; j < instances.length; j++) {",
+									"        //store this random instance's estimated monthly saving",
+									"        if (j == index) {",
+									"            one_est_monthly.push(instances[j].EstimatedMonthlySavings);",
+									"        }",
 									"        curr_instance = instances[j];",
 									"        region = curr_instance.Region;",
 									"        instance_type = curr_instance.RecommendedInstanceType;",
 									"        count = curr_instance.RecommendedNumberOfInstances;",
 									"        let info, dict;",
-									"       ",
-									"        switch(i){",
+									"        switch (i) {",
 									"            case EC2_ORDER:",
 									"                info = curr_instance.Platform;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
-									"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
-									"                \"Region\":region,\"RecommendationId\":r_id};",
+									"                dict = {",
+									"                    \"Service\": service, \"Count\": count, \"Duration\": 3, \"InstanceType\": instance_type,",
+									"                    \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\", \"ProductDescription\": info,",
+									"                    \"Region\": region, \"RecommendationId\": r_id",
+									"                };",
 									"                ec2_list.push(dict);",
+									"                if (j == index) {",
+									"                    one_instance_list.push(dict);",
+									"                }",
 									"                break;",
 									"            case RDS_ORDER:",
 									"                info = curr_instance.ProductDescription;",
 									"                multiAZ = curr_instance.MultiAZ;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
-									"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
-									"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
+									"                dict = {",
+									"                    \"Service\": service, \"Count\": count, \"Duration\": 3, \"DBInstanceClass\": instance_type,",
+									"                    \"OfferingType\": \"All Upfront\", \"ProductDescription\": info,",
+									"                    \"MultiAZ\": multiAZ, \"Region\": region, \"RecommendationId\": r_id",
+									"                };",
 									"                rds_list.push(dict);",
+									"                if (j == index) {",
+									"                    one_instance_list.push(dict);",
+									"                }",
 									"                break;",
 									"            case EC_ORDER:",
 									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+									"                dict = {",
+									"                    \"Service\": service, \"Count\": count, \"CacheNodeType\": instance_type, \"Duration\": \"3\", ",
+									"                    \"ProductDescription\": info.toLowerCase(),",
+									"                    \"OfferingType\": \"All Upfront\", \"Region\": region, \"RecommendationId\": r_id",
+									"                };",
 									"                ec_list.push(dict);",
+									"                if (j == index) {",
+									"                    one_instance_list.push(dict);",
+									"                }",
 									"                break;",
 									"            case RSH_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+									"                dict = {",
+									"                    \"Service\": service, \"Count\": count, \"NodeType\": instance_type, \"Duration\": 3,",
+									"                    \"OfferingType\": \"All Upfront\", \"Region\": region, \"RecommendationId\": r_id",
+									"                };",
 									"                rsh_list.push(dict);",
+									"                 if (j == index) {",
+									"                    one_instance_list.push(dict);",
+									"                }",
 									"                break;",
 									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+									"                dict = {",
+									"                    \"Service\": service, \"Count\": count, \"RecommendedInstanceType\": instance_type, \"Duration\": 3,",
+									"                    \"OfferingType\": \"All Upfront\", \"Region\": region, \"RecommendationId\": r_id",
+									"                };",
 									"                es_list.push(dict);",
+									"                if (j == index) {",
+									"                    one_instance_list.push(dict);",
+									"                }",
 									"                break;",
 									"        }",
-									"    }  ",
+									"    }",
 									"}",
 									"",
-									"pm.environment.set(\"ec2_instances\",ec2_list);",
-									"pm.environment.set(\"rds_instances\",rds_list);",
-									"pm.environment.set(\"elc_instances\",ec_list);",
-									"pm.environment.set(\"red_instances\",rsh_list);",
-									"pm.environment.set(\"es_instances\",es_list);"
+									"pm.environment.set(\"ec2_instances\", ec2_list);",
+									"pm.environment.set(\"rds_instances\", rds_list);",
+									"pm.environment.set(\"elc_instances\", ec_list);",
+									"pm.environment.set(\"red_instances\", rsh_list);",
+									"pm.environment.set(\"es_instances\", es_list);",
+									"",
+									"pm.environment.set(\"annual_total_list\", annual_total);",
+									"pm.environment.set(\"one_instance_list\", one_instance_list);",
+									"pm.environment.set(\"one_est_monthly\", one_est_monthly);"
 								],
 								"type": "text/javascript"
 							}
@@ -205,7 +246,12 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "One EC2",
+			"item": [
 				{
 					"name": "Purchase One EC2 Preview",
 					"event": [
@@ -213,9 +259,17 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"let instances = pm.environment.get(\"ec2_instances\");",
-									"let index = Math.floor(Math.random()*instances.length);",
-									"pm.environment.set(\"one_instance\", JSON.stringify(instances[index]));"
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
+									"let instances = pm.environment.get(\"one_instance_list\");",
+									"pm.environment.set(\"one_instance\", JSON.stringify(instances[EC2_ORDER]));"
 								],
 								"type": "text/javascript"
 							}
@@ -338,6 +392,23 @@
 									"",
 									"pm.test(\"ProductDescription match request\", () => {",
 									"    pm.expect(results[0].ProductDescription).to.equal(pre_instance.ProductDescription);",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"offeringType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"         pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
 									"});"
 								],
 								"type": "text/javascript"
@@ -446,34 +517,25 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
 									"});",
 									"",
-									"// pm.test(\"Bought service goes away\",()=>{",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									"// });",
-									"pm.test(\"Bought service goes away\",()=>{",
-									"    pm.expect( pm.response.json().results.grand_result).to.satisfy((result)=>{",
-									"        for(let i =0; i< result.length;i++){",
-									"            if(result[i].RecommendationDetails === undefined){",
-									"                continue;",
-									"            }",
-									"            let total = parseInt(result[i].Summary.TotalRecommendations);",
-									"            if (result[i].RecommendationDetails.length == total-1){",
-									"                return true;",
-									"            }",
-									"        }",
-									"        return false;",
-									"    })",
-									"});",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									""
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"let result = pm.response.json().results.grand_result;",
+									"pm.test(\"Bought service goes away\", () => {",
+									"    let total = parseInt(result[EC2_ORDER].Summary.TotalRecommendations);",
+									"    let now = result[EC2_ORDER].RecommendationDetails.length;",
+									"    //we bought one instance on prod",
+									"    pm.expect(total).to.equal(now + 2);",
+									"",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -500,6 +562,62 @@
 								{
 									"key": "period",
 									"value": "SEVEN_DAYS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Billings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"pm.test(\"Has results\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
+									"//buying as recommended so must be 3 years",
+									"pm.test(\"Savings equal recommended est monthly * 12 months * 3 years\", () => {",
+									"    let est_monthly = pm.environment.get(\"one_est_monthly\")[EC2_ORDER];",
+									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
+									"    pm.expect(savings).to.be.closeTo(est_monthly * 12 * 3, 1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_user}}/bills/?cloud_account_id={{cloud_account_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"bills",
+								""
+							],
+							"query": [
+								{
+									"key": "cloud_account_id",
+									"value": "{{cloud_account_id}}"
 								}
 							]
 						}
@@ -594,59 +712,10 @@
 			"name": "One RDS",
 			"item": [
 				{
-					"name": "Services",
+					"name": "Purchase One RDS Preview",
 					"event": [
 						{
 							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set(\"service_types_dict\", pm.response.json());"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host_aws}}/services",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"services"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Recommendation",
-					"event": [
-						{
-							"listen": "test",
 							"script": {
 								"exec": [
 									"const EC2_ORDER = 0;",
@@ -658,149 +727,8 @@
 									"//ELASTISEARCH",
 									"const ES_ORDER = 4;",
 									"",
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});",
-									"",
-									"pm.test(\"In Order\",()=>{",
-									"    let results = pm.response.json().results.grand_result;",
-									"    //no d",
-									"    for(let i = 0; i<results.length-1;i++){",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
-									"                break;",
-									"",
-									"            case RDS_ORDER:",
-									"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
-									"                break;",
-									"            case EC_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
-									"                break;",
-									"            case RSH_ORDER:",
-									"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
-									"                break;",
-									"                //when the mismatch is fixed, currently no Service key",
-									"            // case ES_ORDER:",
-									"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
-									"            //     break;",
-									"        }",
-									"    }",
-									"",
-									"})",
-									"",
-									"//Set up input for preview",
-									"",
-									"let ec2_list = [];",
-									"let rds_list = [];",
-									"let ec_list = [];",
-									"let rsh_list = [];",
-									"let es_list = [];",
-									"let result_list = pm.response.json().results.grand_result;",
-									"let r_id, raw_service, service, instances;",
-									"for (let i = 0; i<result_list.length; i++){",
-									"    //RecommendationId",
-									"    r_id = result_list[i].RecommendationId;",
-									"    raw_service = result_list[i].Service;",
-									"    service = pm.environment.get(\"service_dict\")[raw_service];",
-									"    if( r_id == undefined){",
-									"        continue;",
-									"    }",
-									"    instances = result_list[i].RecommendationDetails;",
-									"    let curr_instance, region, instance_type, count;",
-									"    for(let j = 0; j<instances.length; j++){",
-									"        curr_instance = instances[j];",
-									"        region = curr_instance.Region;",
-									"        instance_type = curr_instance.RecommendedInstanceType;",
-									"        count = curr_instance.RecommendedNumberOfInstances;",
-									"        let info, dict;",
-									"       ",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                info = curr_instance.Platform;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
-									"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
-									"                \"Region\":region,\"RecommendationId\":r_id};",
-									"                ec2_list.push(dict);",
-									"                break;",
-									"            case RDS_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                multiAZ = curr_instance.MultiAZ;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
-									"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
-									"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
-									"                rds_list.push(dict);",
-									"                break;",
-									"            case EC_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                ec_list.push(dict);",
-									"                break;",
-									"            case RSH_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                rsh_list.push(dict);",
-									"                break;",
-									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                es_list.push(dict);",
-									"                break;",
-									"        }",
-									"    }  ",
-									"}",
-									"",
-									"pm.environment.set(\"ec2_instances\",ec2_list);",
-									"pm.environment.set(\"rds_instances\",rds_list);",
-									"pm.environment.set(\"elc_instances\",ec_list);",
-									"pm.environment.set(\"red_instances\",rsh_list);",
-									"pm.environment.set(\"es_instances\",es_list);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"ce",
-								"get-reservation-recommendation",
-								""
-							],
-							"query": [
-								{
-									"key": "cloud_account_id",
-									"value": "{{cloud_account_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Purchase One RDS Preview",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"let instances = pm.environment.get(\"red_instances\");",
-									"let index = Math.floor(Math.random()*instances.length);",
-									"pm.environment.set(\"one_instance\", JSON.stringify(instances[index]));"
+									"let instances = pm.environment.get(\"one_instance_list\");",
+									"pm.environment.set(\"one_instance\", JSON.stringify(instances[RDS_ORDER]));"
 								],
 								"type": "text/javascript"
 							}
@@ -917,8 +845,11 @@
 									"    pm.expect(results[0].OfferingType).to.equal(pre_instance.OfferingType);",
 									"});",
 									"",
-									"pm.test(\"ProductDescription match request\", () => {",
-									"    pm.expect(results[0].ProductDescription).to.equal(pre_instance.ProductDescription);",
+									"",
+									"pm.test(\"ProductDescription match request\", ()=>{",
+									"    //replace all space with -, and all lower cased",
+									"    let myProductDescriptionReformatted = pre_instance.ProductDescription.replace(/\\s+/g, '-').toLowerCase();",
+									"    pm.expect(results[0].ProductDescription).to.equal(myProductDescriptionReformatted);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1026,35 +957,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});",
-									"",
-									"// pm.test(\"Bought service goes away\",()=>{",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									"// });",
-									"pm.test(\"Bought service goes away\",()=>{",
-									"    pm.expect( pm.response.json().results.grand_result).to.satisfy((result)=>{",
-									"        for(let i =0; i< result.length;i++){",
-									"            if(result[i].RecommendationDetails === undefined){",
-									"                continue;",
-									"            }",
-									"            let total = parseInt(result[i].Summary.TotalRecommendations);",
-									"            if (result[i].RecommendationDetails.length == total-1){",
-									"                return true;",
-									"            }",
-									"        }",
-									"        return false;",
-									"    })",
-									"});",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									""
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"let this_order = RDS_ORDER;",
+									"let result = pm.response.json().results.grand_result;",
+									"pm.test(\"Bought service goes away\", () => {",
+									"    let total = parseInt(result[this_order].Summary.TotalRecommendations);",
+									"    let now = result[this_order].RecommendationDetails.length;",
+									"    //we bought one instance on prod",
+									"    pm.expect(total).to.equal(now + 1);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1081,6 +998,62 @@
 								{
 									"key": "period",
 									"value": "SEVEN_DAYS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Billings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"pm.test(\"Has results\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
+									"//buying as recommended so must be 3 years",
+									"pm.test(\"Savings equal recommended est monthly * 12 months * 3 years\", () => {",
+									"    let est_monthly = pm.environment.get(\"one_est_monthly\")[RDS_ORDER];",
+									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
+									"    pm.expect(savings).to.be.closeTo(est_monthly * 12 * 3, 1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_user}}/bills/?cloud_account_id={{cloud_account_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"bills",
+								""
+							],
+							"query": [
+								{
+									"key": "cloud_account_id",
+									"value": "{{cloud_account_id}}"
 								}
 							]
 						}
@@ -1136,7 +1109,11 @@
 								"exec": [
 									"pm.test(\"Status code is 200 or 204\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});"
+									"});",
+									"",
+									"pm.test(\"response is 1\", ()=>{",
+									"    pm.expect(pm.response).to.equal(1);",
+									"})"
 								],
 								"type": "text/javascript"
 							}
@@ -1175,10 +1152,10 @@
 			"name": "One ElastiCache",
 			"item": [
 				{
-					"name": "Recommendation",
+					"name": "Purchase One ElastiCache Preview",
 					"event": [
 						{
-							"listen": "test",
+							"listen": "prerequest",
 							"script": {
 								"exec": [
 									"const EC2_ORDER = 0;",
@@ -1190,149 +1167,8 @@
 									"//ELASTISEARCH",
 									"const ES_ORDER = 4;",
 									"",
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});",
-									"",
-									"pm.test(\"In Order\",()=>{",
-									"    let results = pm.response.json().results.grand_result;",
-									"    //no d",
-									"    for(let i = 0; i<results.length-1;i++){",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
-									"                break;",
-									"",
-									"            case RDS_ORDER:",
-									"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
-									"                break;",
-									"            case EC_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
-									"                break;",
-									"            case RSH_ORDER:",
-									"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
-									"                break;",
-									"                //when the mismatch is fixed, currently no Service key",
-									"            // case ES_ORDER:",
-									"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
-									"            //     break;",
-									"        }",
-									"    }",
-									"",
-									"})",
-									"",
-									"//Set up input for preview",
-									"",
-									"let ec2_list = [];",
-									"let rds_list = [];",
-									"let ec_list = [];",
-									"let rsh_list = [];",
-									"let es_list = [];",
-									"let result_list = pm.response.json().results.grand_result;",
-									"let r_id, raw_service, service, instances;",
-									"for (let i = 0; i<result_list.length; i++){",
-									"    //RecommendationId",
-									"    r_id = result_list[i].RecommendationId;",
-									"    raw_service = result_list[i].Service;",
-									"    service = pm.environment.get(\"service_dict\")[raw_service];",
-									"    if( r_id == undefined){",
-									"        continue;",
-									"    }",
-									"    instances = result_list[i].RecommendationDetails;",
-									"    let curr_instance, region, instance_type, count;",
-									"    for(let j = 0; j<instances.length; j++){",
-									"        curr_instance = instances[j];",
-									"        region = curr_instance.Region;",
-									"        instance_type = curr_instance.RecommendedInstanceType;",
-									"        count = curr_instance.RecommendedNumberOfInstances;",
-									"        let info, dict;",
-									"       ",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                info = curr_instance.Platform;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
-									"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
-									"                \"Region\":region,\"RecommendationId\":r_id};",
-									"                ec2_list.push(dict);",
-									"                break;",
-									"            case RDS_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                multiAZ = curr_instance.MultiAZ;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
-									"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
-									"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
-									"                rds_list.push(dict);",
-									"                break;",
-									"            case EC_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                ec_list.push(dict);",
-									"                break;",
-									"            case RSH_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                rsh_list.push(dict);",
-									"                break;",
-									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                es_list.push(dict);",
-									"                break;",
-									"        }",
-									"    }  ",
-									"}",
-									"",
-									"pm.environment.set(\"ec2_instances\",ec2_list);",
-									"pm.environment.set(\"rds_instances\",rds_list);",
-									"pm.environment.set(\"elc_instances\",ec_list);",
-									"pm.environment.set(\"red_instances\",rsh_list);",
-									"pm.environment.set(\"es_instances\",es_list);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"ce",
-								"get-reservation-recommendation",
-								""
-							],
-							"query": [
-								{
-									"key": "cloud_account_id",
-									"value": "{{cloud_account_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Purchase One ElastiCache Preview",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"let instances = pm.environment.get(\"elc_instances\");",
-									"let index = Math.floor(Math.random()*instances.length);",
-									"pm.environment.set(\"one_instance\", JSON.stringify(instances[index]));"
+									"let instances = pm.environment.get(\"one_instance_list\");",
+									"pm.environment.set(\"one_instance\", JSON.stringify(instances[EC_ORDER]));"
 								],
 								"type": "text/javascript"
 							}
@@ -1556,6 +1392,62 @@
 					"response": []
 				},
 				{
+					"name": "Billings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"pm.test(\"Has results\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
+									"//buying as recommended so must be 3 years",
+									"pm.test(\"Savings equal recommended est monthly * 12 months * 3 years\", () => {",
+									"    let est_monthly = pm.environment.get(\"one_est_monthly\")[EC_ORDER];",
+									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
+									"    pm.expect(savings).to.be.closeTo(est_monthly * 12 * 3, 1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_user}}/bills/?cloud_account_id={{cloud_account_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"bills",
+								""
+							],
+							"query": [
+								{
+									"key": "cloud_account_id",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Recommendation Cleared",
 					"event": [
 						{
@@ -1563,34 +1455,25 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
 									"});",
 									"",
-									"// pm.test(\"Bought service goes away\",()=>{",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									"// });",
-									"pm.test(\"Bought service goes away\",()=>{",
-									"    pm.expect( pm.response.json().results.grand_result).to.satisfy((result)=>{",
-									"        for(let i =0; i< result.length;i++){",
-									"            if(result[i].RecommendationDetails === undefined){",
-									"                continue;",
-									"            }",
-									"            let total = parseInt(result[i].Summary.TotalRecommendations);",
-									"            if (result[i].RecommendationDetails.length == total-1){",
-									"                return true;",
-									"            }",
-									"        }",
-									"        return false;",
-									"    })",
-									"});",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									""
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"let this_order = EC_ORDER;",
+									"let result = pm.response.json().results.grand_result;",
+									"pm.test(\"Bought service goes away\", () => {",
+									"    let total = parseInt(result[this_order].Summary.TotalRecommendations);",
+									"    let now = result[this_order].RecommendationDetails.length;",
+									"    //we bought one instance on prod",
+									"    pm.expect(total).to.equal(now + 1);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1711,59 +1594,10 @@
 			"name": "One Redshift",
 			"item": [
 				{
-					"name": "Services",
+					"name": "Purchase One Redshift Preview",
 					"event": [
 						{
 							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set(\"service_types_dict\", pm.response.json());"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host_aws}}/services",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"services"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Recommendation",
-					"event": [
-						{
-							"listen": "test",
 							"script": {
 								"exec": [
 									"const EC2_ORDER = 0;",
@@ -1775,149 +1609,8 @@
 									"//ELASTISEARCH",
 									"const ES_ORDER = 4;",
 									"",
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});",
-									"",
-									"pm.test(\"In Order\",()=>{",
-									"    let results = pm.response.json().results.grand_result;",
-									"    //no d",
-									"    for(let i = 0; i<results.length-1;i++){",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
-									"                break;",
-									"",
-									"            case RDS_ORDER:",
-									"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
-									"                break;",
-									"            case EC_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
-									"                break;",
-									"            case RSH_ORDER:",
-									"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
-									"                break;",
-									"                //when the mismatch is fixed, currently no Service key",
-									"            // case ES_ORDER:",
-									"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
-									"            //     break;",
-									"        }",
-									"    }",
-									"",
-									"})",
-									"",
-									"//Set up input for preview",
-									"",
-									"let ec2_list = [];",
-									"let rds_list = [];",
-									"let ec_list = [];",
-									"let rsh_list = [];",
-									"let es_list = [];",
-									"let result_list = pm.response.json().results.grand_result;",
-									"let r_id, raw_service, service, instances;",
-									"for (let i = 0; i<result_list.length; i++){",
-									"    //RecommendationId",
-									"    r_id = result_list[i].RecommendationId;",
-									"    raw_service = result_list[i].Service;",
-									"    service = pm.environment.get(\"service_dict\")[raw_service];",
-									"    if( r_id == undefined){",
-									"        continue;",
-									"    }",
-									"    instances = result_list[i].RecommendationDetails;",
-									"    let curr_instance, region, instance_type, count;",
-									"    for(let j = 0; j<instances.length; j++){",
-									"        curr_instance = instances[j];",
-									"        region = curr_instance.Region;",
-									"        instance_type = curr_instance.RecommendedInstanceType;",
-									"        count = curr_instance.RecommendedNumberOfInstances;",
-									"        let info, dict;",
-									"       ",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                info = curr_instance.Platform;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
-									"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
-									"                \"Region\":region,\"RecommendationId\":r_id};",
-									"                ec2_list.push(dict);",
-									"                break;",
-									"            case RDS_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                multiAZ = curr_instance.MultiAZ;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
-									"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
-									"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
-									"                rds_list.push(dict);",
-									"                break;",
-									"            case EC_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                ec_list.push(dict);",
-									"                break;",
-									"            case RSH_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                rsh_list.push(dict);",
-									"                break;",
-									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                es_list.push(dict);",
-									"                break;",
-									"        }",
-									"    }  ",
-									"}",
-									"",
-									"pm.environment.set(\"ec2_instances\",ec2_list);",
-									"pm.environment.set(\"rds_instances\",rds_list);",
-									"pm.environment.set(\"elc_instances\",ec_list);",
-									"pm.environment.set(\"red_instances\",rsh_list);",
-									"pm.environment.set(\"es_instances\",es_list);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"ce",
-								"get-reservation-recommendation",
-								""
-							],
-							"query": [
-								{
-									"key": "cloud_account_id",
-									"value": "{{cloud_account_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Purchase One Redshift Preview",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"let instances = pm.environment.get(\"red_instances\");",
-									"let index = Math.floor(Math.random()*instances.length);",
-									"pm.environment.set(\"one_instance\", JSON.stringify(instances[index]));"
+									"let instances = pm.environment.get(\"one_instance_list\");",
+									"pm.environment.set(\"one_instance\", JSON.stringify(instances[RSH_ORDER]));"
 								],
 								"type": "text/javascript"
 							}
@@ -2142,34 +1835,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"let this_order = RSH_ORDER;",
+									"let result = pm.response.json().results.grand_result;",
+									"pm.test(\"Bought service goes away\", () => {",
+									"    let total = parseInt(result[this_order].Summary.TotalRecommendations);",
+									"    let now = result[this_order].RecommendationDetails.length;",
+									"    //we bought one instance on prod",
+									"    pm.expect(total).to.equal(now + 1);",
 									"});",
-									"",
-									"// pm.test(\"Bought service goes away\",()=>{",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									"// });",
-									"pm.test(\"Bought service goes away\",()=>{",
-									"    pm.expect( pm.response.json().results.grand_result).to.satisfy((result)=>{",
-									"        for(let i =0; i< result.length;i++){",
-									"            if(result[i].RecommendationDetails === undefined){",
-									"                continue;",
-									"            }",
-									"            let total = parseInt(result[i].Summary.TotalRecommendations);",
-									"            if (result[i].RecommendationDetails.length == total-1){",
-									"                return true;",
-									"            }",
-									"        }",
-									"        return false;",
-									"    })",
-									"});",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
 									""
 								],
 								"type": "text/javascript"
@@ -2197,6 +1877,62 @@
 								{
 									"key": "period",
 									"value": "SEVEN_DAYS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Billings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"pm.test(\"Has results\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
+									"//buying as recommended so must be 3 years",
+									"pm.test(\"Savings equal recommended est monthly * 12 months * 3 years\", () => {",
+									"    let est_monthly = pm.environment.get(\"one_est_monthly\")[RSH_ORDER];",
+									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
+									"    pm.expect(savings).to.be.closeTo(est_monthly * 3, 1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_user}}/bills/?cloud_account_id={{cloud_account_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"bills",
+								""
+							],
+							"query": [
+								{
+									"key": "cloud_account_id",
+									"value": "{{cloud_account_id}}"
 								}
 							]
 						}
@@ -2290,205 +2026,6 @@
 		{
 			"name": "All EC2",
 			"item": [
-				{
-					"name": "Services",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set(\"service_types_dict\", pm.response.json());"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host_aws}}/services",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"services"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Recommendation",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const EC2_ORDER = 0;",
-									"const RDS_ORDER = 1;",
-									"//ELASTICACHE",
-									"const EC_ORDER = 2;",
-									"//REDSHIFT ",
-									"const RSH_ORDER = 3;",
-									"//ELASTISEARCH",
-									"const ES_ORDER = 4;",
-									"",
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});",
-									"",
-									"pm.test(\"In Order\",()=>{",
-									"    let results = pm.response.json().results.grand_result;",
-									"    //no d",
-									"    for(let i = 0; i<results.length-1;i++){",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
-									"                break;",
-									"",
-									"            case RDS_ORDER:",
-									"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
-									"                break;",
-									"            case EC_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
-									"                break;",
-									"            case RSH_ORDER:",
-									"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
-									"                break;",
-									"                //when the mismatch is fixed, currently no Service key",
-									"            // case ES_ORDER:",
-									"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
-									"            //     break;",
-									"        }",
-									"    }",
-									"",
-									"})",
-									"",
-									"//Set up input for preview",
-									"",
-									"let ec2_list = [];",
-									"let rds_list = [];",
-									"let ec_list = [];",
-									"let rsh_list = [];",
-									"let es_list = [];",
-									"let result_list = pm.response.json().results.grand_result;",
-									"let r_id, raw_service, service, instances;",
-									"for (let i = 0; i<result_list.length; i++){",
-									"    //RecommendationId",
-									"    r_id = result_list[i].RecommendationId;",
-									"    raw_service = result_list[i].Service;",
-									"    service = pm.environment.get(\"service_dict\")[raw_service];",
-									"    if( r_id == undefined){",
-									"        continue;",
-									"    }",
-									"    instances = result_list[i].RecommendationDetails;",
-									"    let curr_instance, region, instance_type, count;",
-									"    for(let j = 0; j<instances.length; j++){",
-									"        curr_instance = instances[j];",
-									"        region = curr_instance.Region;",
-									"        instance_type = curr_instance.RecommendedInstanceType;",
-									"        count = curr_instance.RecommendedNumberOfInstances;",
-									"        let info, dict;",
-									"       ",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                info = curr_instance.Platform;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
-									"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
-									"                \"Region\":region,\"RecommendationId\":r_id};",
-									"                ec2_list.push(dict);",
-									"                break;",
-									"            case RDS_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                multiAZ = curr_instance.MultiAZ;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
-									"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
-									"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
-									"                rds_list.push(dict);",
-									"                break;",
-									"            case EC_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                ec_list.push(dict);",
-									"                break;",
-									"            case RSH_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                rsh_list.push(dict);",
-									"                break;",
-									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                es_list.push(dict);",
-									"                break;",
-									"        }",
-									"    }  ",
-									"}",
-									"pm.environment.set(\"bought_index\", EC2_ORDER);",
-									"pm.environment.set(\"est_annual_total\", result_list[EC2_ORDER].Summary.EstimatedAnnualSavings);",
-									"pm.environment.set(\"ec2_instances\",ec2_list);",
-									"pm.environment.set(\"rds_instances\",rds_list);",
-									"pm.environment.set(\"elc_instances\",ec_list);",
-									"pm.environment.set(\"red_instances\",rsh_list);",
-									"pm.environment.set(\"es_instances\",es_list);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"ce",
-								"get-reservation-recommendation",
-								""
-							],
-							"query": [
-								{
-									"key": "cloud_account_id",
-									"value": "{{cloud_account_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Purchase EC2 All Preview",
 					"event": [
@@ -2627,9 +2164,18 @@
 									"    pm.expect(pm.response.json()).to.have.property('results');",
 									"});",
 									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
 									"//buying as recommended so must be 3 years",
 									"pm.test(\"Savings equal recommended est annual * 3 years\",()=>{",
-									"    let est_yearly = pm.environment.get(\"est_annual_total\");",
+									"    let est_yearly = pm.environment.get(\"annual_total_list\")[EC2_ORDER];",
 									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
 									"    pm.expect(savings).to.be.closeTo(est_yearly *3, 1);",
 									"});"
@@ -2809,206 +2355,6 @@
 			"name": "All RDS",
 			"item": [
 				{
-					"name": "Services",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set(\"service_types_dict\", pm.response.json());"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host_aws}}/services",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"services"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Recommendation",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const EC2_ORDER = 0;",
-									"const RDS_ORDER = 1;",
-									"//ELASTICACHE",
-									"const EC_ORDER = 2;",
-									"//REDSHIFT ",
-									"const RSH_ORDER = 3;",
-									"//ELASTISEARCH",
-									"const ES_ORDER = 4;",
-									"",
-									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
-									"});",
-									"",
-									"pm.test(\"In Order\",()=>{",
-									"    let results = pm.response.json().results.grand_result;",
-									"    //no d",
-									"    for(let i = 0; i<results.length-1;i++){",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
-									"                break;",
-									"",
-									"            case RDS_ORDER:",
-									"              pm.expect(results[i].Service).to.equal(\"Amazon Relational Database Service\");",
-									"                break;",
-									"            case EC_ORDER:",
-									"                pm.expect(results[i].Service).to.equal(\"Amazon ElastiCache\");",
-									"                break;",
-									"            case RSH_ORDER:",
-									"               pm.expect(results[i].Service).to.equal(\"Amazon Redshift\");",
-									"                break;",
-									"                //when the mismatch is fixed, currently no Service key",
-									"            // case ES_ORDER:",
-									"            //   pm.expect(results[i].Service).to.equal(\"Amazon Elasticsearch Service\");",
-									"            //     break;",
-									"        }",
-									"    }",
-									"",
-									"})",
-									"",
-									"//Set up input for preview",
-									"",
-									"let ec2_list = [];",
-									"let rds_list = [];",
-									"let ec_list = [];",
-									"let rsh_list = [];",
-									"let es_list = [];",
-									"let result_list = pm.response.json().results.grand_result;",
-									"let r_id, raw_service, service, instances;",
-									"for (let i = 0; i<result_list.length; i++){",
-									"    //RecommendationId",
-									"    r_id = result_list[i].RecommendationId;",
-									"    raw_service = result_list[i].Service;",
-									"    service = pm.environment.get(\"service_dict\")[raw_service];",
-									"    if( r_id == undefined){",
-									"        continue;",
-									"    }",
-									"    instances = result_list[i].RecommendationDetails;",
-									"    let curr_instance, region, instance_type, count;",
-									"    for(let j = 0; j<instances.length; j++){",
-									"        curr_instance = instances[j];",
-									"        region = curr_instance.Region;",
-									"        instance_type = curr_instance.RecommendedInstanceType;",
-									"        count = curr_instance.RecommendedNumberOfInstances;",
-									"        let info, dict;",
-									"       ",
-									"        switch(i){",
-									"            case EC2_ORDER:",
-									"                info = curr_instance.Platform;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3, \"InstanceType\":instance_type, ",
-									"                \"OfferingClass\": \"standard\", \"OfferingType\": \"All Upfront\",\"ProductDescription\":info , ",
-									"                \"Region\":region,\"RecommendationId\":r_id};",
-									"                ec2_list.push(dict);",
-									"                break;",
-									"            case RDS_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                multiAZ = curr_instance.MultiAZ;",
-									"                dict = {\"Service\": service, \"Count\": count , \"Duration\": 3,\"DBInstanceClass\": instance_type,",
-									"                \"OfferingType\": \"All Upfront\",\"ProductDescription\":info,",
-									"                 \"MultiAZ\": multiAZ, \"Region\": region,\"RecommendationId\": r_id};",
-									"                rds_list.push(dict);",
-									"                break;",
-									"            case EC_ORDER:",
-									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                ec_list.push(dict);",
-									"                break;",
-									"            case RSH_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                rsh_list.push(dict);",
-									"                break;",
-									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
-									"                es_list.push(dict);",
-									"                break;",
-									"        }",
-									"    }  ",
-									"}",
-									"",
-									"pm.environment.set(\"ec2_instances\",ec2_list);",
-									"pm.environment.set(\"rds_instances\",rds_list);",
-									"pm.environment.set(\"bought_index\", RDS_ORDER);",
-									"pm.environment.set(\"est_annual_total\", result_list[RDS_ORDER].Summary.EstimatedAnnualSavings);",
-									"pm.environment.set(\"elc_instances\",ec_list);",
-									"pm.environment.set(\"red_instances\",rsh_list);",
-									"pm.environment.set(\"es_instances\",es_list);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{host_aws}}/ce/get-reservation-recommendation/?cloud_account_id={{cloud_account_id}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"ce",
-								"get-reservation-recommendation",
-								""
-							],
-							"query": [
-								{
-									"key": "cloud_account_id",
-									"value": "{{cloud_account_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Purchase RDS All Preview",
 					"event": [
 						{
@@ -3146,9 +2492,18 @@
 									"    pm.expect(pm.response.json()).to.have.property('results');",
 									"});",
 									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
 									"//buying as recommended so must be 3 years",
 									"pm.test(\"Savings equal recommended est annual * 3 years\",()=>{",
-									"    let est_yearly = pm.environment.get(\"est_annual_total\");",
+									"    let est_yearly = pm.environment.get(\"annual_total_list\")[RDS_ORDER];",
 									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
 									"    pm.expect(savings).to.be.closeTo(est_yearly *3, 1);",
 									"});"
@@ -3665,9 +3020,18 @@
 									"    pm.expect(pm.response.json()).to.have.property('results');",
 									"});",
 									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
 									"//buying as recommended so must be 3 years",
 									"pm.test(\"Savings equal recommended est annual * 3 years\",()=>{",
-									"    let est_yearly = pm.environment.get(\"est_annual_total\");",
+									"    let est_yearly = pm.environment.get(\"annual_total_list\")[EC_ORDER];",
 									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
 									"    pm.expect(savings).to.be.closeTo(est_yearly *3, 1);",
 									"});"
@@ -4184,9 +3548,18 @@
 									"    pm.expect(pm.response.json()).to.have.property('results');",
 									"});",
 									"",
+									"const EC2_ORDER = 0;",
+									"const RDS_ORDER = 1;",
+									"//ELASTICACHE",
+									"const EC_ORDER = 2;",
+									"//REDSHIFT ",
+									"const RSH_ORDER = 3;",
+									"//ELASTISEARCH",
+									"const ES_ORDER = 4;",
+									"",
 									"//buying as recommended so must be 3 years",
 									"pm.test(\"Savings equal recommended est annual * 3 years\",()=>{",
-									"    let est_yearly = pm.environment.get(\"est_annual_total\");",
+									"    let est_yearly = pm.environment.get(\"annual_total_list\")[RSH_ORDER];",
 									"    let savings = parseFloat(pm.response.json().results[0].Savings);",
 									"    pm.expect(savings).to.be.closeTo(est_yearly *3, 1);",
 									"});"
