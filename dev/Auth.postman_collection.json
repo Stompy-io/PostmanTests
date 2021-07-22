@@ -18,9 +18,7 @@
 									"const test_mail_pairs = [['ftm8x','be915d57-78e8-42ef-905a-d56e84a94bdf'],",
 									"                    ['rw1ta', '00e9dd78-915d-49c7-a86b-7a01bc7e7aa4'],",
 									"                    ['eguzv', '853bbc59-1190-4c3d-b19b-fd9b42ec6099'],",
-									"                    ['7b984', '5e234310-2865-473f-b270-8900052450c8'],",
-									"                    ['p7r7y', '65ec4353-0149-4308-ab5d-ef20facafa5d']]",
-									"const test_mail_pairs = pm.collectionVariables.get('test_mail_pairs');",
+									"                    ['7b984', '5e234310-2865-473f-b270-8900052450c8']]",
 									"const index = Math.floor(Math.random()*(test_mail_pairs.length));",
 									"const namespace = test_mail_pairs[index][0];",
 									"pm.environment.set('test_email_namespace', namespace);",
@@ -263,6 +261,88 @@
 								{
 									"key": "vrf_code",
 									"value": "{{vrf_code}}+1",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{randomPassword}}",
+									"type": "text"
+								},
+								{
+									"key": "re_password",
+									"value": "{{randomPassword}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/users/register/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Invalid Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"// pm.test(\"non_field_errors is Verify Code Does Not Match!\", () => {",
+									"//     pm.expect(pm.response.json().non_field_errors).to.eql(['Verify Code Does Not Match!']);",
+									"// });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"first_name\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+									"pm.environment.set('randomPassword', pm.variables.replaceIn('{{$randomPassword}}'))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "{{first_name}}",
+									"type": "text"
+								},
+								{
+									"key": "organization",
+									"value": "Stompy",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "not_an_email",
+									"type": "text"
+								},
+								{
+									"key": "vrf_code",
+									"value": "{{vrf_code}}",
 									"type": "text"
 								},
 								{
@@ -561,57 +641,6 @@
 		{
 			"name": "Connect but oh fail",
 			"item": [
-				{
-					"name": "Users Wrong user id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// pm.test(\"HTTP status code is 401\", function () {",
-									"//     pm.response.to.have.status(401);",
-									"// });",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{test_access}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host_user}}/users/1/",
-							"host": [
-								"{{host_user}}"
-							],
-							"path": [
-								"users",
-								"1",
-								""
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Users Get Organization id Copy",
 					"event": [
@@ -1353,12 +1382,6 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "Authorization",
 								"value": "{{test_access}}",
 								"type": "text"
 							}
@@ -1481,12 +1504,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{test_caid}}&region_code=ap-southeast-1",
+							"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{test_caid}}&region_code=ap-southeast-1",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainer",
+								"spotainers",
 								"get_vpcs",
 								""
 							],
@@ -1515,12 +1538,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainer",
+										"spotainers",
 										"get_vpcs",
 										""
 									],
@@ -1888,12 +1911,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{test_caid}}&region_code=ap-southeast-1",
+							"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{test_caid}}&region_code=ap-southeast-1",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainer",
+								"spotainers",
 								"get_vpcs",
 								""
 							],
@@ -1922,12 +1945,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainer",
+										"spotainers",
 										"get_vpcs",
 										""
 									],
@@ -1999,12 +2022,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code=ap-east-1",
+									"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code=ap-east-1",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainer",
+										"spotainers",
 										"get_vpcs",
 										""
 									],

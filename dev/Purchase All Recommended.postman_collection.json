@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "30d341f2-4117-4b3e-924e-08c6b7415a0e",
-		"name": "Purchase Random",
+		"_postman_id": "9a6fe97e-44f2-4545-9925-98a7c6f5482f",
+		"name": "Purchase All Recommended",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -94,8 +94,8 @@
 									"",
 									"pm.test(\"In Order\",()=>{",
 									"    let results = pm.response.json().results.grand_result;",
-									"    //no d",
-									"   for(let i = 0; i<results.length-1;i++){",
+									"    //no data for es now",
+									"    for(let i = 0; i<results.length-1;i++){",
 									"        switch(i){",
 									"            case EC2_ORDER:",
 									"                pm.expect(results[i].Service).to.equal(\"Amazon Elastic Compute Cloud - Compute\");",
@@ -117,28 +117,11 @@
 									"        }",
 									"    }",
 									"",
-									"});",
+									"})",
 									"",
-									"let result_list = pm.response.json().results.grand_result;",
-									"//EstimatedAnnualSavings = TotalEstimatedMonthlySavingsAmount*12",
-									"pm.test(\"Annual Savings = monthly*12\",()=>{",
-									"    let monthly, annual;",
-									"    for (let i = 0; i<result_list.length; i++){",
-									"        if( result_list[i].Summary == undefined){",
-									"        continue;",
-									"    }",
-									"        monthly = parseFloat(result_list[i].Summary.TotalEstimatedMonthlySavingsAmount);",
-									"        annual = parseFloat(result_list[i].Summary.EstimatedAnnualSavings);",
-									"        pm.expect(monthly*12).to.be.closeTo(annual, 0.5);",
-									"    }",
-									"});",
-									"",
-									"",
-									"//record savings",
-									"let savings_per_instance = [];",
 									"//Set up input for preview",
 									"let instance_list = [];",
-									"",
+									"let result_list = pm.response.json().results.grand_result;",
 									"let r_id, raw_service, service, instances;",
 									"for (let i = 0; i<result_list.length; i++){",
 									"    //RecommendationId",
@@ -152,8 +135,6 @@
 									"    let curr_instance, region, instance_type, count;",
 									"    for(let j = 0; j<instances.length; j++){",
 									"        curr_instance = instances[j];",
-									"        //record each monthly savings",
-									"        savings_per_instance.push(curr_instance.EstimatedMonthlySavings);",
 									"        region = curr_instance.Region;",
 									"        instance_type = curr_instance.RecommendedInstanceType;",
 									"        count = curr_instance.RecommendedNumberOfInstances;",
@@ -177,31 +158,44 @@
 									"                break;",
 									"            case EC_ORDER:",
 									"                info = curr_instance.ProductDescription;",
-									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"1\", \"ProductDescription\":info.toLowerCase(),",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+									"                dict = {\"Service\":service, \"Count\": count,\"CacheNodeType\": instance_type, \"Duration\": \"3\", \"ProductDescription\":info.toLowerCase(),",
+									"                \"OfferingType\": \"All Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
 									"                instance_list.push(dict);",
 									"                break;",
 									"            case RSH_ORDER:",
 									"                dict = {\"Service\":service, \"Count\": count,\"NodeType\": instance_type, \"Duration\": 3, ",
-									"                \"OfferingType\": \"Partial Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+									"                \"OfferingType\": \"All Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
 									"                instance_list.push(dict);",
 									"                break;",
 									"            case ES_ORDER:",
-									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 2, ",
-									"                \"OfferingType\": \"No Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
+									"                dict = {\"Service\":service, \"Count\": count,\"RecommendedInstanceType\": instance_type, \"Duration\": 3, ",
+									"                \"OfferingType\": \"All Upfront\", \"Region\": region, \"RecommendationId\":r_id};",
 									"                instance_list.push(dict);",
 									"                break;",
 									"        }",
 									"    }  ",
 									"}",
-									"let instance_i = Math.floor(Math.random(instance_list)*instance_list.length);",
-									"pm.environment.set(\"bought_index\",instance_i);",
-									"let one_instance = instance_list[instance_i];",
-									"pm.environment.set(\"one_instance\", JSON.stringify(one_instance));",
-									"console.log(pm.environment.get(\"one_instance\"));",
-									"let est_monthly_saving = savings_per_instance[instance_i];",
-									"pm.environment.set(\"est_monthly_saving\", parseFloat(est_monthly_saving));",
-									"console.log(pm.environment.get(\"est_monthly_saving\"));"
+									"",
+									"pm.environment.set(\"instance_list\", JSON.stringify(instance_list));",
+									"console.log(pm.environment.get(\"instance_list\"));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const serviceDict = {",
+									"    \"Amazon Elastic Compute Cloud - Compute\":\"EC2\",",
+									"    \"Amazon Relational Database Service\":\"RDS\",",
+									"    \"Amazon ElastiCache\": \"ElastiCache\" ,",
+									"    \"Amazon Redshift\": \"Redshift\" ,",
+									"    \"Amazon ElastiSearch\": \"ES\"",
+									"};",
+									"",
+									"pm.environment.set(\"service_dict\", serviceDict);"
 								],
 								"type": "text/javascript"
 							}
@@ -238,7 +232,7 @@
 					"response": []
 				},
 				{
-					"name": "Purchase Preview One of Instance",
+					"name": "Purchase All Preview",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -254,115 +248,18 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Status code is 200 or 204\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 									"});",
-									"pm.test(\"Has results\", () => {",
+									"pm.test(\"Has results\", ()=>{",
 									"    pm.expect(pm.response.json()).to.have.property('results');",
 									"});",
 									"",
-									"let pre_instance = JSON.parse(pm.environment.get(\"one_instance\"));",
-									"",
 									"let results = pm.response.json().results;",
-									"",
-									"pm.test(\"Has Service\", () => {",
-									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"let request_list = JSON.parse(pm.environment.get(\"instance_list\"));",
+									"pm.test(\"Same Amount of instances\",()=>{",
+									"    pm.expect(results.length).to.equal(request_list.length);",
 									"});",
-									"",
-									"let service = results[0].Service;",
-									"pm.test(\"Service match request\", () => {",
-									"    pm.expect(results[0].Service).to.equal(pre_instance.Service);",
-									"});",
-									"",
-									"pm.test(\"Has Region\", () => {",
-									"    pm.expect(results[0]).to.have.property(\"Region\");",
-									"});",
-									"",
-									"pm.test(\"Region match request\", () => {",
-									"    if(service == \"ES\"){",
-									"        let response_region = pm.collectionVariables.get('region_dict')[results[0].Region];",
-									"        pm.expect(response_region).to.equal(pm.environment.get(\"_Region\"));",
-									"    }else{",
-									"        pm.expect(results[0].Region).to.equal(pre_instance.Region);",
-									"    }",
-									"});",
-									"",
-									"pm.test(\"Has Count\", () => {",
-									"    pm.expect(results[0]).to.have.property(\"Count\");",
-									"});",
-									"",
-									"pm.test(\"Count match request\", () => {",
-									"    pm.expect(results[0].Count).to.equal(parseInt(pre_instance.Count));",
-									"});",
-									"",
-									"pm.test(\"Has Duration\", () => {",
-									"    pm.expect(results[0]).to.have.property(\"Duration\");",
-									"});",
-									"",
-									"pm.test(\"Duration match request\", () => {",
-									"    //60s * 60 min * 24 hr * 365 days",
-									"    let request_duration_in_seconds = pre_instance.Duration * 60 * 60 * 24 * 365;",
-									"    pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
-									"});",
-									"",
-									"pm.test(\"Check InstanceType\", () => {",
-									"    pm.expect(results[0]).to.satisfy((instance) => {",
-									"        if (service == \"EC2\") {",
-									"            if (instance.InstanceType == undefined) {",
-									"                console.log(\"InstanceType undefined\");",
-									"                return false;",
-									"            }",
-									"            if (instance.OfferingClass != pre_instance.OfferingClass) {",
-									"                console.log(\"Offering Class Mismatch\");",
-									"                return false;",
-									"            }",
-									"            return (instance.InstanceType == pre_instance.InstanceType);",
-									"        } else if (service == \"RDS\") {",
-									"            if (instance.DBInstanceClass == undefined || instance.MultiAZ == undefined) {",
-									"                console.log(\"DBInstanceClass or MultiAZ undefined\");",
-									"                return false;",
-									"            }",
-									"            if (instance.DBInstanceClass != pre_instance.DBInstanceClass) {",
-									"                console.log(\"InstanceType Mismatch\");",
-									"                return false;",
-									"            }",
-									"            return true; ",
-									"        } else if (service == \"ElastiCache\") {",
-									"            if (instance.CacheNodeType != pre_instance.CacheNodeType) {",
-									"                console.log(\"CacheNodeType Mismatch\");",
-									"                return false;",
-									"            }",
-									"            return true; ",
-									"        }else if( service == \"Redshift\"){",
-									"            if (instance.NodeType != pre_instance.NodeType) {",
-									"                console.log(\"NodeType Mismatch\");",
-									"                return false;",
-									"            }",
-									"            return true; ",
-									"        }else {",
-									"            if(service != \"ES\"){",
-									"                console.log(\"Wrong Service Name\");",
-									"                return false;",
-									"            }",
-									"            if (instance.ElasticsearchInstanceType != pre_instance.RecommendedInstanceType) {",
-									"                console.log(\"ElasticsearchInstanceType Mismatch\");",
-									"                return false;",
-									"            }",
-									"            return true; ",
-									"        }",
-									"    });",
-									"});",
-									"",
-									"pm.test(\"InstanceType match request\", () => {",
-									"    pm.expect(results[0].InstanceType).to.equal(pre_instance.InstanceType);",
-									"});",
-									"",
-									"pm.test(\"Has OfferingType\", () => {",
-									"    pm.expect(results[0]).to.have.property(\"OfferingType\");",
-									"});",
-									"",
-									"pm.test(\"OfferingType match request\", () => {",
-									"    pm.expect(results[0].OfferingType).to.equal(pre_instance.OfferingType);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -373,7 +270,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\": \n   [\n    {{one_instance}}\n   ]\n}",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\": \n   {{instance_list}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -396,13 +293,13 @@
 					"response": []
 				},
 				{
-					"name": "!! Purchase One Instance As Recommended",
+					"name": "!!Purchase All",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.environment.set(\"purchase_service\",\"EC2\");"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -419,19 +316,10 @@
 									"});",
 									"",
 									"let results = pm.response.json().results;",
-									"",
-									"pm.test(\"Has info\", ()=>{",
-									"    pm.expect(results[0]).to.have.property(\"info\");",
-									"});",
-									"",
-									"",
-									"pm.test(\"Has Service\", ()=>{",
-									"    pm.expect(results[0]).to.have.property(\"Service\");",
-									"});",
-									"",
-									"let pre_instance = JSON.parse(pm.environment.get(\"one_instance\"));",
-									"pm.test(\"Service match request\", ()=>{",
-									"    pm.expect(results[0].Service).to.equal(pre_instance.Service);",
+									"let request_list = pm.environment.get(\"instance_list\");",
+									"pm.test(\"Same Amount of instances\",()=>{",
+									"    let request_list = JSON.parse(pm.environment.get(\"instance_list\"));",
+									"    pm.expect(results.length).to.equal(request_list.length);",
 									"});",
 									""
 								],
@@ -444,7 +332,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": false,\n  \"Instances\":\n  [\n    {{one_instance}}\n  ]\n}",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": false,\n  \"Instances\":\n  {{instance_list}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -477,31 +365,16 @@
 									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 									"});",
 									"",
-									"// pm.test(\"Bought service goes away\",()=>{",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									"// });",
 									"pm.test(\"Bought service goes away\",()=>{",
-									"    pm.expect( pm.response.json().results.grand_result).to.satisfy((result)=>{",
-									"        for(let i =0; i< result.length;i++){",
-									"            if(result[i].RecommendationDetails === undefined){",
-									"                continue;",
-									"            }",
-									"            let total = parseInt(result[i].Summary.TotalRecommendations);",
-									"            if (result[i].RecommendationDetails.length == total-1){",
-									"                return true;",
-									"            }",
+									"    let result = pm.response.json().results.grand_result;",
+									"    for (let i = 0; i< result.length; i++){",
+									"        //no recommendation for this service in the first place",
+									"        if(result[i].RecommendationDetails == undefined){",
+									"            continue;",
 									"        }",
-									"        return false;",
-									"    })",
-									"});",
-									"//     let result = pm.response.json().results.grand_result;",
-									"//     let bought_index = pm.environment.get(\"bought_index\");",
-									"//     pm.expect(result[bought_index].RecommendationDetails.length).to.equal(0);",
-									"    ",
-									""
+									"        pm.expect(result[i].RecommendationDetails.length).to.equal(0);",
+									"    }",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -535,7 +408,7 @@
 					"response": []
 				},
 				{
-					"name": "Savings",
+					"name": "View Purchases Made",
 					"event": [
 						{
 							"listen": "test",
@@ -544,9 +417,127 @@
 									"pm.test(\"Status code is 200 or 204\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
 									"});",
-									"pm.test(\"Has results\", ()=>{",
-									"    pm.expect(pm.response.json()).to.have.property('results');",
-									"})",
+									"",
+									"let id_list = [];",
+									"for (let i = 0; i< pm.response.json().length;i++){",
+									"    id_list.push(pm.response.json()[i].id);",
+									"}",
+									"pm.environment.set(\"purchase_id_list\", id_list) ;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/services/purchases/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"purchases",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Billings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_user}}/bills/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"bills",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Purchase",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let curr_list = pm.environment.get(\"purchase_id_list\");",
+									"let curr_id = curr_list.shift();",
+									"pm.environment.set(\"purchase_id\", curr_id)",
+									"pm.environment.set(\"purchase_id_list\", curr_list);",
+									"",
+									"if(curr_list.length != 0){",
+									"    postman.setNextRequest(\"Clear Purchase\");",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/services/purchases/{{purchase_id}}/",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"purchases",
+								"{{purchase_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Purcahses Cleared",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Response is an empty list\", ()=>{",
+									"    pm.expect(pm.response.json().length).to.equal(0);",
+									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -557,12 +548,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/savings/?caid={{cloud_account_id}}",
+							"raw": "{{host_aws}}/services/purchases/?caid={{cloud_account_id}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"savings",
+								"services",
+								"purchases",
 								""
 							],
 							"query": [
@@ -585,6 +577,7 @@
 							"let accessed_time = pm.environment.get(\"accessed_time\");",
 							"let current_time = pm.variables.replaceIn(\"{{$timestamp}}\");",
 							"let time_passed = current_time - accessed_time;",
+							"console.log(\"token accessed \"+ time_passed +\"s ago\")",
 							"if(time_passed>240){",
 							"    pm.sendRequest({url: pm.environment.get('host_user') +'/auth/jwt/refresh/',",
 							"    method: 'POST', body: { mode: 'formdata',",
@@ -625,7 +618,33 @@
 					"    \"Amazon ElastiSearch\": \"ES\"",
 					"};",
 					"",
-					"pm.environment.set(\"service_dict\", serviceDict);"
+					"pm.environment.set(\"service_dict\", serviceDict);",
+					"",
+					"",
+					"let region_dict ={ // Only needed by ES preview comparison",
+					"    'us-east-1': 'US East (N. Virginia)',",
+					"    'us-east-2': 'US East (Ohio)',",
+					"    'us-west-1': 'US West (N. California)',",
+					"    'us-west-2': 'US West (Oregon)',",
+					"    'af-south-1': 'Africa (Cape Town)',",
+					"    'ap-east-1': 'Asia Pacific (Hong Kong)',",
+					"    'ap-south-1': 'Asia Pacific (Mumbai)',",
+					"    'ap-northeast-3': 'Asia Pacific (Osaka)',",
+					"    'ap-northeast-2': 'Asia Pacific (Seoul)',",
+					"    'ap-southeast-1': 'Asia Pacific (Singapore)',",
+					"    'ap-southeast-2': 'Asia Pacific (Sydney)',",
+					"    'ap-northeast-1': 'Asia Pacific (Tokyo)',",
+					"    'ca-central-1': 'Canada (Central)',",
+					"    'eu-central-1': 'Europe (Frankfurt)',",
+					"    'eu-west-1': 'Europe (Ireland)',",
+					"    'eu-west-2': 'Europe (London)',",
+					"    'eu-south-1': 'Europe (Milan)',",
+					"    'eu-west-3': 'Europe (Paris)',",
+					"    'eu-north-1': 'Europe (Stockholm)',",
+					"    'me-south-1': 'Middle East (Bahrain)',",
+					"    'sa-east-1': 'South America (São Paulo)'",
+					"}",
+					"pm.collectionVariables.set(\"region_dict\", region_dict);"
 				]
 			}
 		},
@@ -634,9 +653,23 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"const serviceDict = {",
+					"    \"Amazon Elastic Compute Cloud - Compute\":\"EC2\",",
+					"    \"Amazon Relational Database Service\":\"RDS\",",
+					"    \"Amazon ElastiCache\": \"ElastiCache\" ,",
+					"    \"Amazon Redshift\": \"Redshift\" ,",
+					"    \"Amazon ElastiSearch\": \"ES\"",
+					"};",
+					"",
+					"pm.environment.set(\"service_dict\", serviceDict);"
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "region_dict",
+			"value": ""
 		}
 	]
 }

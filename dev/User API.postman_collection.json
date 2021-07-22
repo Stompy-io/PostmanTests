@@ -1524,7 +1524,7 @@
 									"});",
 									"",
 									"pm.test('Plan id changed', ()=>{",
-									"    pm.expect(pm.response.json().plan).to.eql('3');",
+									"    pm.expect(pm.response.json().plan).to.eql(3);",
 									"});"
 								],
 								"type": "text/javascript"

@@ -621,14 +621,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_aws}}/ce/cost_usage/get_current/?caid={{cloud_account_id}}",
+					"raw": "{{host_aws}}/ce/cost_usage/current_cost/?caid={{cloud_account_id}}",
 					"host": [
 						"{{host_aws}}"
 					],
 					"path": [
 						"ce",
 						"cost_usage",
-						"get_current",
+						"current_cost",
 						""
 					],
 					"query": [
@@ -767,7 +767,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{host_aws}}/ce/utilizations/efficiency/?caid={{cloud_account_id}}&sub_accounts={{query_accounts}}",
+					"raw": "{{host_aws}}/ce/utilizations/efficiency/?caid={{cloud_account_id}}&sub_accounts=%5B%7B%22AccountID%22:%22263078123597%22,%22Amount%22:%221128.92%22,%22AccountName%22:%22MR332%22%7D,%7B%22AccountID%22:%22385105545457%22,%22Amount%22:%22180.38%22,%22AccountName%22:%22Stompy.io%22%7D,%7B%22AccountID%22:%22254378262586%22,%22Amount%22:%220.40%22,%22AccountName%22:%22Stompy_test%22%7D%5D",
 					"host": [
 						"{{host_aws}}"
 					],
@@ -784,7 +784,7 @@
 						},
 						{
 							"key": "sub_accounts",
-							"value": "{{query_accounts}}"
+							"value": "%5B%7B%22AccountID%22:%22263078123597%22,%22Amount%22:%221128.92%22,%22AccountName%22:%22MR332%22%7D,%7B%22AccountID%22:%22385105545457%22,%22Amount%22:%22180.38%22,%22AccountName%22:%22Stompy.io%22%7D,%7B%22AccountID%22:%22254378262586%22,%22Amount%22:%220.40%22,%22AccountName%22:%22Stompy_test%22%7D%5D"
 						}
 					]
 				}
