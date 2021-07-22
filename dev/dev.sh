@@ -32,7 +32,7 @@ newman run Auth\ Never\ Fail.postman_collection.json  -e Develop.postman_environ
 -r htmlextra --reporter-htmlextra-export ./results/ --reporter-htmlextra-logs #\
 #--env-var spotARN=$DEV_SPOT_ARN --env-var testARN=$DEV_ANAL_ARN
 newman run Create\ Spotainer.postman_collection.json  -e Develop.postman_environment.json \
--d region_code.csv\
+-d region_code.csv \
 -r htmlextra --reporter-htmlextra-export ./results/ --reporter-htmlextra-logs
 newman run No\ Auth\ No\ Access.postman_collection.json  -e Develop.postman_environment.json \
 -r htmlextra --reporter-htmlextra-export ./results/ --reporter-htmlextra-logs
