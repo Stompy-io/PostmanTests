@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "29e41816-3892-4b15-89f7-a32cc8abc66a",
+		"name": "Reset Too Slow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sent Code Reset",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"result is success\", ()=>{",
+							"    pm.expect(pm.response.json().results).to.eql('The Email has been sent successfully！');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_user}}/auth/users/send_code/?email_to={{reset_test_email}}&operation=resetPwd",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"send_code",
+						""
+					],
+					"query": [
+						{
+							"key": "email_to",
+							"value": "{{reset_test_email}}"
+						},
+						{
+							"key": "operation",
+							"value": "resetPwd"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VRFCode From Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const html_str = pm.response.json()['emails'][0]['html'];",
+							"html_str.replace(/\\/n/, '');",
+							"const $ = cheerio.load(html_str);",
+							"const v_code = $('#vrf_code').text()",
+							"pm.test(\"Verification Code is 6-digit\", ()=>{",
+							"    pm.expect(v_code).to.match(/^\\d{6}$/);",
+							"})",
+							"pm.environment.set(\"vrf_code\", v_code)",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{test_email_api}}?apikey=853bbc59-1190-4c3d-b19b-fd9b42ec6099&namespace=eguz&timestamp_from={{timeStamp}}&livequery=true",
+					"protocol": "https",
+					"host": [
+						"{{test_email_api}}"
+					],
+					"query": [
+						{
+							"key": "apikey",
+							"value": "853bbc59-1190-4c3d-b19b-fd9b42ec6099"
+						},
+						{
+							"key": "namespace",
+							"value": "eguz"
+						},
+						{
+							"key": "timestamp_from",
+							"value": "{{timeStamp}}"
+						},
+						{
+							"key": "livequery",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Password Time Out",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set('currentPassword', pm.variables.replaceIn('{{$randomPassword}}'));",
+							"setTimeout(function(){}, 600001);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"non_field_errors is Verify Code Does Not Match\", ()=>{",
+							"    pm.expect(pm.response.json().non_field_errors).to.equal('Verify Code Does Not Match!');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "organization",
+							"value": "Stompy",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{currentEmail}}",
+							"type": "text"
+						},
+						{
+							"key": "vrf_code",
+							"value": "{{vrf_code}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{currentPassword}}",
+							"type": "text"
+						},
+						{
+							"key": "re_password",
+							"value": "{{currentPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host_user}}/auth/users/reset_password/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"reset_password",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

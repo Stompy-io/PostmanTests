@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "e229adaa-3a13-4a30-93d1-39cd7e5cd8c8",
+		"name": "Register Slow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sent Code Register Normal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const test_mail_pairs = pm.collectionVariables.get('test_mail_pairs');",
+							"const index = Math.floor(Math.random()*(test_mail_pairs.length));",
+							"const namespace = test_mail_pairs[index][0];",
+							"pm.environment.set('test_email_namespace', namespace);",
+							"pm.environment.set('test_email_api_key', test_mail_pairs[index][1]);",
+							"const email = namespace+\".\" + pm.variables.replaceIn('{{$guid}}') +'.temp'+ pm.variables.get(\"test_email_domain\");",
+							"pm.environment.set(\"currentEmail\", email);",
+							"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"result is email sent success\", ()=>{",
+							"    pm.expect(pm.response.json().results).to.equal('The Email has been sent successfully！');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_user}}/auth/users/send_code/?email_to={{currentEmail}}&operation=register",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"send_code",
+						""
+					],
+					"query": [
+						{
+							"key": "email_to",
+							"value": "{{currentEmail}}"
+						},
+						{
+							"key": "operation",
+							"value": "register"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VRFCode From Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const html_str = pm.response.json()['emails'][0]['html'];",
+							"html_str.replace(/\\/n/, '');",
+							"const $ = cheerio.load(html_str);",
+							"const v_code = $('#vrf_code').text()",
+							"pm.test(\"Verification Code is 6-digit\", ()=>{",
+							"    pm.expect(v_code).to.match(/^\\d{6}$/);",
+							"})",
+							"pm.environment.set(\"vrf_code\", v_code)",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{test_email_api}}?apikey={{test_email_api_key}}&namespace={{test_email_namespace}}&timestamp_from={{timeStamp}}&livequery=true",
+					"protocol": "https",
+					"host": [
+						"{{test_email_api}}"
+					],
+					"query": [
+						{
+							"key": "apikey",
+							"value": "{{test_email_api_key}}"
+						},
+						{
+							"key": "namespace",
+							"value": "{{test_email_namespace}}"
+						},
+						{
+							"key": "timestamp_from",
+							"value": "{{timeStamp}}"
+						},
+						{
+							"key": "livequery",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Vrf Code expired",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.equal(400);",
+							"});",
+							"",
+							"pm.test(\"non_field_errors is Verify Code Does Not Match!\", () => {",
+							"    pm.expect(pm.response.json().non_field_errors).to.equal(['Verify Code Does Not Match!']);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"first_name\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+							"pm.environment.set('currentPassword', pm.variables.replaceIn('{{$randomPassword}}'));",
+							"setTimeout(()=>{}, 600001)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "first_name",
+							"value": "{{first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "organization",
+							"value": "Stompy",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{currentEmail}}",
+							"type": "text"
+						},
+						{
+							"key": "vrf_code",
+							"value": "{{vrf_code}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{currentPassword}}",
+							"type": "text"
+						},
+						{
+							"key": "re_password",
+							"value": "{{currentPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host_user}}/auth/users/register/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"register",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

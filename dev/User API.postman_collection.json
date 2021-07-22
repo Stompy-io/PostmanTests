@@ -1,0 +1,1817 @@
+{
+	"info": {
+		"_postman_id": "162f9325-9fbd-4f14-93a8-5819d3d31411",
+		"name": "User API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Has Access\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property(\"access\");",
+									"});",
+									"pm.test(\"Has Refresh\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property(\"refresh\");",
+									"});",
+									"",
+									"pm.environment.set('token', \"JWT \" + pm.response.json().access);",
+									"pm.environment.set(\"accessed_time\", pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"pm.environment.set('refresh', pm.response.json().refresh);",
+									"",
+									"function parseJwt(token) {",
+									"    var base64Payload = token.split('.')[1];",
+									"    var payload = Buffer.from(base64Payload, 'base64');",
+									"    return JSON.parse(payload.toString());",
+									"}",
+									"let payload = parseJwt(pm.response.json().access);",
+									"pm.environment.set('user_id', payload.user_id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "{{testUser}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Secret123!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/jwt/create/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"jwt",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"pm.test(\"Has Access\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"access\");",
+									"});",
+									"pm.test(\"Has Refresh\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"refresh\");",
+									"});",
+									"pm.environment.set('token', 'JWT ' + pm.response.json().access);",
+									"pm.environment.set('refresh', pm.response.json().refresh);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "refresh",
+									"value": "{{refresh}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/jwt/refresh/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"jwt",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"response has same id as request\", function () {",
+									"   pm.expect(pm.response.json().id).to.equal(pm.environment.get('user_id'))",
+									"});",
+									"",
+									"pm.test(\"response has email, role\", function () {",
+									"   pm.expect(pm.response.json()).to.have.all.keys([\"email\", 'username','id', 'role', 'organization']);",
+									"  ",
+									"});",
+									"pm.environment.set('org_id', pm.response.json().organization);",
+									"pm.environment.set('username', pm.response.json().username)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/users/{{user_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "users",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/users/{{user_id}}/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"users",
+										"{{user_id}}",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "109"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 01 Jul 2021 02:24:22 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "05db271b-8750-46b0-91b8-824e8f237af5"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, PUT, PATCH, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "114"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "BxMVQHYSyQ0FTjg="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60dd2754-3cdee4d46f80ef862637072a;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 04904401d608fcf25189f8fad65fe7a4.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "HKG54-C1"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "mVaNNmyKGfQfFnhSUIF37W_8qPqNzCm1Ls97pyzjRYen9_nMW8J_4Q=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 323,\n    \"username\": \"a_feng_test+dev__gmail_com\",\n    \"email\": \"a.feng.test+dev@gmail.com\",\n    \"role\": 0,\n    \"organization\": 323\n}"
+						}
+					]
+				},
+				{
+					"name": "Change Username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('username changed', ()=>{",
+									"    pm.expect(pm.response.json().username).to.not.eql(pm.environment.get('username'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"{{username}}1\",\n    \"email\": \"a.feng.test@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/users/{{user_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "users",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\":\"a\",\n    \"email\": \"a.feng.test@gmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/users/{{user_id}}/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"users",
+										"{{user_id}}",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "95"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 16 Jul 2021 07:30:44 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "a2cfcc1c-eaf6-47d3-9031-8e54e284b78e"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, PUT, PATCH, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "83"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "CjVRPEhKSQ0FQIQ="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60f135a1-0151d88f1c4a42031f06c1e4;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 1d0860167e2100a6d1cd9c0213c2b8e8.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "SEA19-C3"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "vwjSqlHTlyixIT4L5NHkFY8CZdAfVjonrIDMEz1ajHkC272YhHRHxg=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 6,\n    \"username\": \"ada\",\n    \"email\": \"a.feng.test@gmail.com\",\n    \"role\": 0,\n    \"organization\": 6\n}"
+						}
+					]
+				},
+				{
+					"name": "Users Info Changed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"response has same id as request\", function () {",
+									"   pm.expect(pm.response.json().id).to.equal(pm.environment.get('user_id'))",
+									"});",
+									"",
+									"pm.test(\"response has email, role\", function () {",
+									"   pm.expect(pm.response.json()).to.have.all.keys([\"email\", 'username','id', 'role', 'organization']);",
+									"  ",
+									"});",
+									"pm.test('username changed', ()=>{",
+									"    pm.expect(pm.response.json().username).to.not.eql(pm.environment.get('username'));",
+									"});",
+									"pm.environment.set('org_id', pm.response.json().organization);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/users/{{user_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "users",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/users/{{user_id}}/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"users",
+										"{{user_id}}",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "109"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 01 Jul 2021 02:24:22 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "05db271b-8750-46b0-91b8-824e8f237af5"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, PUT, PATCH, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "114"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "BxMVQHYSyQ0FTjg="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60dd2754-3cdee4d46f80ef862637072a;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 04904401d608fcf25189f8fad65fe7a4.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "HKG54-C1"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "mVaNNmyKGfQfFnhSUIF37W_8qPqNzCm1Ls97pyzjRYen9_nMW8J_4Q=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 323,\n    \"username\": \"a_feng_test+dev__gmail_com\",\n    \"email\": \"a.feng.test+dev@gmail.com\",\n    \"role\": 0,\n    \"organization\": 323\n}"
+						}
+					]
+				},
+				{
+					"name": "Check Success AWS Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"AWS Status is True\", function () {",
+									"    pm.expect(pm.response.json()['arn_status']['analyzer']) .to.be.true;",
+									"     pm.expect(pm.response.json()['arn_status']['spotainer']) .to.be.true;",
+									"});",
+									"",
+									"pm.test(\"Has keys id, old_id, bucket, analyzer_arn, spotainer_arn, aws_status, organization\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.all.keys('id', 'old_id', 'bucket', 'analyzer_arn', 'spotainer_arn','arn_status', 'organization');",
+									"    pm.expect(pm.response.json().bucket).to.eql( pm.environment.get('bucketName'));",
+									"    pm.expect(pm.response.json().analyzer_arn).to.eql(pm.environment.get('testARN'));",
+									"    pm.expect(pm.response.json().spotainer_arn).to.eql(pm.environment.get('spotARN'));",
+									"    pm.expect(pm.response.json().id.toString()) .to.eql(pm.environment.get('cloud_account_id'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/cloud-accounts/{{cloud_account_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"cloud-accounts",
+								"{{cloud_account_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Check Success AWS Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{test_access}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/cloud-accounts/{{test_caid}}/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"cloud-accounts",
+										"{{test_caid}}",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "174"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 07 Jul 2021 05:06:31 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "65b26d2e-ecd8-4b9a-bb7c-13dc1dea1e6f"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, PUT, PATCH, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "187"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "CFVtYHSDSQ0FpOg="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60e53655-52090be114d1e1fa696fbe6b;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 ba055a10d278614dad75399031edff3c.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "MRS52-C2"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "593UX8u24QnxQIKSBbu4m5GZNrYswhyFm2QT3zmN98GLskDA61Db5w=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 17,\n    \"old_id\": null,\n    \"bucket\": \"stompycursingapore\",\n    \"arn\": \"arn:aws:iam::385105545457:role/stompy-iam-role-stack-noelDev-StompyFinOpsRole-BECYKKB5NVPO\",\n    \"aws_status\": true,\n    \"organization\": 6\n}"
+						}
+					]
+				},
+				{
+					"name": "Change Username back",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('username changed', ()=>{",
+									"    pm.expect(pm.response.json().username).to.eql(pm.environment.get('username'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"{{username}}\",\n    \"email\": \"a.feng.test@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/users/{{user_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "users",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\":\"a\",\n    \"email\": \"a.feng.test@gmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/users/{{user_id}}/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"users",
+										"{{user_id}}",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "95"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 16 Jul 2021 07:30:44 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "a2cfcc1c-eaf6-47d3-9031-8e54e284b78e"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, PUT, PATCH, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "83"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "CjVRPEhKSQ0FQIQ="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60f135a1-0151d88f1c4a42031f06c1e4;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 1d0860167e2100a6d1cd9c0213c2b8e8.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "SEA19-C3"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "vwjSqlHTlyixIT4L5NHkFY8CZdAfVjonrIDMEz1ajHkC272YhHRHxg=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 6,\n    \"username\": \"ada\",\n    \"email\": \"a.feng.test@gmail.com\",\n    \"role\": 0,\n    \"organization\": 6\n}"
+						}
+					]
+				},
+				{
+					"name": "Change Connect ECS Account Invalid Arn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization\": \"{{org_id}}\",\n    \"bucket\": \"something\",\n    \"analyzer_arn\": \"blah\",\n    \"spotainer_arn\": \"spot\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/cloud-accounts/{{cloud_account_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"cloud-accounts",
+								"{{cloud_account_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Save New ECS Account",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"1564894\",\n    \"organization\": \"152\",\n    \"bucket\": \"{{bucketName}}\",\n    \"arn\": \"{{testARN}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/cloud-accounts/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"cloud-accounts",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "173"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 01 Jul 2021 07:54:01 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "81fa75fc-b7b4-43a1-a13b-9ce528d4ba5b"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "186"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "Bx8nlHJ1SQ0FfCg="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60dd7496-1a9d36181e8dd63378e023f7;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 6ff363ba56d3f8161f6692bcccc7a36d.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "LAX50-C3"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "6bdYkBKaCRvPem0kYLfR4IDQp-hTrz7GDxPa7poxEKxWYWbxuV3wSA=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1564894,\n    \"bucket\": \"stompy-dev1-bucket1\",\n    \"arn\": \"arn:aws:iam::385105545457:role/stompy-iam-role-stack-22315084633-StompyFinOpsRole-D7IZKZZ41JO5\",\n    \"aws_status\": false,\n    \"organization\": 152\n}"
+						}
+					]
+				},
+				{
+					"name": "Check Success AWS Status Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"AWS Status is True\", function () {",
+									"    pm.expect(pm.response.json()['arn_status']['analyzer']) .to.be.true;",
+									"     pm.expect(pm.response.json()['arn_status']['spotainer']) .to.be.true;",
+									"});",
+									"pm.test(\"Has keys id, old_id, bucket, analyzer_arn, spotainer_arn, aws_status, organization\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.all.keys('id', 'old_id', 'bucket', 'analyzer_arn', 'spotainer_arn','arn_status', 'organization');",
+									"    pm.expect(pm.response.json().bucket).to.eql( pm.environment.get('bucketName'));",
+									"    pm.expect(pm.response.json().analyzer_arn).to.eql(pm.environment.get('testARN'));",
+									"    pm.expect(pm.response.json().spotainer_arn).to.eql(pm.environment.get('spotARN'));",
+									"    pm.expect(pm.response.json().id.toString()) .to.eql(pm.environment.get('cloud_account_id'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/cloud-accounts/{{cloud_account_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"cloud-accounts",
+								"{{cloud_account_id}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Check Success AWS Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{test_access}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_user}}/cloud-accounts/{{test_caid}}/",
+									"host": [
+										"{{host_user}}"
+									],
+									"path": [
+										"cloud-accounts",
+										"{{test_caid}}",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "174"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 07 Jul 2021 05:06:31 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "65b26d2e-ecd8-4b9a-bb7c-13dc1dea1e6f"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, PUT, PATCH, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "187"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "CFVtYHSDSQ0FpOg="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60e53655-52090be114d1e1fa696fbe6b;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 ba055a10d278614dad75399031edff3c.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "MRS52-C2"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "593UX8u24QnxQIKSBbu4m5GZNrYswhyFm2QT3zmN98GLskDA61Db5w=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 17,\n    \"old_id\": null,\n    \"bucket\": \"stompycursingapore\",\n    \"arn\": \"arn:aws:iam::385105545457:role/stompy-iam-role-stack-noelDev-StompyFinOpsRole-BECYKKB5NVPO\",\n    \"aws_status\": true,\n    \"organization\": 6\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "organizations list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"//has next， future improvement to test them all but for now leave it be ",
+									"// pm.test(\"Count is correct\", function () {",
+									"//     pm.expect(pm.response.json().results.length).to.eql(pm.response.json().count)",
+									"// });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/organizations/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"organizations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "organization detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.environment.set('plan_id', pm.response.json().plan);",
+									"pm.environment.set('org_name', pm.response.json().name);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/organizations/{{org_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"organizations",
+								"{{org_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change organization plan and or name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"org_id\": \"{{org_id}}\",\n    \"name\": \"funny name\",\n    \"plan\": \"3\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/organizations/{{org_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"organizations",
+								"{{org_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check changes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Org name changed', ()=>{",
+									"    pm.expect(pm.response.json().name).to.eql('funny name');",
+									"});",
+									"",
+									"pm.test('Plan id changed', ()=>{",
+									"    pm.expect(pm.response.json().plan).to.eql('3');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/organizations/{{org_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"organizations",
+								"{{org_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change organization back",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"org_id\": \"{{org_id}}\",\n    \"name\": \"{{org_name}}\",\n    \"plan\": \"{{plan_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/organizations/{{org_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"organizations",
+								"{{org_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Plans",
+			"item": [
+				{
+					"name": "all plans",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_user}}/plans/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"plans",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "current plans",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_user}}/plans/{{plan_id}}/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"plans",
+								"{{plan_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Billings",
+			"item": [
+				{
+					"name": "Billings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_user}}/bills/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"bills",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Version",
+			"item": [
+				{
+					"name": "Version",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_user}}/release/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"release",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
