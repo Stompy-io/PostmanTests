@@ -87,7 +87,7 @@
 											"        \"Start\": \"2021-01-01\",",
 											"        \"End\": \"2021-07-05\"",
 											"    },",
-											"    \"Granularity\": \"MONTHLY\",",
+											"    \"Granularity\": \"YEARLY\",",
 											"    \"Metrics\": [",
 											"        \"UNBLENDED_COST\",",
 											"        \"AMORTIZED_COST\"",
@@ -101,6 +101,17 @@
 											"}",
 											"",
 											"pm.environment.set('spend_params', encodeURI(JSON.stringify(spend_query_params)));"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status is 400', () => {",
+											"    pm.expect(pm.response).to.have.status(400);",
+											"});"
 										],
 										"type": "text/javascript"
 									}

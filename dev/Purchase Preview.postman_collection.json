@@ -472,11 +472,11 @@
 									"});",
 									"",
 									"pm.test(\"Service match request\", ()=>{",
-									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchase_service\"));",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
 									"});",
 									"",
-									"pm.test(\"Has warning\", ()=>{",
-									"    pm.expect(results[0]).to.have.property(\"warning\");",
+									"pm.test(\"Has Error\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Error\");",
 									"});"
 								],
 								"type": "text/javascript"

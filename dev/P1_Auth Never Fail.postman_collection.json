@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "b9fb6da1-efc2-4d74-bb7a-ac7f822066b3",
-		"name": "Auth Never Fail",
+		"name": "P1_Auth Never Fail",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -1056,46 +1056,12 @@
 			]
 		},
 		{
-			"name": "Get VPCs",
+			"name": "Access Check Get VPCs",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// const REGION_MAP = {",
-							"//     'US East (N. Virginia)': 'us-east-1',",
-							"//     'Canada (Central)': 'ca-central-1',",
-							"//     'Asia Pacific (Mumbai)': 'ap-south-1',",
-							"//     'US West (Oregon)': 'us-west-2',",
-							"//     'Asia Pacific (Seoul)': 'ap-northeast-2',",
-							"//     'US West (N. California)': 'us-west-1',",
-							"//     'US East (Ohio)': 'us-east-2',",
-							"//     'EU (Ireland)': 'eu-west-1',",
-							"//     'South America (Sao Paulo)': 'sa-east-1',",
-							"//     'Asia Pacific (Tokyo)': 'ap-northeast-1',",
-							"//     'EU (London)': 'eu-west-2',",
-							"//     'Asia Pacific (Sydney)': 'ap-southeast-2',",
-							"//     'EU (Milan)': 'eu-south-1',",
-							"//     'EU (Paris)': 'eu-west-3',",
-							"//     'EU (Stockholm)': 'eu-north-1',",
-							"//     'Middle East (Bahrain)': 'me-south-1',",
-							"//     'EU (Frankfurt)': 'eu-central-1',",
-							"//     'Asia Pacific (Singapore)': 'ap-southeast-1',",
-							"//     'Africa (Cape Town)': 'af-south-1',",
-							"//     'Asia Pacific (Hong Kong)': 'ap-east-1',",
-							"//     'Asia Pacific (Osaka)': 'ap-northeast-3',",
-							"//     // 'AWS GovCloud (US)': None",
-							"// }",
-							"",
-							"// function randomValue(obj) {",
-							"//     let keys = Object.keys(obj);",
-							"//     return obj[keys[ Math.floor( keys.length * Math.random())]];",
-							"// };",
-							"",
-							"// let region_code = randomValue(REGION_MAP);",
-							"// console.log(region_code);",
-							"// pm.environment.set('region_code',region_code);",
-							"pm.environment.set('region_code','ap-southeast-1');",
 							""
 						],
 						"type": "text/javascript"
@@ -1105,39 +1071,30 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"const default_no_access = ['me-south-1', 'af-south-1', 'ap-east-1', ' eu-south-1']",
-							"if (default_no_access.includes(pm.request.url.query.toObject().region_code)) {",
-							"    pm.test('Status is 400', () => {",
-							"        pm.expect(pm.response).to.have.status(400);",
-							"    });",
-							"    pm.test('results is parameter error', () => {",
-							"        pm.expect(pm.response.json().error).to.eql('Parameters Error! Detail: An error occurred (AuthFailure) when calling the DescribeVpcs operation: AWS was not able to validate the provided access credentials');",
-							"    });",
 							"",
-							"} else {",
-							"    pm.test('Status is 200', () => {",
-							"        pm.expect(pm.response).to.have.status(200);",
-							"    });",
+							"pm.test('Status is 200', () => {",
+							"    pm.expect(pm.response).to.have.status(200);",
+							"});",
 							"",
-							"    pm.test('Has VpcId', () => {",
-							"        let results_list = pm.response.json().results;",
-							"        results_list.forEach(data => {",
-							"            pm.expect(data).to.have.property('VpcId');",
-							"        })",
-							"    });",
+							"pm.test('Has VpcId', () => {",
+							"    let results_list = pm.response.json().results;",
+							"    results_list.forEach(data => {",
+							"        pm.expect(data).to.have.property('VpcId');",
+							"    })",
+							"});",
 							"",
-							"    let checkDuplicatesFromList = (list, target_prop) => {",
-							"        let store = new Set();",
-							"        list.forEach(data => {",
-							"            pm.expect(store.has(data[target_prop]),\"No \"+data[target_prop] +'existed' ).to.be.false;",
-							"            store.add((data[target_prop]))",
-							"        });",
-							"    };",
-							"",
-							"    pm.test('has no duplicates', () => {",
-							"        checkDuplicatesFromList(pm.response.json().results, 'VpcId');",
+							"let checkDuplicatesFromList = (list, target_prop) => {",
+							"    let store = new Set();",
+							"    list.forEach(data => {",
+							"        pm.expect(store.has(data[target_prop]), \"No \" + data[target_prop] + 'existed').to.be.false;",
+							"        store.add((data[target_prop]))",
 							"    });",
-							"}"
+							"};",
+							"",
+							"pm.test('has no duplicates', () => {",
+							"    checkDuplicatesFromList(pm.response.json().results, 'VpcId');",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1187,12 +1144,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainer",
+								"spotainers",
 								"get_vpcs",
 								""
 							],
@@ -1251,124 +1208,6 @@
 					],
 					"cookie": [],
 					"body": "{\n    \"results\": [\n        {\n            \"CidrBlock\": \"172.31.0.0/16\",\n            \"DhcpOptionsId\": \"dopt-0c6b846a\",\n            \"State\": \"available\",\n            \"VpcId\": \"vpc-3023d756\",\n            \"OwnerId\": \"385105545457\",\n            \"InstanceTenancy\": \"default\",\n            \"IsDefault\": true\n        },\n        {\n            \"CidrBlock\": \"192.168.0.0/16\",\n            \"DhcpOptionsId\": \"dopt-0c6b846a\",\n            \"State\": \"available\",\n            \"VpcId\": \"vpc-0b3265044afb57fce\",\n            \"OwnerId\": \"385105545457\",\n            \"InstanceTenancy\": \"default\",\n            \"IsDefault\": false\n        }\n    ]\n}"
-				},
-				{
-					"name": "Get VPCs",
-					"originalRequest": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code=ap-east-1",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"spotainer",
-								"get_vpcs",
-								""
-							],
-							"query": [
-								{
-									"key": "caid",
-									"value": "{{cloud_account_id}}"
-								},
-								{
-									"key": "region_code",
-									"value": "ap-east-1"
-								},
-								{
-									"key": "region_code",
-									"value": "me-south-1",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"status": "Bad Request",
-					"code": 400,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						},
-						{
-							"key": "Content-Length",
-							"value": "153"
-						},
-						{
-							"key": "Connection",
-							"value": "keep-alive"
-						},
-						{
-							"key": "Date",
-							"value": "Tue, 06 Jul 2021 08:30:06 GMT"
-						},
-						{
-							"key": "x-amzn-RequestId",
-							"value": "aaf77474-e0a5-4c8c-9707-22b17dadbb36"
-						},
-						{
-							"key": "Referrer-Policy",
-							"value": "same-origin"
-						},
-						{
-							"key": "Content-Encoding",
-							"value": "gzip"
-						},
-						{
-							"key": "Allow",
-							"value": "GET, HEAD, OPTIONS"
-						},
-						{
-							"key": "x-amzn-Remapped-Content-Length",
-							"value": "173"
-						},
-						{
-							"key": "X-Frame-Options",
-							"value": "DENY"
-						},
-						{
-							"key": "x-amz-apigw-id",
-							"value": "CCgl6Fn3SQ0FSlQ="
-						},
-						{
-							"key": "Vary",
-							"value": "Accept, Origin"
-						},
-						{
-							"key": "X-Content-Type-Options",
-							"value": "nosniff"
-						},
-						{
-							"key": "X-Amzn-Trace-Id",
-							"value": "Root=1-60e4148c-5223826f3b3723d630fab37b;Sampled=1"
-						},
-						{
-							"key": "X-Cache",
-							"value": "Error from cloudfront"
-						},
-						{
-							"key": "Via",
-							"value": "1.1 ef6538ee7be7b17c84d06edb0f4c0a1a.cloudfront.net (CloudFront)"
-						},
-						{
-							"key": "X-Amz-Cf-Pop",
-							"value": "SEA19-C1"
-						},
-						{
-							"key": "X-Amz-Cf-Id",
-							"value": "Sm1ambOeosjNRPBiFHO90GaoF-K5hWYaap88TrgS7c1h1EhWWPA8bg=="
-						}
-					],
-					"cookie": [],
-					"body": "{\n    \"results\": \"Parameters Error! Detail: An error occurred (AuthFailure) when calling the DescribeVpcs operation: AWS was not able to validate the provided access credentials\"\n}"
 				}
 			]
 		}

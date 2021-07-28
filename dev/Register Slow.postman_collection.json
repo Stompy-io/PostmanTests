@@ -12,7 +12,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"const test_mail_pairs = [['klild', 'e751c3aa-4d29-4178-b2d8-057cb0c23a67']",
+							"const test_mail_pairs = [['klild', 'e751c3aa-4d29-4178-b2d8-057cb0c23a67'],",
 							"                    ['p7r7y', '65ec4353-0149-4308-ab5d-ef20facafa5d']]",
 							"",
 							"const index = Math.floor(Math.random()*(test_mail_pairs.length));",
