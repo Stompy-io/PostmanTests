@@ -1,0 +1,949 @@
+{
+	"info": {
+		"_postman_id": "f8078f49-8d0e-42c8-9886-129ec63f1707",
+		"name": "Utilization",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has Access\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"access\");",
+									"});",
+									"pm.test(\"Has Refresh\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"refresh\");",
+									"});",
+									"",
+									"pm.environment.set('token', \"JWT \"+ pm.response.json().access);",
+									"pm.environment.set(\"accessed_time\", pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"pm.environment.set('refresh', pm.response.json().refresh)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{testUser}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Secret123!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/jwt/create/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"jwt",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "With Auth",
+			"item": [
+				{
+					"name": "Utilization Chart - with Summary",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has 5 services\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(5);",
+									"});",
+									"pm.test(\"Not identical values\", function () {",
+									"    pm.expect(pm.response.json().results).to.satisfy( (results)=>{",
+									"        let fee1, fee2;",
+									"        for(let i = 0; i<results.length;i++){",
+									"            if (results[i].Summary !== undefined){",
+									"                if(fee1 === undefined){",
+									"                    fee1 = results[i].Summary.TotalAmortizedFee;",
+									"                }else if(fee2 === undefined){",
+									"                    fee2 = results[i].Summary.TotalAmortizedFee;",
+									"                    return (fee1!=fee2);",
+									"                }",
+									"            }",
+									"        }",
+									"    }",
+									"",
+									"    );",
+									"});",
+									"",
+									"pm.test(\"Has 6 days default\", function () {",
+									"    pm.expect(pm.response.json().results[0].UtilizationsByTime.length).to.equal(6);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - all last month",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"pm.test(\"Has 5 services\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(5);",
+									"});",
+									"pm.test(\"Not identical values\", function () {",
+									"    pm.expect(pm.response.json().results).to.satisfy((results) => {",
+									"        let fee1, fee2;",
+									"        for (let i = 0; i < results.length; i++) {",
+									"            if (results[i].Summary !== undefined) {",
+									"                if (fee1 === undefined) {",
+									"                    fee1 = results[i].Summary.TotalAmortizedFee;",
+									"                } else if (fee2 === undefined) {",
+									"                    fee2 = results[i].Summary.TotalAmortizedFee;",
+									"                    return (fee1 != fee2);",
+									"                }",
+									"            }",
+									"        }",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');",
+									"let startOfLastMonth = moment().startOf('month').subtract(1, 'months').format('YYYY-MM-DD');",
+									"let endOfLastMonth = moment().endOf('month').subtract(1, 'months').format('YYYY-MM-DD');",
+									"pm.environment.set(\"last_month_begin\", startOfLastMonth);",
+									"pm.environment.set(\"last_month_end\", endOfLastMonth);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily&start_date={{last_month_begin}}&end_date={{last_month_end}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								},
+								{
+									"key": "start_date",
+									"value": "{{last_month_begin}}"
+								},
+								{
+									"key": "end_date",
+									"value": "{{last_month_end}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - all 04/01-04/20",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"// pm.test(\"Has 5 services\", function () {",
+									"//     pm.expect(pm.response.json().results.length).to.equal(5);",
+									"// });",
+									"pm.test(\"Not identical values\", function () {",
+									"    pm.expect(pm.response.json().results).to.satisfy( (results)=>{",
+									"        let fee1, fee2;",
+									"        for(let i = 0; i<results.length;i++){",
+									"            if (results[i].Summary !== undefined){",
+									"                if(fee1 === undefined){",
+									"                    fee1 = results[i].Summary.TotalAmortizedFee;",
+									"                }else if(fee2 === undefined){",
+									"                    fee2 = results[i].Summary.TotalAmortizedFee;",
+									"                    return (fee1!=fee2);",
+									"                }",
+									"            }",
+									"        }",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');",
+									"let startOfLastMonth = moment().startOf('month').subtract(1, 'months').format('YYYY-MM-DD');",
+									"let endOfLastMonth = moment().endOf('month').subtract(1, 'months').format('YYYY-MM-DD');",
+									"pm.environment.set(\"last_month_begin\", startOfLastMonth);",
+									"pm.environment.set(\"last_month_end\", endOfLastMonth);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily&end_date=2021-04-20&start_date=2021-04-01",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-04-20"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-04-01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - Redshift with Summary",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has 1 service\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(1);",
+									"});",
+									"pm.test(\"No data returned\",()=>{",
+									"    pm.expect(pm.response.json().results[0]).to.not.have.property('UtilizationsByTime');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&service=Redshift&granularity=daily",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "service",
+									"value": "Redshift"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - RDS with Summary",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has 1 service\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(1);",
+									"});",
+									"pm.test(\"Has 6 days default\", function () {",
+									"    pm.expect(pm.response.json().results[0].UtilizationsByTime.length).to.equal(6);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&service=RDS&granularity=daily",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - EC2 May Match",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"2021-05-11 match\",()=>{",
+									"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2021-05-11\",\"75.44\"]);",
+									"    ",
+									"});",
+									"",
+									"pm.test(\"2021-05-18 match\",()=>{",
+									"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2021-05-18\",\"22.22\"]);",
+									"    ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily&start_date=2021-05-01&end_date=2021-05-31&service=EC2",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-05-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-05-31"
+								},
+								{
+									"key": "service",
+									"value": "EC2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - RDS December Match",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test('first data is 12-03', ()=>{",
+									"     pm.expect(pm.response.json()['results'][0]['UtilizationsByTime'][0][0])",
+									"      .to.equal('2020-12-03');",
+									"})",
+									"",
+									"pm.test(\"2020-12-03 match\",()=>{",
+									"     pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2020-12-03\",\"82.88\"]);",
+									"});",
+									"",
+									"",
+									"pm.test(\"2021-12-29 match\",()=>{",
+									"    pm.expect(pm.response.json().results[0]['UtilizationsByTime']).to.deep.include([\"2020-12-29\",\"86.70\"]);",
+									"    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily&start_date=2020-12-01&end_date=2020-12-31&service=RDS",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								},
+								{
+									"key": "start_date",
+									"value": "2020-12-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2020-12-31"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Chart - ElastiCache Last 2 Month",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test('Has total amortized fee', ()=>{",
+									"     pm.expect(pm.response.json()['results'][0]['Summary']['TotalAmortizedFee'])",
+									"      .to.exist;",
+									"})",
+									"",
+									"",
+									"pm.test('Has unrealized savings', ()=>{",
+									"     pm.expect(pm.response.json()['results'][0]['Summary']['UnrealizedSavings'])",
+									"      .to.exist;",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily&start_date=2021-04-01&end_date=2021-05-31&service=ElastiCache",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "granularity",
+									"value": "daily"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-04-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-05-31"
+								},
+								{
+									"key": "service",
+									"value": "ElastiCache"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Table",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has 5 services\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(5);",
+									"});",
+									"",
+									"pm.test(\"Not identical values\", function () {",
+									"    pm.expect(pm.response.json().results[3].TotalAmortizedFee).to.satisfy(",
+									"        (fee)=>{",
+									"            return (fee!=pm.response.json().results[1].TotalAmortizedFee ",
+									"            || fee!=pm.response.json().results[2].TotalAmortizedFee)",
+									"        }",
+									"    );",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&groupby=subscription",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "subscription"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Table - RDS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Subscriptions[0].instanceType).to.exist;",
+									"",
+									"});",
+									"pm.test(\"Has subscriptionId\", function () {",
+									"    pm.expect(pm.response.json().results[0].Subscriptions[0].subscriptionId).to.exist;",
+									"});",
+									"pm.test(\"Has 1 service\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&groupby=subscription&service=RDS",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "subscription"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Table - EC2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Subscriptions[0].instanceType).to.exist;",
+									"",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Subscriptions[0].subscriptionId).to.exist;",
+									"});",
+									"pm.test(\"Has 1 service\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&groupby=subscription&service=EC2",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "subscription"
+								},
+								{
+									"key": "service",
+									"value": "EC2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilization Table - ElastiCache",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Subscriptions[0].instanceType).to.exist;",
+									"",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Subscriptions[0].subscriptionId).to.exist;",
+									"});",
+									"pm.test(\"Has 1 service\", function () {",
+									"    pm.expect(pm.response.json().results.length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&groupby=subscription&service=ElastiCache",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"utilizations",
+								"reservation",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "subscription"
+								},
+								{
+									"key": "service",
+									"value": "ElastiCache"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let accessed_time = pm.environment.get(\"accessed_time\");",
+							"let current_time = pm.variables.replaceIn(\"{{$timestamp}}\");",
+							"let time_passed = current_time - accessed_time;",
+							"if(time_passed>240){",
+							"    pm.sendRequest({url: pm.environment.get('host_user') +'/auth/jwt/refresh/',",
+							"    method: 'POST', body: { mode: 'formdata',",
+							"        formdata: [{key: \"refresh\", value: pm.environment.get('refresh')}]",
+							"        }},(err, res)=>{",
+							"        pm.environment.set('accessed_time',  pm.variables.replaceIn(\"{{$timestamp}}\"));",
+							"        pm.environment.set('token', \"JWT \"+ res.json().access);",
+							"        pm.environment.set('refresh', res.json().refresh);",
+							"    });",
+							"}",
+							"pm.request.headers.add({key: 'Authorization', value: pm.environment.get(\"token\") });"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host_aws",
+			"value": "https://v1.aws.api.stompy.io"
+		},
+		{
+			"key": "caid",
+			"value": "4208028608559802998"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

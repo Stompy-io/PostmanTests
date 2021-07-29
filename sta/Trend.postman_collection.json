@@ -1,0 +1,820 @@
+{
+	"info": {
+		"_postman_id": "528b9906-c12d-4584-8665-54690e7ed177",
+		"name": "Trend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has Access\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"access\");",
+									"});",
+									"pm.test(\"Has Refresh\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"refresh\");",
+									"});",
+									"pm.environment.set('token', \"JWT \"+ pm.response.json().access);",
+									"pm.environment.set(\"accessed_time\", pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"pm.environment.set('refresh', pm.response.json().refresh)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{testUser}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Secret123!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/jwt/create/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"jwt",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "With Auth",
+			"item": [
+				{
+					"name": "Trends Diagram Default",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has 3 accounts\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram.length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Has 6 or 7 days data\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram[0].data.length).to.be.oneOf([6,7]);",
+									"});",
+									"pm.test(\"Table lists top 10\", ()=>{",
+									"    pm.expect(pm.response.json()['Table'].length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test(\"AllTable has changes > 10%\",()=>{",
+									"    let all_table = pm.response.json().AllTable;",
+									"    for(let i = 0; i<all_table.length; i++){",
+									"        let change = parseFloat(all_table[i].Change);",
+									"        pm.expect(change).to.be.above(10);",
+									"    }",
+									"    ",
+									"})",
+									"",
+									"let table = pm.response.json()['Table'];",
+									"",
+									"pm.test(\"Table from high diff to low\", ()=>{",
+									"    ",
+									"    let prev = parseInt(table[0]['Diff']);",
+									"    for(let i = 1; i<table.length; i++){",
+									"        let curr = parseInt(table[i]['Diff']);",
+									"        pm.expect(prev).to.be.at.least(curr);",
+									"        prev = curr;",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Change Rate is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let change = parseFloat(table[i].Change);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let myChange = diff/precost*100;",
+									"        pm.expect(change).to.be.closeTo(myChange,0.01);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Diff is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let cost = parseFloat(table[i]['Cost']);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let my_diff = cost - precost;",
+									"        pm.expect(diff).be.closeTo(my_diff,0.01);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let moment = require('moment');",
+									"let weekAgo = moment().subtract(7,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('start_date', weekAgo);",
+									"let yesterday = moment().subtract(1,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('end_date', yesterday);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}&start_date={{start_date}}&end_date={{end_date}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-trend-diagram",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "{{start_date}}"
+								},
+								{
+									"key": "end_date",
+									"value": "{{end_date}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Trends Diagram Default",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}&start_date={{start_date}}&end_date={{end_date}}",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"ce",
+										"get-trend-diagram",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "{{cloud_account_id}}"
+										},
+										{
+											"key": "start_date",
+											"value": "{{start_date}}"
+										},
+										{
+											"key": "end_date",
+											"value": "{{end_date}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "723"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 15 Jul 2021 11:30:54 GMT"
+								},
+								{
+									"key": "x-amzn-RequestId",
+									"value": "f53bdd9a-fc99-4096-a8c0-f0f7ce681462"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "x-amzn-Remapped-Content-Length",
+									"value": "5535"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "x-amz-apigw-id",
+									"value": "Cglf1HiwyQ0Fjhg="
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Amzn-Trace-Id",
+									"value": "Root=1-60f01c65-55fddddb04f1bb471d232eed;Sampled=1"
+								},
+								{
+									"key": "X-Cache",
+									"value": "Miss from cloudfront"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 b4085435efbe95a420f374958bd145bf.cloudfront.net (CloudFront)"
+								},
+								{
+									"key": "X-Amz-Cf-Pop",
+									"value": "SEA19-C1"
+								},
+								{
+									"key": "X-Amz-Cf-Id",
+									"value": "gVhVg3XOwhWdpnRoZs02Ruuwc5Vk2UOt5Kqp201Gg5RAYmmN7eekhw=="
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"Diagram\": [\n        {\n            \"name\": \"Stompy_test\",\n            \"data\": [\n                {\n                    \"Date\": \"2021-07-08\",\n                    \"BlendedCost\": \"0.00\"\n                },\n                {\n                    \"Date\": \"2021-07-09\",\n                    \"BlendedCost\": \"0.00\"\n                },\n                {\n                    \"Date\": \"2021-07-10\",\n                    \"BlendedCost\": \"0.00\"\n                },\n                {\n                    \"Date\": \"2021-07-11\",\n                    \"BlendedCost\": \"0.00\"\n                },\n                {\n                    \"Date\": \"2021-07-12\",\n                    \"BlendedCost\": \"0.00\"\n                },\n                {\n                    \"Date\": \"2021-07-13\",\n                    \"BlendedCost\": \"0.00\"\n                },\n                {\n                    \"Date\": \"2021-07-14\",\n                    \"BlendedCost\": \"0.00\"\n                }\n            ]\n        },\n        {\n            \"name\": \"MR332\",\n            \"data\": [\n                {\n                    \"Date\": \"2021-07-08\",\n                    \"BlendedCost\": \"43.73\"\n                },\n                {\n                    \"Date\": \"2021-07-09\",\n                    \"BlendedCost\": \"43.04\"\n                },\n                {\n                    \"Date\": \"2021-07-10\",\n                    \"BlendedCost\": \"36.46\"\n                },\n                {\n                    \"Date\": \"2021-07-11\",\n                    \"BlendedCost\": \"35.86\"\n                },\n                {\n                    \"Date\": \"2021-07-12\",\n                    \"BlendedCost\": \"36.03\"\n                },\n                {\n                    \"Date\": \"2021-07-13\",\n                    \"BlendedCost\": \"19.05\"\n                },\n                {\n                    \"Date\": \"2021-07-14\",\n                    \"BlendedCost\": \"21.78\"\n                }\n            ]\n        },\n        {\n            \"name\": \"Stompy.io\",\n            \"data\": [\n                {\n                    \"Date\": \"2021-07-08\",\n                    \"BlendedCost\": \"3.72\"\n                },\n                {\n                    \"Date\": \"2021-07-09\",\n                    \"BlendedCost\": \"4.26\"\n                },\n                {\n                    \"Date\": \"2021-07-10\",\n                    \"BlendedCost\": \"0.92\"\n                },\n                {\n                    \"Date\": \"2021-07-11\",\n                    \"BlendedCost\": \"1.32\"\n                },\n                {\n                    \"Date\": \"2021-07-12\",\n                    \"BlendedCost\": \"3.79\"\n                },\n                {\n                    \"Date\": \"2021-07-13\",\n                    \"BlendedCost\": \"1.49\"\n                },\n                {\n                    \"Date\": \"2021-07-14\",\n                    \"BlendedCost\": \"4.43\"\n                }\n            ]\n        }\n    ],\n    \"AllTable\": [\n        {\n            \"Date\": \"2021-07-10\",\n            \"Cost\": \"41.50\",\n            \"Diff\": \"20.31\",\n            \"Change\": \"95.85%\",\n            \"PreCost\": \"21.19\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 7\n        },\n        {\n            \"Date\": \"2021-07-14\",\n            \"Cost\": \"14.14\",\n            \"Diff\": \"5.92\",\n            \"Change\": \"72.02%\",\n            \"PreCost\": \"8.22\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Relational Database Service\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-14\",\n            \"Cost\": \"3.74\",\n            \"Diff\": \"3.01\",\n            \"Change\": \"412.33%\",\n            \"PreCost\": \"0.73\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-08\",\n            \"Cost\": \"9.73\",\n            \"Diff\": \"2.53\",\n            \"Change\": \"35.14%\",\n            \"PreCost\": \"7.20\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Elastic Compute Cloud - Compute\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-12\",\n            \"Cost\": \"3.04\",\n            \"Diff\": \"2.43\",\n            \"Change\": \"398.36%\",\n            \"PreCost\": \"0.61\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-08\",\n            \"Cost\": \"2.11\",\n            \"Diff\": \"1.87\",\n            \"Change\": \"779.17%\",\n            \"PreCost\": \"0.24\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Elastic Container Service for Kubernetes\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-10\",\n            \"Cost\": \"8.26\",\n            \"Diff\": \"1.83\",\n            \"Change\": \"28.46%\",\n            \"PreCost\": \"6.43\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"Amazon Elastic Compute Cloud - Compute\",\n            \"TrendScope\": 7\n        },\n        {\n            \"Date\": \"2021-07-09\",\n            \"Cost\": \"3.54\",\n            \"Diff\": \"0.86\",\n            \"Change\": \"32.09%\",\n            \"PreCost\": \"2.68\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-08\",\n            \"Cost\": \"2.68\",\n            \"Diff\": \"0.59\",\n            \"Change\": \"28.23%\",\n            \"PreCost\": \"2.09\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-11\",\n            \"Cost\": \"0.61\",\n            \"Diff\": \"0.40\",\n            \"Change\": \"190.48%\",\n            \"PreCost\": \"0.21\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-09\",\n            \"Cost\": \"2.40\",\n            \"Diff\": \"0.29\",\n            \"Change\": \"13.74%\",\n            \"PreCost\": \"2.11\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Elastic Container Service for Kubernetes\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-13\",\n            \"Cost\": \"0.08\",\n            \"Diff\": \"0.02\",\n            \"Change\": \"33.33%\",\n            \"PreCost\": \"0.06\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Simple Storage Service\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-13\",\n            \"Cost\": \"0.02\",\n            \"Diff\": \"0.01\",\n            \"Change\": \"100.00%\",\n            \"PreCost\": \"0.01\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"AmazonCloudWatch\",\n            \"TrendScope\": 1\n        }\n    ],\n    \"Table\": [\n        {\n            \"Date\": \"2021-07-10\",\n            \"Cost\": \"41.50\",\n            \"Diff\": \"20.31\",\n            \"Change\": \"95.85%\",\n            \"PreCost\": \"21.19\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 7\n        },\n        {\n            \"Date\": \"2021-07-14\",\n            \"Cost\": \"14.14\",\n            \"Diff\": \"5.92\",\n            \"Change\": \"72.02%\",\n            \"PreCost\": \"8.22\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Relational Database Service\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-14\",\n            \"Cost\": \"3.74\",\n            \"Diff\": \"3.01\",\n            \"Change\": \"412.33%\",\n            \"PreCost\": \"0.73\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-08\",\n            \"Cost\": \"9.73\",\n            \"Diff\": \"2.53\",\n            \"Change\": \"35.14%\",\n            \"PreCost\": \"7.20\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Elastic Compute Cloud - Compute\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-12\",\n            \"Cost\": \"3.04\",\n            \"Diff\": \"2.43\",\n            \"Change\": \"398.36%\",\n            \"PreCost\": \"0.61\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-08\",\n            \"Cost\": \"2.11\",\n            \"Diff\": \"1.87\",\n            \"Change\": \"779.17%\",\n            \"PreCost\": \"0.24\",\n            \"AccountId\": \"263078123597\",\n            \"AccountName\": \"MR332\",\n            \"ServiceName\": \"Amazon Elastic Container Service for Kubernetes\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-10\",\n            \"Cost\": \"8.26\",\n            \"Diff\": \"1.83\",\n            \"Change\": \"28.46%\",\n            \"PreCost\": \"6.43\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"Amazon Elastic Compute Cloud - Compute\",\n            \"TrendScope\": 7\n        },\n        {\n            \"Date\": \"2021-07-09\",\n            \"Cost\": \"3.54\",\n            \"Diff\": \"0.86\",\n            \"Change\": \"32.09%\",\n            \"PreCost\": \"2.68\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-08\",\n            \"Cost\": \"2.68\",\n            \"Diff\": \"0.59\",\n            \"Change\": \"28.23%\",\n            \"PreCost\": \"2.09\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        },\n        {\n            \"Date\": \"2021-07-11\",\n            \"Cost\": \"0.61\",\n            \"Diff\": \"0.40\",\n            \"Change\": \"190.48%\",\n            \"PreCost\": \"0.21\",\n            \"AccountId\": \"385105545457\",\n            \"AccountName\": \"Stompy.io\",\n            \"ServiceName\": \"AWS Cost Explorer\",\n            \"TrendScope\": 1\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Trends Diagram One Week",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has 3 accounts\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram.length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Has 7 days data\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram[0].data.length).to.eql(7);",
+									"});",
+									"",
+									"pm.test(\"Table lists top 10\", ()=>{",
+									"    pm.expect(pm.response.json()['Table'].length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test(\"AllTable has changes > 10%\",()=>{",
+									"    let all_table = pm.response.json().AllTable;",
+									"    for(let i = 0; i<all_table.length; i++){",
+									"        let change = parseFloat(all_table[i].Change);",
+									"        pm.expect(change).to.be.above(10);",
+									"    }",
+									"    ",
+									"})",
+									"",
+									"let table = pm.response.json()['Table'];",
+									"",
+									"pm.test(\"Table from high diff to low\", ()=>{",
+									"    ",
+									"    let prev = parseInt(table[0]['Diff']);",
+									"    for(let i = 1; i<table.length; i++){",
+									"        let curr = parseInt(table[i]['Diff']);",
+									"        pm.expect(prev).to.be.at.least(curr);",
+									"        prev = curr;",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Change Rate is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let change = parseFloat(table[i].Change);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let myChange = diff/precost*100;",
+									"        pm.expect(change).to.be.closeTo(myChange,0.01);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Diff is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let cost = parseFloat(table[i]['Cost']);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let my_diff = cost - precost;",
+									"        pm.expect(diff).be.closeTo(my_diff,0.01);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let moment = require('moment');",
+									"let older_time = moment().subtract(8,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('start_date', older_time);",
+									"let recent = moment().subtract(2,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('end_date', recent);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}&start_date={{start_date}}&end_date={{end_date}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-trend-diagram",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "{{start_date}}"
+								},
+								{
+									"key": "end_date",
+									"value": "{{end_date}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Trends Diagram 30 days",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has 3 accounts\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram.length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Has 30 days data\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram[0].data.length).to.eql(30);",
+									"});",
+									"",
+									"pm.test(\"Table lists top 10\", ()=>{",
+									"    pm.expect(pm.response.json()['Table'].length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test(\"AllTable has changes > 10%\",()=>{",
+									"    let all_table = pm.response.json().AllTable;",
+									"    for(let i = 0; i<all_table.length; i++){",
+									"        let change = parseFloat(all_table[i].Change);",
+									"        pm.expect(change).to.be.above(10);",
+									"    }",
+									"    ",
+									"})",
+									"",
+									"let table = pm.response.json()['Table'];",
+									"",
+									"pm.test(\"Table from high diff to low\", ()=>{",
+									"    ",
+									"    let prev = parseInt(table[0]['Diff']);",
+									"    for(let i = 1; i<table.length; i++){",
+									"        let curr = parseInt(table[i]['Diff']);",
+									"        pm.expect(prev).to.be.at.least(curr);",
+									"        prev = curr;",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Change Rate is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let change = parseFloat(table[i].Change);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let myChange = diff/precost*100;",
+									"        pm.expect(change).to.be.closeTo(myChange,0.01);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Diff is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let cost = parseFloat(table[i]['Cost']);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let my_diff = cost - precost;",
+									"        pm.expect(diff).be.closeTo(my_diff,0.01);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let moment = require('moment');",
+									"let older_time = moment().subtract(31,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('start_date', older_time);",
+									"let recent = moment().subtract(2,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('end_date', recent);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}&start_date={{start_date}}&end_date={{end_date}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-trend-diagram",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "{{start_date}}"
+								},
+								{
+									"key": "end_date",
+									"value": "{{end_date}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Trends Diagram June",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has 3 accounts\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram.length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Has 30 days data\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram[0].data.length).to.eql(30);",
+									"});",
+									"",
+									"pm.test(\"Table lists top 10\", ()=>{",
+									"    pm.expect(pm.response.json()['Table'].length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test(\"AllTable has changes > 10%\",()=>{",
+									"    let all_table = pm.response.json().AllTable;",
+									"    for(let i = 0; i<all_table.length; i++){",
+									"        let change = parseFloat(all_table[i].Change);",
+									"        pm.expect(change).to.be.above(10);",
+									"    }",
+									"    ",
+									"})",
+									"",
+									"let table = pm.response.json()['Table'];",
+									"",
+									"pm.test(\"Table from high diff to low\", ()=>{",
+									"    ",
+									"    let prev = parseInt(table[0]['Diff']);",
+									"    for(let i = 1; i<table.length; i++){",
+									"        let curr = parseInt(table[i]['Diff']);",
+									"        pm.expect(prev).to.be.at.least(curr);",
+									"        prev = curr;",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Change Rate is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let change = parseFloat(table[i].Change);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let myChange = diff/precost*100;",
+									"        pm.expect(change).to.be.closeTo(myChange,0.01);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Diff is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let cost = parseFloat(table[i]['Cost']);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let my_diff = cost - precost;",
+									"        pm.expect(diff).be.closeTo(my_diff,0.01);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set('start_date', '2021-06-01');",
+									"pm.environment.set('end_date', '2021-06-30');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}&start_date={{start_date}}&end_date={{end_date}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-trend-diagram",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "{{start_date}}"
+								},
+								{
+									"key": "end_date",
+									"value": "{{end_date}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Trends Diagram 04/15-07/13",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has 3 accounts\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram.length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Stompy_test as 82 days data\", ()=>{",
+									"    pm.expect(pm.response.json().Diagram[0].data.length).to.eql(82);",
+									"});",
+									"",
+									"pm.test(\"Table lists top 10\", ()=>{",
+									"    pm.expect(pm.response.json()['Table'].length).to.be.at.most(10);",
+									"});",
+									"",
+									"pm.test(\"AllTable has changes > 10%\",()=>{",
+									"    let all_table = pm.response.json().AllTable;",
+									"    for(let i = 0; i<all_table.length; i++){",
+									"        let change = parseFloat(all_table[i].Change);",
+									"        pm.expect(change).to.be.above(10);",
+									"    }",
+									"    ",
+									"})",
+									"",
+									"let table = pm.response.json()['Table'];",
+									"",
+									"pm.test(\"Table from high diff to low\", ()=>{",
+									"    ",
+									"    let prev = parseInt(table[0]['Diff']);",
+									"    for(let i = 1; i<table.length; i++){",
+									"        let curr = parseInt(table[i]['Diff']);",
+									"        pm.expect(prev).to.be.at.least(curr);",
+									"        prev = curr;",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Change Rate is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let change = parseFloat(table[i].Change);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let myChange = diff/precost*100;",
+									"        pm.expect(change).to.be.closeTo(myChange,0.01);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Table Diff is Correct\", ()=>{",
+									"     for(let i = 0; i<table.length; i++){",
+									"        let diff = parseFloat(table[i]['Diff']);",
+									"        let cost = parseFloat(table[i]['Cost']);",
+									"        let precost = parseFloat(table[i]['PreCost']);",
+									"        let my_diff = cost - precost;",
+									"        pm.expect(diff).be.closeTo(my_diff,0.01);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let moment = require('moment');",
+									"let older_time = moment().subtract(91,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('start_date', older_time);",
+									"let recent = moment().subtract(2,'days').format('YYYY-MM-DD');",
+									"pm.environment.set('end_date', recent);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}&start_date=2021-04-15&end_date=2021-07-13",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-trend-diagram",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-04-15"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-07-13"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let accessed_time = pm.environment.get(\"accessed_time\");",
+							"let current_time = pm.variables.replaceIn(\"{{$timestamp}}\");",
+							"let time_passed = current_time - accessed_time;",
+							"if(time_passed>240){",
+							"    console.log(\"refreshed\");",
+							"    pm.sendRequest({url: pm.environment.get('host_user') +'/auth/jwt/refresh/',",
+							"    method: 'POST', body: { mode: 'formdata',",
+							"        formdata: [{key: \"refresh\", value: pm.environment.get('refresh')}]",
+							"        }},(err, res)=>{",
+							"        pm.environment.set('accessed_time',  pm.variables.replaceIn(\"{{$timestamp}}\"));",
+							"        pm.environment.set('token', \"JWT \"+ res.json().access);",
+							"        pm.environment.set('refresh', res.json().refresh);",
+							"        console.log(res);",
+							"    });",
+							"}",
+							"pm.request.headers.add({key: 'Authorization', value: pm.environment.get(\"token\") });"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

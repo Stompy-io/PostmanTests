@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "2270533e-d222-4944-85db-6658da3818e0",
+		"name": "Register Existed",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Fields Check Email Existed",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.eql(400);",
+							"});",
+							"",
+							"pm.test('error is Email Alread Exist', ()=>{",
+							"    pm.expect(pm.response.json().error).to.eql('Email Alread Exist!');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_user}}/auth/users/fields_check/?field_value={{reset_test_email}}",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"fields_check",
+						""
+					],
+					"query": [
+						{
+							"key": "field_value",
+							"value": "{{reset_test_email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sent Code Register Existed Has No Catch",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// const test_mail_pairs = pm.collectionVariables.get('test_mail_pairs');",
+							"// const index = Math.floor(Math.random()*(test_mail_pairs.length));",
+							"// const namespace = test_mail_pairs[index][0];",
+							"// pm.environment.set('test_email_namespace', namespace);",
+							"// pm.environment.set('test_email_api_key', test_mail_pairs[index][1]);",
+							"// const email = namespace+\".\" + pm.variables.replaceIn('{{$guid}}') +'.temp'+ pm.variables.get(\"test_email_domain\");",
+							"// pm.environment.set(\"currentEmail\", email);",
+							"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"result is email sent success\", ()=>{",
+							"    pm.expect(pm.response.json().results).to.equal('The Email has been sent successfully！');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_user}}/auth/users/send_code/?email_to={{reset_test_email}}&operation=register",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"send_code",
+						""
+					],
+					"query": [
+						{
+							"key": "email_to",
+							"value": "{{reset_test_email}}"
+						},
+						{
+							"key": "operation",
+							"value": "register"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VRFCode From Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const html_str = pm.response.json()['emails'][0]['html'];",
+							"html_str.replace(/\\/n/, '');",
+							"const $ = cheerio.load(html_str);",
+							"const v_code = $('#vrf_code').text();",
+							"pm.test(\"Verification Code is 6-digit\", ()=>{",
+							"    pm.expect(v_code).to.match(/^\\d{6}$/);",
+							"});",
+							"pm.environment.set(\"vrf_code\", v_code)",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{test_email_api}}?apikey=853bbc59-1190-4c3d-b19b-fd9b42ec6099&namespace=eguzv&timestamp_from={{timeStamp}}&livequery=true",
+					"protocol": "https",
+					"host": [
+						"{{test_email_api}}"
+					],
+					"query": [
+						{
+							"key": "apikey",
+							"value": "853bbc59-1190-4c3d-b19b-fd9b42ec6099"
+						},
+						{
+							"key": "namespace",
+							"value": "eguzv"
+						},
+						{
+							"key": "timestamp_from",
+							"value": "{{timeStamp}}"
+						},
+						{
+							"key": "livequery",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Existed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.eql(400);",
+							"});",
+							"",
+							"pm.test('error is Email Alread Exist', ()=>{",
+							"    pm.expect(pm.response.json().error).to.eql('Email Alread Exist!');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"first_name\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+							"pm.environment.set('currentPassword', pm.variables.replaceIn('{{$randomPassword}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "first_name",
+							"value": "{{first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "organization",
+							"value": "Stompy",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{reset_test_email}}",
+							"type": "text"
+						},
+						{
+							"key": "vrf_code",
+							"value": "{{vrf_code}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{currentPassword}}",
+							"type": "text"
+						},
+						{
+							"key": "re_password",
+							"value": "{{currentPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host_user}}/auth/users/register/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"register",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

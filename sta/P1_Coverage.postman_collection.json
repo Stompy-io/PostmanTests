@@ -1,0 +1,908 @@
+{
+	"info": {
+		"_postman_id": "8126fa83-7dbf-4f96-ba41-a6d9e6821038",
+		"name": "P1_Coverage",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Has Access\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"access\");",
+									"});",
+									"pm.test(\"Has Refresh\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"refresh\");",
+									"});",
+									"",
+									"pm.environment.set('token', \"JWT \" + pm.response.json().access);",
+									"pm.environment.set(\"accessed_time\", pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"pm.environment.set('refresh', pm.response.json().refresh);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{testUser}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Secret123!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/jwt/create/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"jwt",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "With Auth",
+			"item": [
+				{
+					"name": "Coverage Chart EC2 April",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&start_date=2021-04-01&end_date=2021-04-30&service=EC2",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-04-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-04-30"
+								},
+								{
+									"key": "service",
+									"value": "EC2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"})",
+									"",
+									"let results = pm.response.json().results;",
+									"if(results.length > 5){",
+									"    results.pop();",
+									"}",
+									"",
+									"pm.test(\"Has 5 services\", function () {",
+									"    pm.expect(results.length).to.equal(5);",
+									"});",
+									"",
+									"pm.test(\"Each service has Coverage\", function () {",
+									"    for(let i = 0; i<results.length; i++){",
+									"        pm.expect(results[i]).to.have.property('Coverage');",
+									"    }",
+									"});",
+									"",
+									"pm.test('default is 7 days',()=>{",
+									"   for(let i = 0; i<results.length; i++){",
+									"       let this_service_coverage = results[i].Coverage;",
+									"       if(this_service_coverage.length !== 0){",
+									"            pm.expect(this_service_coverage.length).to.equal(7);",
+									"       } ",
+									"    }  ",
+									"});",
+									"",
+									"pm.test(\"Not identical values\", function () {",
+									"    pm.expect(pm.response.json().results).to.satisfy( (results)=>{",
+									"        let coverage_rds, coverage_ec2;",
+									"        for(let i = 0; i<results.length;i++ ){",
+									"            if (results[i].Service == \"Amazon Relational Database Service\"){",
+									"                coverage_rds = results[i].Coverage;",
+									"            }",
+									"            if (results[i].Service == 'Amazon Elastic Compute Cloud - Compute'){",
+									"                coverage_ec2 = results[i].Coverage;",
+									"            }",
+									"        }",
+									"        return (coverage_rds!=coverage_ec2);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart 02-11 to 03-02",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"})",
+									"",
+									"let results = pm.response.json().results;",
+									"if(results.length > 5){",
+									"    results.pop();",
+									"}",
+									"",
+									"pm.test(\"Has 5 services\", function () {",
+									"    pm.expect(results.length).to.equal(5);",
+									"});",
+									"",
+									"pm.test(\"Each service has Coverage\", function () {",
+									"    for(let i = 0; i<results.length; i++){",
+									"        pm.expect(results[i]).to.have.property('Coverage');",
+									"    }",
+									"});",
+									"pm.test(\"Has data 2021-02-18\", function () {",
+									"   for(let i = 0; i<results.length; i++){",
+									"       let this_service_coverage = results[i].Coverage;",
+									"       if(this_service_coverage.length !== 0){",
+									"            pm.expect(this_service_coverage).to.deep",
+									"            .include([\"2021-02-18\",\"66.19\"]);",
+									"       } ",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&start_date=2021-02-11&end_date=2021-03-02",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-02-11"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-03-02"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart EC2 Yearly",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let moment = require('moment');",
+									"let lastDayLastMonth = moment().startOf('month').subtract(1 ,'days');",
+									"pm.environment.set('last_day_last_month', lastDayLastMonth.format('YYYY-MM-DD'));",
+									"// let aYearBefore = lastDayLastMonth.subtract(1, 'years').add(1, 'days');",
+									"let aYearBefore =moment().startOf('month').subtract(13 ,'months');",
+									"pm.environment.set('a_year_ago', aYearBefore.format('YYYY-MM-DD'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&start_date={{a_year_ago}}&end_date={{last_day_last_month}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "{{a_year_ago}}"
+								},
+								{
+									"key": "end_date",
+									"value": "{{last_day_last_month}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart EC2 Too Early Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 500\", function () {",
+									"    pm.expect(pm.response.code).to.equal(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let moment = require('moment');",
+									"pm.environment.set('13monthsAgo', moment().startOf('month').subtract(13, 'months').subtract(1,'days').format('YYYY-MM-DD'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&start_date={{13monthsAgo}}&end_date=2021-03-30",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "start_date",
+									"value": "{{13monthsAgo}}"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-03-30"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart - RDS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&service=RDS",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart - RDS 05-09 to 05-12",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"2020-12-24 has 100% coverage\",()=>{",
+									"    pm.expect(pm.response.json().results[0].Coverage[0]).to.deep.equal([\"2021-05-27\",\"0.00\"])",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&service=RDS&start_date=2021-05-27&end_date=2021-05-28",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-05-27"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-05-28"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart - RDS 02-11 to 03-02",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&service=RDS&start_date=2021-02-11&end_date=2021-03-02",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-02-11"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-03-02"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Table 05-03 to 05/15",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Instances[0].instanceType).to.exist;",
+									"",
+									"});",
+									"let results = pm.response.json().results;",
+									"// pm.test(\"Has 5 services\", function () {",
+									"//     pm.expect(results.length).to.equal(5);",
+									"// });",
+									"",
+									"// pm.test(\"Each service has Instances\", function () {",
+									"//     for(let i = 0; i<results.length; i++){",
+									"//         pm.expect(results[i]).to.have.property('Instances');",
+									"//     }",
+									"// });",
+									"",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(results[0].Instances[0].instanceType).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has region\", function () {",
+									"    pm.expect(results[0].Instances[0].region).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has ReservedHours\", function () {",
+									"    pm.expect(results[0].Instances[0].ReservedHours).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Has OnDemandHours\", function () {",
+									"    pm.expect(results[0].Instances[0].OnDemandHours).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has CoveragePercentage\", function () {",
+									"    pm.expect(results[0].Instances[0].CoveragePercentage).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has OnDemandCost\", function () {",
+									"    pm.expect(results[0].Instances[0].OnDemandCost).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Coverage == ReservedHours/(ReservedHours + OnDemandHours) *100)\", ()=>{",
+									"    let coverage = parseFloat(results[0].Instances[0].CoveragePercentage);",
+									"    let reserved_hours = parseFloat(results[0].Instances[0].ReservedHours);",
+									"    let on_demand = parseFloat(results[0].Instances[0].OnDemandHours);",
+									"    let myCoverage = reserved_hours/(reserved_hours+on_demand)*100;",
+									"    pm.expect(coverage).to.be.closeTo(myCoverage, 0.01);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&groupby=instance&start_date=2021-05-03&end_date=2021-05-15",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "instance"
+								},
+								{
+									"key": "start_date",
+									"value": "2021-05-03"
+								},
+								{
+									"key": "end_date",
+									"value": "2021-05-15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Chart - RDS 12-24",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"2020-12-24 has 100% coverage\",()=>{",
+									"    pm.expect(pm.response.json().results[0].Coverage[0]).to.deep.equal([\"2020-12-24\",\"100.00\"])",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&service=RDS&start_date=2020-12-24&end_date=2020-12-25",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								},
+								{
+									"key": "start_date",
+									"value": "2020-12-24"
+								},
+								{
+									"key": "end_date",
+									"value": "2020-12-25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Table",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(pm.response.json().results[0].Instances[0].instanceType).to.exist;",
+									"",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"if(results.length > 5){",
+									"    results.pop();",
+									"}",
+									"pm.test(\"Has 5 services\", function () {",
+									"    pm.expect(results.length).to.equal(5);",
+									"});",
+									"",
+									"pm.test(\"Each service has Instances\", function () {",
+									"    for(let i = 0; i<results.length; i++){",
+									"        pm.expect(results[i]).to.have.property('Instances');",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Has instanceType\", function () {",
+									"    pm.expect(results[0].Instances[0].instanceType).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has region\", function () {",
+									"    pm.expect(results[0].Instances[0].region).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has ReservedHours\", function () {",
+									"    pm.expect(results[0].Instances[0].ReservedHours).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Has OnDemandHours\", function () {",
+									"    pm.expect(results[0].Instances[0].OnDemandHours).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has CoveragePercentage\", function () {",
+									"    pm.expect(results[0].Instances[0].CoveragePercentage).to.exist;",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has OnDemandCost\", function () {",
+									"    pm.expect(results[0].Instances[0].OnDemandCost).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Coverage == ReservedHours/(ReservedHours + OnDemandHours) *100)\", ()=>{",
+									"    let coverage = parseFloat(results[0].Instances[0].CoveragePercentage);",
+									"    let reserved_hours = parseFloat(results[0].Instances[0].ReservedHours);",
+									"    let on_demand = parseFloat(results[0].Instances[0].OnDemandHours);",
+									"    let myCoverage = reserved_hours/(reserved_hours+on_demand)*100;",
+									"    pm.expect(coverage).to.be.closeTo(myCoverage, 0.01);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&groupby=instance",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "instance"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coverage Table - RDS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has instanceType\", function () {",
+									"   pm.expect(pm.response.json().results[0]['Instances'][0]).to.have.property('instanceType');",
+									"",
+									"});",
+									"pm.test(\"Has databaseEngine\", function () {",
+									"    pm.expect(pm.response.json().results[0]['Instances'][0]).to.have.property('databaseEngine');",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&groupby=instance&service=RDS",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"ce",
+								"get-reservation-coverage",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "groupby",
+									"value": "instance"
+								},
+								{
+									"key": "service",
+									"value": "RDS"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let accessed_time = pm.environment.get(\"accessed_time\");",
+							"let current_time = pm.variables.replaceIn(\"{{$timestamp}}\");",
+							"let time_passed = current_time - accessed_time;",
+							"if(time_passed>240){",
+							"    pm.sendRequest({url: pm.environment.get('host_user') +'/auth/jwt/refresh/',",
+							"    method: 'POST', body: { mode: 'formdata',",
+							"        formdata: [{key: \"refresh\", value: pm.environment.get('refresh')}]",
+							"        }},(err, res)=>{",
+							"        pm.environment.set('accessed_time',  pm.variables.replaceIn(\"{{$timestamp}}\"));",
+							"        pm.environment.set('token', \"JWT \"+ res.json().access);",
+							"        pm.environment.set('refresh', res.json().refresh);",
+							"    pm.request.headers.add({ key: 'Authorization', value: pm.environment.get(\"token\") });",
+							"    });",
+							"} else {",
+							"    pm.request.headers.add({ key: 'Authorization', value: pm.environment.get(\"token\") });",
+							"",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

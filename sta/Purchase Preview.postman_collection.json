@@ -1,0 +1,1938 @@
+{
+	"info": {
+		"_postman_id": "a9d56fde-2552-46bb-b481-1d5800a3df9b",
+		"name": "Purchase Preview",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"",
+									"pm.test(\"Has Access\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"access\");",
+									"});",
+									"pm.test(\"Has Refresh\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property(\"refresh\");",
+									"});",
+									"pm.environment.set('token', \"JWT \" + pm.response.json().access);",
+									"pm.environment.set(\"accessed_time\", pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"pm.environment.set('refresh', pm.response.json().refresh);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{testUser}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Secret123!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host_user}}/auth/jwt/create/",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"auth",
+								"jwt",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "With Auth",
+			"item": [
+				{
+					"name": "Purchase Preview RDS",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchase_service\",\"RDS\");",
+									"pm.environment.set(\"count\",1);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									"pm.environment.set('productDescription', \"Aurora MySQL\");",
+									"pm.environment.set('DBInstanceClass', \"db.t3.small\");",
+									"pm.environment.set('multiAZ', false);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchase_service\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", ()=>{",
+									"    pm.expect(results[0].Count).to.equal(pm.environment.get(\"count\"));",
+									"});",
+									"",
+									"pm.test(\"Has Duration\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Duration\");",
+									"});",
+									"",
+									"pm.test(\"Duration Match\", ()=>{",
+									"    //60s * 60 min * 24 hr * 365 days",
+									"    let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"    pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Has ProductDescription\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"});",
+									"",
+									"pm.test(\"ProductDescription match request\", ()=>{",
+									"    //replace all space with -, and all lower cased",
+									"    let myProductDescriptionReformatted = pm.environment.get(\"productDescription\").replace(/\\s+/g, '-').toLowerCase();",
+									"    pm.expect(results[0].ProductDescription).to.equal(myProductDescriptionReformatted);",
+									"});",
+									"",
+									"pm.test(\"Has DBInstanceClass\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"DBInstanceClass\");",
+									"});",
+									"",
+									"pm.test(\"DBInstanceClass match request\", ()=>{",
+									"    pm.expect(results[0].DBInstanceClass).to.equal(pm.environment.get(\"DBInstanceClass\"));",
+									"});",
+									"",
+									"pm.test(\"Has MultiAZ\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"MultiAZ\");",
+									"});",
+									"",
+									"pm.test(\"MultiAZ match request\", ()=>{",
+									"    pm.expect(results[0].MultiAZ).to.equal(pm.environment.get(\"multiAZ\"));",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"offeringType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"         pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": \"{{cloud_account_id}}\",\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchase_service}}\",\n      \"Count\": \"{{count}}\",\n      \"DBInstanceClass\": \"{{DBInstanceClass}}\",\n      \"Duration\": \"{{duration}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"MultiAZ\": {{multiAZ}},\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview ElastiCache",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchase_service\",\"ElastiCache\");",
+									"pm.environment.set(\"count\",1);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									"pm.environment.set('productDescription', \"redis\");",
+									"pm.environment.set('CacheNodeType', \"cache.t3.small\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"pm.test(\"Has results\", () => {",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", () => {",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", () => {",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchase_service\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", () => {",
+									"    pm.expect(results[0]).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", () => {",
+									"    pm.expect(results[0].Count).to.equal(pm.environment.get(\"count\"));",
+									"});",
+									"",
+									"pm.test(\"Has Duration\", () => {",
+									"    pm.expect(results[0]).to.have.property(\"Duration\");",
+									"});",
+									"",
+									"pm.test(\"Duration Match\", () => {",
+									"    //60s * 60 min * 24 hr * 365 days",
+									"    let request_duration_in_seconds = pm.environment.get(\"duration\") * 60 * 60 * 24 * 365;",
+									"    pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"});",
+									"",
+									"pm.test(\"Has Region\", () => {",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", () => {",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Has ProductDescription\", () => {",
+									"    pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"});",
+									"",
+									"pm.test(\"ProductDescription match request\", () => {",
+									"    pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"});",
+									"",
+									"pm.test(\"Has CacheNodeType\", () => {",
+									"    pm.expect(results[0]).to.have.property(\"CacheNodeType\");",
+									"});",
+									"",
+									"pm.test(\"CacheNodeType match request\", () => {",
+									"    pm.expect(results[0].CacheNodeType).to.equal(pm.environment.get(\"CacheNodeType\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"Price check\", () => {",
+									"    let upfront_option = pm.environment.get(\"offeringType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if (upfront_option == 'All Upfront') {",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    } else if (upfront_option == 'Partial Upfront') {",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    } else {",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"        pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchase_service}}\",\n      \"Count\": \"{{count}}\",\n      \"CacheNodeType\": \"{{CacheNodeType}}\",\n      \"Duration\": \"{{duration}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview RDS MutiAZ Error",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"RDS\");",
+									"pm.environment.set(\"count\",1);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"db.t3.small\");",
+									"pm.environment.set('offeringClass', 'standard');",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Aurora MySQL\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
+									"});",
+									"",
+									"pm.test(\"Has Error\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": 4243134645189358054,\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count}}\",\n      \"Duration\": \"{{duration}}\",\n      \"DBInstanceClass\": \"{{instanceType}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"MultiAZ\": \"test\",\n      \"RecommendationId\": \"8105b69c-591b-4861-baaf-eff394593be8\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview Error RDS Wrong Product Description",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"RDS\");",
+									"pm.environment.set(\"count\",1);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"db.t3.small\");",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Linux/UNIX\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
+									"});",
+									"",
+									"pm.test(\"Has Error\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": 4243134645189358054,\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count}}\",\n      \"Duration\": \"{{duration}}\",\n      \"DBInstanceClass\": \"{{instanceType}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"MultiAZ\": \"test\",\n      \"RecommendationId\": \"8105b69c-591b-4861-baaf-eff394593be8\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview RDS Instance Error",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"RDS\");",
+									"pm.environment.set(\"count\",1);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"m1.small\");",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Aurora MySQL\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"// let results = pm.response.json().results;",
+									"",
+									"// pm.test(\"Has Service\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Service\");",
+									"// });",
+									"",
+									"// pm.test(\"Service match request\", ()=>{",
+									"//     pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchase_service\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Region\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Region\");",
+									"// });",
+									"",
+									"// pm.test(\"Region match request\", ()=>{",
+									"//     pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Count\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Count\");",
+									"// });",
+									"",
+									"// pm.test(\"Count match request\", ()=>{",
+									"//     pm.expect(results[0].Count).to.equal(pm.environment.get(\"count\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Duration\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Duration\");",
+									"// });",
+									"",
+									"// pm.test(\"Duration match request\", ()=>{",
+									"//     //60s * 60 min * 24 hr * 365 days",
+									"//     let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"//     pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"// });",
+									"",
+									"// pm.test(\"Has InstanceType\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"InstanceType\");",
+									"// });",
+									"",
+									"// pm.test(\"InstanceType match request\", ()=>{",
+									"//     pm.expect(results[0].InstanceType).to.equal(pm.environment.get(\"instanceType\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has OfferingClass\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"OfferingClass\");",
+									"// });",
+									"",
+									"// pm.test(\"OfferingClass match request\", ()=>{",
+									"//     pm.expect(results[0].OfferingClass).to.equal(pm.environment.get(\"offeringClass\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has OfferingType\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"// });",
+									"",
+									"// pm.test(\"OfferingType match request\", ()=>{",
+									"//     pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"offeringType\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has ProductDescription\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"// });",
+									"",
+									"// pm.test(\"ProductDescription match request\", ()=>{",
+									"//     pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Region\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Region\");",
+									"// });",
+									"",
+									"",
+									"// pm.test(\"Region match request\", ()=>{",
+									"//     pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"// });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count}}\",\n      \"Duration\": \"{{duration}}\",\n      \"DBInstanceClass\": \"{{instanceType}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"MultiAZ\": false,\n      \"RecommendationId\": \"8105b69c-591b-4861-baaf-eff394593be8\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview Error Wrong instance type",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"RDS\");",
+									"pm.environment.set(\"count\",1);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"m1.small\");",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Aurora MySQL\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
+									"});",
+									"",
+									"pm.test(\"Has Error\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": \"{{cloud_account_id}}\",\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count}}\",\n      \"Duration\": \"{{duration}}\",\n      \"InstanceType\": \"{{instanceType}}\",\n      \"OfferingClass\": \"{{offeringClass}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"8105b69c-591b-4861-baaf-eff394593be8\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview Small Sample",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"EC2\");",
+									"pm.environment.set(\"count\",5);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"m1.small\");",
+									"pm.environment.set('offeringClass', 'standard');",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Linux/UNIX\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has 3 instances in response\", ()=>{",
+									"    pm.expect(results.length).to.equal(3);",
+									"});",
+									"",
+									"// pm.test(\"Service match request\", ()=>{",
+									"//     pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchase_service\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Region\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Region\");",
+									"// });",
+									"",
+									"// pm.test(\"Region match request\", ()=>{",
+									"//     pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Count\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Count\");",
+									"// });",
+									"",
+									"// pm.test(\"Count match request\", ()=>{",
+									"//     pm.expect(results[0].Count).to.equal(pm.environment.get(\"count\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Duration\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Duration\");",
+									"// });",
+									"",
+									"// pm.test(\"Duration match request\", ()=>{",
+									"//     //60s * 60 min * 24 hr * 365 days",
+									"//     let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"//     pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"// });",
+									"",
+									"// pm.test(\"Has InstanceType\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"InstanceType\");",
+									"// });",
+									"",
+									"// pm.test(\"InstanceType match request\", ()=>{",
+									"//     pm.expect(results[0].InstanceType).to.equal(pm.environment.get(\"instanceType\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has OfferingClass\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"OfferingClass\");",
+									"// });",
+									"",
+									"// pm.test(\"OfferingClass match request\", ()=>{",
+									"//     pm.expect(results[0].OfferingClass).to.equal(pm.environment.get(\"offeringClass\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has OfferingType\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"// });",
+									"",
+									"// pm.test(\"OfferingType match request\", ()=>{",
+									"//     pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"offeringType\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has ProductDescription\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"// });",
+									"",
+									"// pm.test(\"ProductDescription match request\", ()=>{",
+									"//     pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Region\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Region\");",
+									"// });",
+									"",
+									"",
+									"// pm.test(\"Region match request\", ()=>{",
+									"//     pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"// });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count}}\",\n      \"Duration\": \"{{duration}}\",\n      \"InstanceType\": \"{{instanceType}}\",\n      \"OfferingClass\": \"{{offeringClass}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"3\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"redis\",\n      \"CacheNodeType\": \"cache.t3.small\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"memcached\",\n      \"CacheNodeType\": \"cache.m6g.4xlarge\",\n      \"OfferingType\": \"No Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview EC2 Count 5",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"EC2\");",
+									"pm.environment.set(\"count_1\",5);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"m1.small\");",
+									"pm.environment.set('offeringClass', 'standard');",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Linux/UNIX\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", ()=>{",
+									"    pm.expect(results[0].Count).to.equal(pm.environment.get(\"count_1\"));",
+									"});",
+									"",
+									"pm.test(\"Has Duration\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Duration\");",
+									"});",
+									"",
+									"pm.test(\"Duration match request\", ()=>{",
+									"    //60s * 60 min * 24 hr * 365 days",
+									"    let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"    pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"});",
+									"",
+									"pm.test(\"Has InstanceType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"InstanceType\");",
+									"});",
+									"",
+									"pm.test(\"InstanceType match request\", ()=>{",
+									"    pm.expect(results[0].InstanceType).to.equal(pm.environment.get(\"instanceType\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingClass\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingClass\");",
+									"});",
+									"",
+									"pm.test(\"OfferingClass match request\", ()=>{",
+									"    pm.expect(results[0].OfferingClass).to.equal(pm.environment.get(\"offeringClass\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"});",
+									"",
+									"pm.test(\"OfferingType match request\", ()=>{",
+									"    pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"offeringType\"));",
+									"});",
+									"",
+									"pm.test(\"Has ProductDescription\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"});",
+									"",
+									"pm.test(\"ProductDescription match request\", ()=>{",
+									"    pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"offeringType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    pm.environment.set('count5_price', fixed_price);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"         pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count_1}}\",\n      \"Duration\": \"{{duration}}\",\n      \"InstanceType\": \"{{instanceType}}\",\n      \"OfferingClass\": \"{{offeringClass}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview Combined",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"pm.test(\"more than 20 instances\", ()=>{",
+									"    pm.expect(results.length).to.be.above(20);",
+									"});",
+									"",
+									"// pm.test(\"Has Service\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Service\");",
+									"// });",
+									"",
+									"// pm.test(\"Service match request\", ()=>{",
+									"//     pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchase_service\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Region\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Region\");",
+									"// });",
+									"",
+									"// pm.test(\"Region match request\", ()=>{",
+									"//     pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Count\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Count\");",
+									"// });",
+									"",
+									"// pm.test(\"Count match request\", ()=>{",
+									"//     pm.expect(results[0].Count).to.equal(pm.environment.get(\"count\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Duration\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Duration\");",
+									"// });",
+									"",
+									"// pm.test(\"Duration match request\", ()=>{",
+									"//     //60s * 60 min * 24 hr * 365 days",
+									"//     let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"//     pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"// });",
+									"",
+									"// pm.test(\"Has InstanceType\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"InstanceType\");",
+									"// });",
+									"",
+									"// pm.test(\"InstanceType match request\", ()=>{",
+									"//     pm.expect(results[0].InstanceType).to.equal(pm.environment.get(\"instanceType\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has OfferingClass\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"OfferingClass\");",
+									"// });",
+									"",
+									"// pm.test(\"OfferingClass match request\", ()=>{",
+									"//     pm.expect(results[0].OfferingClass).to.equal(pm.environment.get(\"offeringClass\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has OfferingType\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"// });",
+									"",
+									"// pm.test(\"OfferingType match request\", ()=>{",
+									"//     pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"offeringType\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has ProductDescription\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"// });",
+									"",
+									"// pm.test(\"ProductDescription match request\", ()=>{",
+									"//     pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"// });",
+									"",
+									"// pm.test(\"Has Region\", ()=>{",
+									"//     pm.expect(results[0]).to.have.property(\"Region\");",
+									"// });",
+									"",
+									"",
+									"// pm.test(\"Region match request\", ()=>{",
+									"//     pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"// });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [{\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"3\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"redis\",\n      \"CacheNodeType\": \"cache.t3.small\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"EC2\",\n      \"Count\": \"1\",\n      \"Duration\": \"3\",\n      \"InstanceType\": \"c5a.large\",\n      \"OfferingClass\": \"standard\",\n      \"OfferingType\": \"All Upfront\",\n      \"ProductDescription\": \"Linux/UNIX\",\n      \"Region\": \"US East (N. Virginia)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"3\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"redis\",\n      \"CacheNodeType\": \"cache.m6g.xlarge\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"US West (Oregon)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"EC2\",\n      \"Count\": \"1\",\n      \"Duration\": \"3\",\n      \"InstanceType\": \"t3.small\",\n      \"OfferingClass\": \"standard\",\n      \"OfferingType\": \"All Upfront\",\n      \"ProductDescription\": \"Linux/UNIX\",\n      \"Region\": \"US West (Oregon)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n     {\n      \"Service\": \"EC2\",\n      \"Count\": \"1\",\n      \"Duration\": \"3\",\n      \"InstanceType\": \"t3.small\",\n      \"OfferingClass\": \"standard\",\n      \"OfferingType\": \"All Upfront\",\n      \"ProductDescription\": \"Linux/UNIX\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"3\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"redis\",\n      \"CacheNodeType\": \"cache.t3.medium\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"US West (Oregon)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"EC2\",\n      \"Count\": \"1\",\n      \"Duration\": \"3\",\n      \"InstanceType\": \"t3.large\",\n      \"OfferingClass\": \"standard\",\n      \"OfferingType\": \"All Upfront\",\n      \"ProductDescription\": \"Linux/UNIX\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"3\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"redis\",\n      \"CacheNodeType\": \"cache.m4.4xlarge\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"US West (Oregon)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"RDS\",\n      \"Count\": \"1\",\n      \"DBInstanceClass\": \"db.m6g.xlarge\",\n      \"Duration\": \"1\",\n      \"ProductDescription\": \"PostgreSQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"US East (N. Virginia)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ElastiCache\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"memcached\",\n      \"CacheNodeType\": \"cache.m6g.4xlarge\",\n      \"OfferingType\": \"No Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"RDS\",\n      \"Count\": \"1\",\n      \"DBInstanceClass\": \"db.t3.small\",\n      \"Duration\": \"3\",\n      \"ProductDescription\": \"Aurora MySQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"RDS\",\n      \"Count\": \"2\",\n      \"DBInstanceClass\": \"db.t3.medium\",\n      \"Duration\": \"1\",\n      \"ProductDescription\": \"Aurora PostgreSQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n\n    {\n      \"Service\": \"Redshift\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"NodeType\": \"dc2.large\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"US East (N. Virginia)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n     {\n      \"Service\": \"Redshift\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"NodeType\": \"dc2.large\",\n      \"OfferingType\": \"All Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n     {\n      \"Service\": \"RDS\",\n      \"Count\": \"1\",\n      \"DBInstanceClass\": \"db.m6g.large\",\n      \"Duration\": \"1\",\n      \"ProductDescription\": \"PostgreSQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"US East (N. Virginia)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ES\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"RecommendedInstanceType\": \"c5.xlarge.elasticsearch\",\n      \"OfferingType\": \"No Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ES\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"RecommendedInstanceType\": \"c5.large.elasticsearch\",\n      \"OfferingType\": \"No Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"ES\",\n      \"Count\": \"2\",\n      \"Duration\": \"3\",\n      \"RecommendedInstanceType\": \"c5.xlarge.elasticsearch\",\n      \"OfferingType\": \"No Upfront\",\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"RDS\",\n      \"Count\": \"1\",\n      \"DBInstanceClass\": \"db.t3.micro\",\n      \"Duration\": \"1\",\n      \"ProductDescription\": \"Aurora PostgreSQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n    {\n      \"Service\": \"RDS\",\n      \"Count\": \"1\",\n      \"DBInstanceClass\": \"db.t3.medium\",\n      \"Duration\": \"1\",\n      \"ProductDescription\": \"Aurora PostgreSQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"Asia Pacific (Singapore)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    },\n     {\n      \"Service\": \"RDS\",\n      \"Count\": \"1\",\n      \"DBInstanceClass\": \"db.t3.micro\",\n      \"Duration\": \"1\",\n      \"ProductDescription\": \"Aurora PostgreSQL\",\n      \"OfferingType\": \"All Upfront\",\n      \"MultiAZ\": false,\n      \"Region\": \"US East (N. Virginia)\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview EC2 Count 3",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"EC2\");",
+									"pm.environment.set(\"count_2\",3);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"m1.small\");",
+									"pm.environment.set('offeringClass', 'standard');",
+									"pm.environment.set('offeringType', 'All Upfront');",
+									"pm.environment.set('productDescription', \"Linux/UNIX\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", ()=>{",
+									"    pm.expect(results[0].Count).to.equal(pm.environment.get(\"count_2\"));",
+									"});",
+									"",
+									"pm.test(\"Count2 is 3/5 of count1\", ()=>{",
+									"    let unit_price2 = results[0].FixedPrice/pm.environment.get(\"count_2\");",
+									"    let unit_price1 = pm.environment.get('fixed_price') / pm.environment.get(\"count_1\");",
+									"    pm.expect().to.equal();",
+									"});",
+									"",
+									"pm.test(\"Has Duration\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Duration\");",
+									"});",
+									"",
+									"pm.test(\"Duration match request\", ()=>{",
+									"    //60s * 60 min * 24 hr * 365 days",
+									"    let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"    pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"});",
+									"",
+									"pm.test(\"Has InstanceType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"InstanceType\");",
+									"});",
+									"",
+									"pm.test(\"InstanceType match request\", ()=>{",
+									"    pm.expect(results[0].InstanceType).to.equal(pm.environment.get(\"instanceType\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingClass\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingClass\");",
+									"});",
+									"",
+									"pm.test(\"OfferingClass match request\", ()=>{",
+									"    pm.expect(results[0].OfferingClass).to.equal(pm.environment.get(\"offeringClass\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"});",
+									"",
+									"pm.test(\"OfferingType match request\", ()=>{",
+									"    pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"offeringType\"));",
+									"});",
+									"",
+									"pm.test(\"Has ProductDescription\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"});",
+									"",
+									"pm.test(\"ProductDescription match request\", ()=>{",
+									"    pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"offeringType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"        pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"compare 3 to five\",()=>{",
+									"    let curr_price = parseFloat(results[0].FixedPrice);",
+									"    let curr_count = pm.environment.get('count_2');",
+									"    let prev_price = pm.environment.get('count5_price');",
+									"    let prev_count = pm.environment.get('count_1');",
+									"    pm.expect(curr_price/curr_count).to.equal(prev_price/prev_count);",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count_2}}\",\n      \"Duration\": \"{{duration}}\",\n      \"InstanceType\": \"{{instanceType}}\",\n      \"OfferingClass\": \"{{offeringClass}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview EC2 Partial Upfront",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"purchaseService\",\"EC2\");",
+									"pm.environment.set(\"count\",5);",
+									"pm.environment.set('duration', 3);",
+									"pm.environment.set('instanceType', \"m1.small\");",
+									"pm.environment.set('offeringClass', 'standard');",
+									"pm.environment.set('offeringType', 'Partial Upfront');",
+									"pm.environment.set('productDescription', \"Linux/UNIX\");",
+									"pm.environment.set(\"region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"purchaseService\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", ()=>{",
+									"    pm.expect(results[0].Count).to.equal(pm.environment.get(\"count\"));",
+									"});",
+									"",
+									"pm.test(\"Has Duration\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Duration\");",
+									"});",
+									"",
+									"pm.test(\"Duration match request\", ()=>{",
+									"    //60s * 60 min * 24 hr * 365 days",
+									"    let request_duration_in_seconds = pm.environment.get(\"duration\") *60 *60 *24 *365;",
+									"    pm.expect(results[0].Duration).to.equal(request_duration_in_seconds);",
+									"});",
+									"",
+									"pm.test(\"Has InstanceType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"InstanceType\");",
+									"});",
+									"",
+									"pm.test(\"InstanceType match request\", ()=>{",
+									"    pm.expect(results[0].InstanceType).to.equal(pm.environment.get(\"instanceType\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingClass\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingClass\");",
+									"});",
+									"",
+									"pm.test(\"OfferingClass match request\", ()=>{",
+									"    pm.expect(results[0].OfferingClass).to.equal(pm.environment.get(\"offeringClass\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"});",
+									"",
+									"pm.test(\"OfferingType match request\", ()=>{",
+									"    pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"offeringType\"));",
+									"});",
+									"",
+									"pm.test(\"Has ProductDescription\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"ProductDescription\");",
+									"});",
+									"",
+									"pm.test(\"ProductDescription match request\", ()=>{",
+									"    pm.expect(results[0].ProductDescription).to.equal(pm.environment.get(\"productDescription\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(results[0].Region).to.equal(pm.environment.get(\"region\"));",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"offeringType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"         pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{purchaseService}}\",\n      \"Count\": \"{{count}}\",\n      \"Duration\": \"{{duration}}\",\n      \"InstanceType\": \"{{instanceType}}\",\n      \"OfferingClass\": \"{{offeringClass}}\",\n      \"OfferingType\": \"{{offeringType}}\",\n      \"ProductDescription\": \"{{productDescription}}\",\n      \"Region\": \"{{region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview Redshift",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"_Service\",\"Redshift\");",
+									"pm.environment.set(\"_Count\", 2);",
+									"pm.environment.set(\"_Duration\", 3);",
+									"pm.environment.set(\"_NodeType\", 'dc2.large');",
+									"pm.environment.set('_OfferingType', 'All Upfront');",
+									"pm.environment.set(\"_Region\",'Asia Pacific (Singapore)');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let this_service = pm.response.json().results[0];",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(this_service.Service).to.equal(pm.environment.get(\"_Service\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", ()=>{",
+									"    pm.expect(this_service.Count).to.equal(pm.environment.get(\"_Count\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    pm.expect(this_service.Region).to.equal(pm.environment.get(\"_Region\"));",
+									"});",
+									"",
+									"",
+									"",
+									"pm.test(\"Has Duration\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"Duration\");",
+									"});",
+									"",
+									"pm.test(\"Duration Match\", ()=>{",
+									"    //60s * 60 min * 24 hr * 365 days",
+									"    let request_duration_in_seconds = pm.environment.get(\"_Duration\") *60 *60 *24 *365;",
+									"    pm.expect(this_service.Duration).to.equal(request_duration_in_seconds);",
+									"});",
+									"",
+									"pm.test(\"Has NodeType\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"NodeType\");",
+									"});",
+									"",
+									"pm.test(\"NodeType match request\", ()=>{",
+									"    pm.expect(this_service.NodeType).to.equal(pm.environment.get(\"_NodeType\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingType\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"OfferingType\");",
+									"});",
+									"",
+									"pm.test(\"OfferingType match request\", ()=>{",
+									"    pm.expect(this_service.OfferingType).to.equal(pm.environment.get(\"_OfferingType\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has NodeType\", ()=>{",
+									"    pm.expect(this_service).to.have.property(\"NodeType\");",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"_OfferingType\");",
+									"    let fixed_price = parseFloat(this_service.FixedPrice);",
+									"    let hourly_price = parseFloat(this_service.RecurringCharges[0].Amount);",
+									"    //no upfront, only fixed price",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"         pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{_Service}}\",\n      \"Count\": \"{{_Count}}\",\n      \"Duration\": \"{{_Duration}}\",\n      \"NodeType\": \"{{_NodeType}}\",\n      \"OfferingType\": \"{{_OfferingType}}\",\n      \"Region\": \"{{_Region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Preview ES",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"_Service\",\"ES\");",
+									"pm.environment.set(\"_Count\", 2);",
+									"pm.environment.set(\"_Duration\", 3);",
+									"pm.environment.set(\"_RecommendedInstanceType\", \"c5.xlarge.elasticsearch\");",
+									"pm.environment.set('_OfferingType', \"No Upfront\");",
+									"pm.environment.set(\"_Region\",'Asia Pacific (Singapore)');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 204\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,204]);",
+									"});",
+									"pm.test(\"Has results\", ()=>{",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"let results = pm.response.json().results;",
+									"",
+									"pm.test(\"Has Service\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Service\");",
+									"});",
+									"",
+									"pm.test(\"Service match request\", ()=>{",
+									"    pm.expect(results[0].Service).to.equal(pm.environment.get(\"_Service\"));",
+									"});",
+									"",
+									"pm.test(\"Has Count\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Count\");",
+									"});",
+									"",
+									"pm.test(\"Count match request\", ()=>{",
+									"    pm.expect(results[0].Count).to.equal(pm.environment.get(\"_Count\"));",
+									"});",
+									"",
+									"pm.test(\"Has Region\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"Region\");",
+									"});",
+									"",
+									"pm.test(\"Region match request\", ()=>{",
+									"    let response_region = pm.collectionVariables.get('region_dict')[results[0].Region];",
+									"    pm.expect(response_region).to.equal(pm.environment.get(\"_Region\"));",
+									"});",
+									"",
+									"pm.test(\"Has RecommendedInstanceType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"ElasticsearchInstanceType\");",
+									"});",
+									"",
+									"pm.test(\"RecommendedInstanceType match request\", ()=>{",
+									"    pm.expect(results[0].ElasticsearchInstanceType).to.equal(pm.environment.get(\"_RecommendedInstanceType\"));",
+									"});",
+									"",
+									"pm.test(\"Has OfferingType\", ()=>{",
+									"    pm.expect(results[0]).to.have.property(\"OfferingType\");",
+									"});",
+									"",
+									"pm.test(\"OfferingType match request\", ()=>{",
+									"    pm.expect(results[0].OfferingType).to.equal(pm.environment.get(\"_OfferingType\"));",
+									"});",
+									"",
+									"pm.test(\"Price check\",()=>{",
+									"    let upfront_option = pm.environment.get(\"_OfferingType\");",
+									"    let fixed_price = parseFloat(results[0].FixedPrice);",
+									"    let hourly_price = parseFloat(results[0].RecurringCharges[0].Amount);",
+									"    if(upfront_option == 'All Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.equal(0);",
+									"    }else if(upfront_option =='Partial Upfront'){",
+									"        pm.expect(fixed_price).to.be.above(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }else{",
+									"        pm.expect(upfront_option).to.equal(\"No Upfront\");",
+									"         pm.expect(fixed_price).to.equal(0);",
+									"        pm.expect(hourly_price).to.be.above(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"caid\": {{cloud_account_id}},\n  \"Preview\": true,\n  \"Instances\":\n  [\n    {\n      \"Service\": \"{{_Service}}\",\n      \"Count\": \"{{_Count}}\",\n      \"Duration\": \"{{_Duration}}\",\n      \"RecommendedInstanceType\": \"{{_RecommendedInstanceType}}\",\n      \"OfferingType\": \"{{_OfferingType}}\",\n      \"Region\": \"{{_Region}}\",\n      \"RecommendationId\": \"6f44bdd8-6cf8-4777-a82c-e4f222582a90\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services",
+								"ri-offerings",
+								"purchase",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Services",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"service_types_dict\", pm.response.json());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/services?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"services"
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let accessed_time = pm.environment.get(\"accessed_time\");",
+							"let current_time = pm.variables.replaceIn(\"{{$timestamp}}\");",
+							"let time_passed = current_time - accessed_time;",
+							"if(time_passed>240){",
+							"    pm.sendRequest({url: pm.environment.get('host_user') +'/auth/jwt/refresh/',",
+							"    method: 'POST', body: { mode: 'formdata',",
+							"        formdata: [{key: \"refresh\", value: pm.environment.get('refresh')}]",
+							"        }},(err, res)=>{",
+							"        pm.environment.set('accessed_time',  pm.variables.replaceIn(\"{{$timestamp}}\"));",
+							"        pm.environment.set('token', \"JWT \"+ res.json().access);",
+							"        pm.environment.set('refresh', res.json().refresh);",
+							"    });",
+							"}",
+							"pm.request.headers.add({key: 'Authorization', value: pm.environment.get(\"token\") });"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"let region_dict ={ // Only for ES preview compare",
+					"    'us-east-1': 'US East (N. Virginia)',",
+					"    'us-east-2': 'US East (Ohio)',",
+					"    'us-west-1': 'US West (N. California)',",
+					"    'us-west-2': 'US West (Oregon)',",
+					"    'af-south-1': 'Africa (Cape Town)',",
+					"    'ap-east-1': 'Asia Pacific (Hong Kong)',",
+					"    'ap-south-1': 'Asia Pacific (Mumbai)',",
+					"    'ap-northeast-3': 'Asia Pacific (Osaka)',",
+					"    'ap-northeast-2': 'Asia Pacific (Seoul)',",
+					"    'ap-southeast-1': 'Asia Pacific (Singapore)',",
+					"    'ap-southeast-2': 'Asia Pacific (Sydney)',",
+					"    'ap-northeast-1': 'Asia Pacific (Tokyo)',",
+					"    'ca-central-1': 'Canada (Central)',",
+					"    'eu-central-1': 'Europe (Frankfurt)',",
+					"    'eu-west-1': 'Europe (Ireland)',",
+					"    'eu-west-2': 'Europe (London)',",
+					"    'eu-south-1': 'Europe (Milan)',",
+					"    'eu-west-3': 'Europe (Paris)',",
+					"    'eu-north-1': 'Europe (Stockholm)',",
+					"    'me-south-1': 'Middle East (Bahrain)',",
+					"    'sa-east-1': 'South America (São Paulo)'",
+					"}",
+					"pm.collectionVariables.set(\"region_dict\", region_dict);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "region_dict",
+			"value": ""
+		}
+	]
+}
