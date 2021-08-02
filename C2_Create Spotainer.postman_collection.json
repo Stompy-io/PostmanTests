@@ -3011,6 +3011,101 @@
 					]
 				},
 				{
+					"name": "Get Spot Types Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"pm.test('Has results', () => {",
+									"    pm.expect(pm.response.json()).to.have.property('results');",
+									"});",
+									"",
+									"if (pm.response.json().results != null) {",
+									"",
+									"    pm.test('region match', () => {",
+									"        pm.expect(pm.response.json().results.Region).to.equal(pm.request.url.query.toObject().region_code)",
+									"    });",
+									"    const all_keys_list = ['linux', \"rhel\", \"suse\", \"windows\", \"Region\"]",
+									"",
+									"    pm.test('results has expected keys', () => {",
+									"        pm.expect(pm.response.json().results, 'Nooo we need all the product types').to.have.all.keys(all_keys_list);",
+									"    });",
+									"    let spot_array = [];",
+									"    all_keys_list.pop();",
+									"    pm.test('results has expected properties', () => {",
+									"        for (let system of all_keys_list) {",
+									"            pm.response.json().results[system].forEach((item) => {",
+									"                pm.expect(item).to.have.all.keys({",
+									"                    \"Memory\": \"976 GiB\",",
+									"                    \"VCPU\": \"64\",",
+									"                    \"Storage\": \"1 x 1920 SSD\",",
+									"                    \"InstanceFamily\": \"Memory optimized\",",
+									"                    \"InstanceType\": \"x1.16xlarge\"",
+									"                });",
+									"                let spot_type = item.InstanceType;",
+									"                if (!spot_array.includes(spot_type)) {",
+									"                    spot_array.push(spot_type);",
+									"                }",
+									"            });",
+									"        }",
+									"    });",
+									"",
+									"    pm.environment.set('all_spot_list', spot_array);",
+									"",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/spotainers/get_aws_spot_types/?region_code={{region_code}}&caid={{cloua}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainers",
+								"get_aws_spot_types",
+								""
+							],
+							"query": [
+								{
+									"key": "region_code",
+									"value": "{{region_code}}"
+								},
+								{
+									"key": "caid",
+									"value": "{{cloua}}"
+								},
+								{
+									"key": "region_code",
+									"value": "af-south-1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Common Images",
 					"event": [
 						{
@@ -4853,7 +4948,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"name\": \"test_spotainer\",\n    \"region_code\": \"{{region_code}}\",\n    \"CapacityUnit\": \"123\",\n    \"CapacityTarget\": \"3\",\n    \"CapacityMin\": \"1\",\n    \"CapacityMax\": \"5\",\n    \"CapacityKey\": \"on_demand_count\",\n    \"CapacityValue\": \"3\",\n    \"ClusterOrientation\": \"balanced\",\n    \"DrainingTimeout\": \"300\",\n    \"FallbackToOnDemand\": false,\n    \"VPC\": \"123\",\n    \"OperatingSystem\": \"{{system}}\",\n    \"OnDemandType\": \"t3.nano\",\n    \"SubNets\": {\n        \"AZ_ID\": [\n            \"SubNetID\"\n        ],\n        \"AZ_ID1\": [\n            \"SubNetID\"\n        ],\n        \"AZ_ID2\": [\n            \"SubNetID\"\n        ]\n    },\n    \"SpotTypes\": [\n        \"t3.nano\",\n        \"t4.nano\"\n    ],\n    \"ImageId\": \"imagetid\",\n    \"SecurityGroupsIds\": [\n        \"\"\n    ],\n    \"KeyPairName\": \"kyleMaster\",\n    \"PublicIp\": \"PublicIpid\",\n    \"AddMonitoringAgent\": false\n}",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"name\": \"{{$randomProduct}}\",\n    \"region_code\": \"{{region_code}}\",\n    \"CapacityUnit\": \"123\",\n    \"CapacityTarget\": \"3\",\n    \"CapacityMin\": \"1\",\n    \"CapacityMax\": \"5\",\n    \"CapacityKey\": \"on_demand_count\",\n    \"CapacityValue\": \"3\",\n    \"ClusterOrientation\": \"balanced\",\n    \"DrainingTimeout\": \"300\",\n    \"FallbackToOnDemand\": false,\n    \"VPC\": \"123\",\n    \"OperatingSystem\": \"{{system}}\",\n    \"OnDemandType\": \"t3.nano\",\n    \"SubNets\": {\n        \"AZ_ID\": [\n            \"SubNetID\"\n        ],\n        \"AZ_ID1\": [\n            \"SubNetID\"\n        ],\n        \"AZ_ID2\": [\n            \"SubNetID\"\n        ]\n    },\n    \"SpotTypes\": [\n        \"t3.nano\",\n        \"t4.nano\"\n    ],\n    \"ImageId\": \"imagetid\",\n    \"SecurityGroupsIds\": [\n        \"\"\n    ],\n    \"KeyPairName\": \"kyleMaster\",\n    \"PublicIp\": \"PublicIpid\",\n    \"AddMonitoringAgent\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6128,7 +6223,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_instances/?caid={{cloud_account_id}}",
+							"raw": "{{host_aws}}/spotainers/get_instances/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
@@ -6141,6 +6236,10 @@
 								{
 									"key": "caid",
 									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "region_code",
+									"value": "{{region_code}}"
 								}
 							]
 						}
@@ -6205,7 +6304,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"instance_list\": []\n}",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"region_code\": {{region_code}},\n    \"instance_list\": []\n}",
 							"options": {
 								"raw": {
 									"language": "json"

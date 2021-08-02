@@ -153,7 +153,7 @@
 							"});",
 							"",
 							"pm.test(\"non_field_errors is Verify Code Does Not Match!\", () => {",
-							"    pm.expect(pm.response.json().non_field_errors).to.equal(['Verify Code Does Not Match!']);",
+							"    pm.expect(pm.response.json().non_field_errors[0]).to.equal('Verify Code Does Not Match!');",
 							"});"
 						],
 						"type": "text/javascript"

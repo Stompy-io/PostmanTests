@@ -200,7 +200,7 @@
 							"});",
 							"",
 							"pm.test('error is Email Alread Exist', ()=>{",
-							"    pm.expect(pm.response.json().email).to.eql(['Email Already Exists!']);",
+							"    pm.expect(pm.response.json().email[0]).to.eql('Email Already Exists!');",
 							"})"
 						],
 						"type": "text/javascript"
