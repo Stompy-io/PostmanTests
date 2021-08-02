@@ -31,6 +31,10 @@ function run_tests(){
 
     newman run P1_Auth\ Never\ Fail.postman_collection.json  -e ${1}.postman_environment.json -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs ##--env-var spotARN=${${1}_SPOT_ARN} --env-var testARN=${${1}_ANAL_ARN}
 
+    newman run P1_Connect\ First\ Analy\ Only.postman_collection.json  -e ${1}.postman_environment.json -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs ##--env-var spotARN=${${1}_SPOT_ARN} --env-var testARN=${${1}_ANAL_ARN}
+
+    newman run P1_Connect\ First\ Spotainer\ Only.postman_collection.json  -e ${1}.postman_environment.json -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs ##--env-var spotARN=${${1}_SPOT_ARN} --env-var testARN=${${1}_ANAL_ARN}
+
     newman run C2_Create\ Spotainer.postman_collection.json  -e ${1}.postman_environment.json -d region_code.csv -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs
 
     newman run No\ Auth\ No\ Access.postman_collection.json  -e ${1}.postman_environment.json -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs
