@@ -1,0 +1,1002 @@
+{
+	"info": {
+		"_postman_id": "94d6261f-2ac1-4fb0-b78d-e3d38bfd7000",
+		"name": "No Auth No Access",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AWS Accounts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/organizations/list-accounts/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"organizations",
+						"list-accounts",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AWS Services",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/services/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coverage Chart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coverage Table",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-coverage/?caid={{cloud_account_id}}&groupby=instance",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-coverage",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "groupby",
+							"value": "instance"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Chart - with Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&granularity=daily",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"utilizations",
+						"reservation",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "granularity",
+							"value": "daily"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Utilization Table",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/utilizations/reservation/?caid={{cloud_account_id}}&groupby=subscription",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"utilizations",
+						"reservation",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "groupby",
+							"value": "subscription"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trends Diagram",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let moment = require('moment');",
+							"let two_days_ago = moment().subtract(2,'days').format('YYYY-MM-DD');",
+							"pm.environment.set('two_days_ago', two_days_ago);",
+							"let weekAgo = moment().subtract(9,'days').format('YYYY-MM-DD');",
+							"pm.environment.set('a_week_ago', weekAgo);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/ce/get-trend-diagram/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-trend-diagram",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "start_date",
+							"value": "{{a_week_ago}}",
+							"disabled": true
+						},
+						{
+							"key": "end_date",
+							"value": "{{two_days_ago}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommendation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host_aws}}/ce/get-reservation-recommendation/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"get-reservation-recommendation",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Purchase Preview One of Instance",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"Preview\": true,\n    \"Instances\": [\n        {\n            \"Service\": \"ElastiCache\",\n            \"Count\": \"2\",\n            \"CacheNodeType\": \"cache.t3.small\",\n            \"Duration\": \"1\",\n            \"ProductDescription\": \"redis\",\n            \"OfferingType\": \"No Upfront\",\n            \"Region\": \"Asia Pacific (Singapore)\",\n            \"RecommendationId\": \"f7e230ee-2345-4324-8e20-ab5aef5dd3ec\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_aws}}/services/ri-offerings/purchase/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"services",
+						"ri-offerings",
+						"purchase",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Billings",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{host_user}}/bills/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"bills",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Savings",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/savings/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"savings",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Forecast Cost",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/ce/cost_forecast/get_forecast/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"cost_forecast",
+						"get_forecast",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Current Cost",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_aws}}/ce/cost_usage/current_cost/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"cost_usage",
+						"current_cost",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Account cost",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI0OTU3NTMwLCJqdGkiOiI5NTgyYjRkNzhkNzc0YjdlODkzNmQ0N2I3N2RjOTYzZSIsInVzZXJfaWQiOjIsImNhaWQiOjF9.EC8lYnlVSXuD3Jpk9FLvHkMSy4rmc1SaE2P74yISSb0",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/ce/cost_usage/account_cost/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"cost_usage",
+						"account_cost",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Waste history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/ce/utilizations/waste_history/?caid={{cloud_account_id}}",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"utilizations",
+						"waste_history",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Efficiency",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{host_aws}}/ce/utilizations/efficiency/?caid={{cloud_account_id}}&sub_accounts=%5B%7B%22AccountID%22:%22263078123597%22,%22Amount%22:%221128.92%22,%22AccountName%22:%22MR332%22%7D,%7B%22AccountID%22:%22385105545457%22,%22Amount%22:%22180.38%22,%22AccountName%22:%22Stompy.io%22%7D,%7B%22AccountID%22:%22254378262586%22,%22Amount%22:%220.40%22,%22AccountName%22:%22Stompy_test%22%7D%5D",
+					"host": [
+						"{{host_aws}}"
+					],
+					"path": [
+						"ce",
+						"utilizations",
+						"efficiency",
+						""
+					],
+					"query": [
+						{
+							"key": "caid",
+							"value": "{{cloud_account_id}}"
+						},
+						{
+							"key": "sub_accounts",
+							"value": "%5B%7B%22AccountID%22:%22263078123597%22,%22Amount%22:%221128.92%22,%22AccountName%22:%22MR332%22%7D,%7B%22AccountID%22:%22385105545457%22,%22Amount%22:%22180.38%22,%22AccountName%22:%22Stompy.io%22%7D,%7B%22AccountID%22:%22254378262586%22,%22Amount%22:%220.40%22,%22AccountName%22:%22Stompy_test%22%7D%5D"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "organizations list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_user}}/organizations/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"organizations",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_user}}/users/1/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"users",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all plans",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host_user}}/plans/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"plans",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "current plans",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401\", () => {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host_user}}/plans/{{plan_id}}/",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"plans",
+						"{{plan_id}}",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const serviceDict = {",
+					"    \"Amazon Elastic Compute Cloud - Compute\":\"EC2\",",
+					"    \"Amazon Relational Database Service\":\"RDS\",",
+					"    \"Amazon ElastiCache\": \"ElastiCache\" ,",
+					"    \"Amazon Redshift\": \"Redshift\" ,",
+					"    \"Amazon ElastiSearch\": \"ES\"",
+					"};",
+					"",
+					"pm.environment.set(\"service_dict\", serviceDict);",
+					"",
+					"const region_dict ={ // Only needed by ES preview comparison",
+					"    'us-east-1': 'US East (N. Virginia)',",
+					"    'us-east-2': 'US East (Ohio)',",
+					"    'us-west-1': 'US West (N. California)',",
+					"    'us-west-2': 'US West (Oregon)',",
+					"    'af-south-1': 'Africa (Cape Town)',",
+					"    'ap-east-1': 'Asia Pacific (Hong Kong)',",
+					"    'ap-south-1': 'Asia Pacific (Mumbai)',",
+					"    'ap-northeast-3': 'Asia Pacific (Osaka)',",
+					"    'ap-northeast-2': 'Asia Pacific (Seoul)',",
+					"    'ap-southeast-1': 'Asia Pacific (Singapore)',",
+					"    'ap-southeast-2': 'Asia Pacific (Sydney)',",
+					"    'ap-northeast-1': 'Asia Pacific (Tokyo)',",
+					"    'ca-central-1': 'Canada (Central)',",
+					"    'eu-central-1': 'Europe (Frankfurt)',",
+					"    'eu-west-1': 'Europe (Ireland)',",
+					"    'eu-west-2': 'Europe (London)',",
+					"    'eu-south-1': 'Europe (Milan)',",
+					"    'eu-west-3': 'Europe (Paris)',",
+					"    'eu-north-1': 'Europe (Stockholm)',",
+					"    'me-south-1': 'Middle East (Bahrain)',",
+					"    'sa-east-1': 'South America (São Paulo)'",
+					"}",
+					"pm.collectionVariables.set(\"region_dict\", region_dict);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "region_dict",
+			"value": ""
+		},
+		{
+			"key": "service_types_dict",
+			"value": ""
+		}
+	]
+}
