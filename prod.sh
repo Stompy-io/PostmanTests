@@ -2,7 +2,8 @@
 # npm install -g newman-reporter-htmlextra
 # cd git_repo/PostmanTests
 mkdir -p prod_results
-newman run P1_AWS_API_Tests.postman_collection.json -e Prod.postman_environment.json -r htmlextra --reporter-htmlextra-export ./prod_results/ --reporter-htmlextra-logs
+export env_name
+newman run P1_AWS_API_Tests.postman_collection.json -e $(env_name).postman_environment.json -r htmlextra --reporter-htmlextra-export ./$(env_name)_results/ --reporter-htmlextra-logs
 
 newman run P1_Coverage.postman_collection.json -e Prod.postman_environment.json -r htmlextra --reporter-htmlextra-export ./prod_results/ --reporter-htmlextra-logs
 
