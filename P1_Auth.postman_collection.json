@@ -220,7 +220,7 @@
 									"});",
 									"",
 									"pm.test(\"non_field_errors is Verify Code Does Not Match!\", () => {",
-									"    pm.expect(pm.response.json().non_field_errors).to.eql(['Verify Code Does Not Match!']);",
+									"    pm.expect(pm.response.json().non_field_errors[0]).to.eql('Verify Code Does Not Match!');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -301,9 +301,9 @@
 									"    pm.expect(pm.response.code).to.equal(400);",
 									"});",
 									"",
-									"// pm.test(\"non_field_errors is Verify Code Does Not Match!\", () => {",
-									"//     pm.expect(pm.response.json().non_field_errors).to.eql(['Verify Code Does Not Match!']);",
-									"// });"
+									"pm.test(\"email is invalid\", () => {",
+									"    pm.expect(pm.response.json().email[0]).to.eql(\"Enter a valid email address.\");",
+									"});"
 								],
 								"type": "text/javascript"
 							}
