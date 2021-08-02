@@ -4944,6 +4944,366 @@
 					]
 				},
 				{
+					"name": "Get Spotainer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"pm.test('results has expected keys', () => {",
+									"    let property_list = [\"id\", \"caid\", \"name\", \"region_code\", \"created_at\", \"updated_at\", \"spotainer_config\", \"aws_config\", \"is_deleted\"];",
+									"    let spot_config = [\"VPC\", \"SubNets\", \"SpotTypes\", \"ElasticIps\", \"CapacityKey\", \"CapacityMax\", \"CapacityMin\", \"Schedulings\",",
+									"        \"CapacityUnit\", \"AMIAutoBackup\", \"CapacityValue\", \"LoadBalancers\", \"CapacityTarget\", \"ShutDownScript\", \"DrainingTimeout\",",
+									"        \"OperatingSystem\", \"AutoHealingTarget\", \"TerminationPolicy\", \"UnhealthyDuration\", \"ClusterOrientation\", \"FallbackToOnDemand\",",
+									"        \"PreferredSpotTypes\", \"TargetScalingPolicys\", \"AMIAutoBackupFrequency\", \"HealthCheckGracePeriod\", \"SimpleUpScalingPolicys\",",
+									"        \"SimpleDownScalingPolicys\", \"PreferredAvailabilityZones\"];",
+									"    let aws_properties = [\"Tags\", \"ImageId\", \"Tenancy\", \"PublicIp\", \"UserData\", \"IAMRoleArn\", \"Monitoring\", \"IAMRoleName\",",
+									"        \"KeyPairName\", \"EbsOptimized\", \"OnDemandType\", \"SecurityGroupsIds\", \"AddMonitoringAgent\", \"AssociateIpv6Address\"];",
+									"",
+									"    let result = pm.response.json().results;",
+									"    property_list.forEach(prop => {",
+									"        pm.expect(result).to.have.property(prop);",
+									"        if (prop == \"spotainer_config\") {",
+									"            let configs = result[prop];",
+									"            spot_config.forEach(key => {",
+									"                pm.expect(configs).to.have.property(key);",
+									"            });",
+									"",
+									"        } else if (prop == \"aws_config\") {",
+									"            let configs = result[prop];",
+									"            aws_properties.forEach(key => {",
+									"                pm.expect(configs).to.have.property(key);",
+									"            });",
+									"        }",
+									"    })",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/spotainers/{{spotainer_id_1}}/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainers",
+								"{{spotainer_id_1}}",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "spotainer_id",
+									"value": "{{spotainer_id_1}}",
+									"disabled": true
+								},
+								{
+									"key": "region_code",
+									"value": "{{region_code}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Fail To Query Spotainer",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainers/51/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainers",
+										"51",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "{{cloud_account_id}}"
+										},
+										{
+											"key": "region_code",
+											"value": "{{region_code}}"
+										},
+										{
+											"key": "spotainer_id",
+											"value": "14",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 23 Jul 2021 08:20:33 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "85"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"Fail to query Spotainer! Detail: Spotainer matching query does not exist.\"\n}"
+						},
+						{
+							"name": "Get Spotainer",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainers/51/?caid={{cloud_account_id}}&spotainer_id=51",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainers",
+										"51",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "{{cloud_account_id}}"
+										},
+										{
+											"key": "region_code",
+											"value": "{{region_code}}",
+											"disabled": true
+										},
+										{
+											"key": "spotainer_id",
+											"value": "51"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 23 Jul 2021 08:21:18 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1702"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": {\n        \"id\": 51,\n        \"caid\": 2,\n        \"name\": \"test_spotainer\",\n        \"region_code\": \"ap-southeast-1\",\n        \"created_at\": \"2021-07-23T13:55:50.197133+08:00\",\n        \"updated_at\": \"2021-07-23T13:55:50.202848+08:00\",\n        \"spotainer_config\": {\n            \"CapacityUnit\": \"123\",\n            \"CapacityTarget\": \"3\",\n            \"CapacityMin\": \"1\",\n            \"CapacityMax\": \"5\",\n            \"CapacityKey\": \"on_demand_count\",\n            \"CapacityValue\": \"3\",\n            \"ClusterOrientation\": \"balanced\",\n            \"DrainingTimeout\": \"300\",\n            \"FallbackToOnDemand\": false,\n            \"VPC\": \"123\",\n            \"OperatingSystem\": \"linux\",\n            \"SubNets\": {\n                \"AZ_ID\": [\n                    \"SubNetID\"\n                ],\n                \"AZ_ID1\": [\n                    \"SubNetID\"\n                ],\n                \"AZ_ID2\": [\n                    \"SubNetID\"\n                ]\n            },\n            \"SpotTypes\": [\n                \"t3.nano\",\n                \"t4.nano\"\n            ],\n            \"PreferredAvailabilityZones\": [],\n            \"PreferredSpotTypes\": [],\n            \"ElasticIps\": [],\n            \"AMIAutoBackup\": null,\n            \"AMIAutoBackupFrequency\": null,\n            \"ShutDownScript\": null,\n            \"LoadBalancers\": [],\n            \"AutoHealingTarget\": null,\n            \"HealthCheckGracePeriod\": null,\n            \"UnhealthyDuration\": null,\n            \"TargetScalingPolicys\": [],\n            \"SimpleUpScalingPolicys\": [],\n            \"SimpleDownScalingPolicys\": [],\n            \"TerminationPolicy\": null,\n            \"Schedulings\": []\n        },\n        \"aws_config\": {\n            \"OnDemandType\": \"t3.nano\",\n            \"ImageId\": \"imagetid\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": 2\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": 49\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": 2\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": 51\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                }\n            ],\n            \"SecurityGroupsIds\": [\n                \"SecurityGroupsIds1\"\n            ],\n            \"KeyPairName\": \"kyleMaster\",\n            \"IAMRoleArn\": null,\n            \"IAMRoleName\": null,\n            \"PublicIp\": \"PublicIpid\",\n            \"Tenancy\": null,\n            \"EbsOptimized\": true,\n            \"Monitoring\": false,\n            \"AssociateIpv6Address\": null,\n            \"UserData\": null\n        },\n        \"is_deleted\": false\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Spotainer1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test('Status is 200', () => {",
+									"        pm.expect(pm.response).to.be.ok;",
+									"    });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"caid\": {{cloud_account_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/spotainers/{{spotainer_id_1}}/",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainers",
+								"{{spotainer_id_1}}",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete Spotainer",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"caid\": {{cloud_account_id}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_aws}}/spotainers/27/",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainers",
+										"27",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 22 Jul 2021 08:56:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": \"Successful Delete Spotainer. Spotainer ID: 27\"\n}"
+						}
+					]
+				},
+				{
 					"name": "Create Spotainer Full",
 					"event": [
 						{
@@ -5087,8 +5447,8 @@
 									"pm.test('Status is 200', () => {",
 									"    pm.response.to.be.ok;",
 									"});",
-									"",
-									"",
+									"let id_2 = pm.environment.get('spotainer_id_2');",
+									"let isContained = false;",
 									"pm.test('results has expected keys', () => {",
 									"    let property_list = [\"id\",\"caid\",\"name\",\"region_code\",\"created_at\",\"updated_at\",\"spotainer_config\",\"aws_config\",\"is_deleted\"];",
 									"    let spot_config = [\"VPC\",\"SubNets\",\"SpotTypes\",\"ElasticIps\",\"CapacityKey\",\"CapacityMax\",\"CapacityMin\",\"Schedulings\",",
@@ -5100,6 +5460,9 @@
 									"    \"KeyPairName\",\"EbsOptimized\",\"OnDemandType\",\"SecurityGroupsIds\",\"AddMonitoringAgent\",\"AssociateIpv6Address\"];",
 									"    ",
 									"    pm.response.json().results.forEach(data => {",
+									"        if(data.id == id_2){",
+									"            isContained = true;",
+									"        }",
 									"        property_list.forEach(prop => {",
 									"            pm.expect(data).to.have.property(prop);",
 									"            if(prop == \"spotainer_config\"){",
@@ -5114,8 +5477,10 @@
 									"                    pm.expect(configs).to.have.property(key);",
 									"                });",
 									"            }",
-									"        })",
+									"        });",
+									"        ",
 									"    });",
+									"    pm.expect(isContained).to.be.true;",
 									"});",
 									"",
 									""
@@ -5128,7 +5493,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainers/?caid={{cloud_account_id}}",
 							"host": [
 								"{{host_aws}}"
 							],
@@ -5143,7 +5508,8 @@
 								},
 								{
 									"key": "region_code",
-									"value": "{{region_code}}"
+									"value": "{{region_code}}",
+									"disabled": true
 								}
 							]
 						}
@@ -5585,364 +5951,6 @@
 					]
 				},
 				{
-					"name": "Get Spotainer",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status is 200', () => {",
-									"    pm.expect(pm.response).to.be.ok;",
-									"});",
-									"",
-									"pm.test('results has expected keys', () => {",
-									"    let property_list = [\"id\", \"caid\", \"name\", \"region_code\", \"created_at\", \"updated_at\", \"spotainer_config\", \"aws_config\", \"is_deleted\"];",
-									"    let spot_config = [\"VPC\", \"SubNets\", \"SpotTypes\", \"ElasticIps\", \"CapacityKey\", \"CapacityMax\", \"CapacityMin\", \"Schedulings\",",
-									"        \"CapacityUnit\", \"AMIAutoBackup\", \"CapacityValue\", \"LoadBalancers\", \"CapacityTarget\", \"ShutDownScript\", \"DrainingTimeout\",",
-									"        \"OperatingSystem\", \"AutoHealingTarget\", \"TerminationPolicy\", \"UnhealthyDuration\", \"ClusterOrientation\", \"FallbackToOnDemand\",",
-									"        \"PreferredSpotTypes\", \"TargetScalingPolicys\", \"AMIAutoBackupFrequency\", \"HealthCheckGracePeriod\", \"SimpleUpScalingPolicys\",",
-									"        \"SimpleDownScalingPolicys\", \"PreferredAvailabilityZones\"];",
-									"    let aws_properties = [\"Tags\", \"ImageId\", \"Tenancy\", \"PublicIp\", \"UserData\", \"IAMRoleArn\", \"Monitoring\", \"IAMRoleName\",",
-									"        \"KeyPairName\", \"EbsOptimized\", \"OnDemandType\", \"SecurityGroupsIds\", \"AddMonitoringAgent\", \"AssociateIpv6Address\"];",
-									"",
-									"    let result = pm.response.json().results;",
-									"    property_list.forEach(prop => {",
-									"        pm.expect(result).to.have.property(prop);",
-									"        if (prop == \"spotainer_config\") {",
-									"            let configs = result[prop];",
-									"            spot_config.forEach(key => {",
-									"                pm.expect(configs).to.have.property(key);",
-									"            });",
-									"",
-									"        } else if (prop == \"aws_config\") {",
-									"            let configs = result[prop];",
-									"            aws_properties.forEach(key => {",
-									"                pm.expect(configs).to.have.property(key);",
-									"            });",
-									"        }",
-									"    })",
-									"",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host_aws}}/spotainers/{{spotainer_id_1}}/?caid={{cloud_account_id}}&spotainer_id={{spotainer_id_1}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"spotainers",
-								"{{spotainer_id_1}}",
-								""
-							],
-							"query": [
-								{
-									"key": "caid",
-									"value": "{{cloud_account_id}}"
-								},
-								{
-									"key": "spotainer_id",
-									"value": "{{spotainer_id_1}}"
-								},
-								{
-									"key": "region_code",
-									"value": "{{region_code}}",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "Fail To Query Spotainer",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{host_aws}}/spotainers/51/?caid={{cloud_account_id}}&region_code={{region_code}}&spotainer_id=14",
-									"host": [
-										"{{host_aws}}"
-									],
-									"path": [
-										"spotainers",
-										"51",
-										""
-									],
-									"query": [
-										{
-											"key": "caid",
-											"value": "{{cloud_account_id}}"
-										},
-										{
-											"key": "region_code",
-											"value": "{{region_code}}"
-										},
-										{
-											"key": "spotainer_id",
-											"value": "14"
-										}
-									]
-								}
-							},
-							"status": "Bad Request",
-							"code": 400,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Date",
-									"value": "Fri, 23 Jul 2021 08:20:33 GMT"
-								},
-								{
-									"key": "Server",
-									"value": "WSGIServer/0.2 CPython/3.6.5"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Vary",
-									"value": "Accept, Origin"
-								},
-								{
-									"key": "Allow",
-									"value": "GET, POST, DELETE, HEAD, OPTIONS"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "DENY"
-								},
-								{
-									"key": "Content-Length",
-									"value": "85"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "same-origin"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Fail to query Spotainer! Detail: Spotainer matching query does not exist.\"\n}"
-						},
-						{
-							"name": "Get Spotainer",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{host_aws}}/spotainers/51/?caid={{cloud_account_id}}&spotainer_id=51",
-									"host": [
-										"{{host_aws}}"
-									],
-									"path": [
-										"spotainers",
-										"51",
-										""
-									],
-									"query": [
-										{
-											"key": "caid",
-											"value": "{{cloud_account_id}}"
-										},
-										{
-											"key": "region_code",
-											"value": "{{region_code}}",
-											"disabled": true
-										},
-										{
-											"key": "spotainer_id",
-											"value": "51"
-										}
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Date",
-									"value": "Fri, 23 Jul 2021 08:21:18 GMT"
-								},
-								{
-									"key": "Server",
-									"value": "WSGIServer/0.2 CPython/3.6.5"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Vary",
-									"value": "Accept, Origin"
-								},
-								{
-									"key": "Allow",
-									"value": "GET, POST, DELETE, HEAD, OPTIONS"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "DENY"
-								},
-								{
-									"key": "Content-Length",
-									"value": "1702"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "same-origin"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"results\": {\n        \"id\": 51,\n        \"caid\": 2,\n        \"name\": \"test_spotainer\",\n        \"region_code\": \"ap-southeast-1\",\n        \"created_at\": \"2021-07-23T13:55:50.197133+08:00\",\n        \"updated_at\": \"2021-07-23T13:55:50.202848+08:00\",\n        \"spotainer_config\": {\n            \"CapacityUnit\": \"123\",\n            \"CapacityTarget\": \"3\",\n            \"CapacityMin\": \"1\",\n            \"CapacityMax\": \"5\",\n            \"CapacityKey\": \"on_demand_count\",\n            \"CapacityValue\": \"3\",\n            \"ClusterOrientation\": \"balanced\",\n            \"DrainingTimeout\": \"300\",\n            \"FallbackToOnDemand\": false,\n            \"VPC\": \"123\",\n            \"OperatingSystem\": \"linux\",\n            \"SubNets\": {\n                \"AZ_ID\": [\n                    \"SubNetID\"\n                ],\n                \"AZ_ID1\": [\n                    \"SubNetID\"\n                ],\n                \"AZ_ID2\": [\n                    \"SubNetID\"\n                ]\n            },\n            \"SpotTypes\": [\n                \"t3.nano\",\n                \"t4.nano\"\n            ],\n            \"PreferredAvailabilityZones\": [],\n            \"PreferredSpotTypes\": [],\n            \"ElasticIps\": [],\n            \"AMIAutoBackup\": null,\n            \"AMIAutoBackupFrequency\": null,\n            \"ShutDownScript\": null,\n            \"LoadBalancers\": [],\n            \"AutoHealingTarget\": null,\n            \"HealthCheckGracePeriod\": null,\n            \"UnhealthyDuration\": null,\n            \"TargetScalingPolicys\": [],\n            \"SimpleUpScalingPolicys\": [],\n            \"SimpleDownScalingPolicys\": [],\n            \"TerminationPolicy\": null,\n            \"Schedulings\": []\n        },\n        \"aws_config\": {\n            \"OnDemandType\": \"t3.nano\",\n            \"ImageId\": \"imagetid\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": 2\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": 49\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": 2\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": 51\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                }\n            ],\n            \"SecurityGroupsIds\": [\n                \"SecurityGroupsIds1\"\n            ],\n            \"KeyPairName\": \"kyleMaster\",\n            \"IAMRoleArn\": null,\n            \"IAMRoleName\": null,\n            \"PublicIp\": \"PublicIpid\",\n            \"Tenancy\": null,\n            \"EbsOptimized\": true,\n            \"Monitoring\": false,\n            \"AssociateIpv6Address\": null,\n            \"UserData\": null\n        },\n        \"is_deleted\": false\n    }\n}"
-						}
-					]
-				},
-				{
-					"name": "Delete Spotainer1",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									" pm.test('Status is 200', () => {",
-									"        pm.expect(pm.response).to.be.ok;",
-									"    });"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"caid\": {{cloud_account_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host_aws}}/spotainers/{{spotainer_id_1}}/",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"spotainers",
-								"{{spotainer_id_1}}",
-								""
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "Delete Spotainer",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"caid\": {{cloud_account_id}}\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{host_aws}}/spotainers/27/",
-									"host": [
-										"{{host_aws}}"
-									],
-									"path": [
-										"spotainers",
-										"27",
-										""
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Date",
-									"value": "Thu, 22 Jul 2021 08:56:58 GMT"
-								},
-								{
-									"key": "Server",
-									"value": "WSGIServer/0.2 CPython/3.6.5"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Vary",
-									"value": "Accept, Origin"
-								},
-								{
-									"key": "Allow",
-									"value": "GET, POST, DELETE, HEAD, OPTIONS"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "DENY"
-								},
-								{
-									"key": "Content-Length",
-									"value": "59"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "same-origin"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"results\": \"Successful Delete Spotainer. Spotainer ID: 27\"\n}"
-						}
-					]
-				},
-				{
 					"name": "Delete Spotainer2",
 					"event": [
 						{
@@ -6062,6 +6070,161 @@
 							"body": "{\n    \"results\": \"Successful Delete Spotainer. Spotainer ID: 27\"\n}"
 						}
 					]
+				},
+				{
+					"name": "Get Instances",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"pm.test('results has expected keys', () => {",
+									"    let property_list = [\"id\", \"caid\", \"name\", \"region_code\", \"created_at\", \"updated_at\", \"spotainer_config\", \"aws_config\", \"is_deleted\"];",
+									"    let spot_config = [\"VPC\", \"SubNets\", \"SpotTypes\", \"ElasticIps\", \"CapacityKey\", \"CapacityMax\", \"CapacityMin\", \"Schedulings\",",
+									"        \"CapacityUnit\", \"AMIAutoBackup\", \"CapacityValue\", \"LoadBalancers\", \"CapacityTarget\", \"ShutDownScript\", \"DrainingTimeout\",",
+									"        \"OperatingSystem\", \"AutoHealingTarget\", \"TerminationPolicy\", \"UnhealthyDuration\", \"ClusterOrientation\", \"FallbackToOnDemand\",",
+									"        \"PreferredSpotTypes\", \"TargetScalingPolicys\", \"AMIAutoBackupFrequency\", \"HealthCheckGracePeriod\", \"SimpleUpScalingPolicys\",",
+									"        \"SimpleDownScalingPolicys\", \"PreferredAvailabilityZones\"];",
+									"    let aws_properties = [\"Tags\", \"ImageId\", \"Tenancy\", \"PublicIp\", \"UserData\", \"IAMRoleArn\", \"Monitoring\", \"IAMRoleName\",",
+									"        \"KeyPairName\", \"EbsOptimized\", \"OnDemandType\", \"SecurityGroupsIds\", \"AddMonitoringAgent\", \"AssociateIpv6Address\"];",
+									"",
+									"    let result = pm.response.json().results;",
+									"    property_list.forEach(prop => {",
+									"        pm.expect(result).to.have.property(prop);",
+									"        if (prop == \"spotainer_config\") {",
+									"            let configs = result[prop];",
+									"            spot_config.forEach(key => {",
+									"                pm.expect(configs).to.have.property(key);",
+									"            });",
+									"",
+									"        } else if (prop == \"aws_config\") {",
+									"            let configs = result[prop];",
+									"            aws_properties.forEach(key => {",
+									"                pm.expect(configs).to.have.property(key);",
+									"            });",
+									"        }",
+									"    })",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/spotainers/get_instances/?caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainers",
+								"get_instances",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Instance Status",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"pm.test('results has expected keys', () => {",
+									"    let property_list = [\"id\", \"caid\", \"name\", \"region_code\", \"created_at\", \"updated_at\", \"spotainer_config\", \"aws_config\", \"is_deleted\"];",
+									"    let spot_config = [\"VPC\", \"SubNets\", \"SpotTypes\", \"ElasticIps\", \"CapacityKey\", \"CapacityMax\", \"CapacityMin\", \"Schedulings\",",
+									"        \"CapacityUnit\", \"AMIAutoBackup\", \"CapacityValue\", \"LoadBalancers\", \"CapacityTarget\", \"ShutDownScript\", \"DrainingTimeout\",",
+									"        \"OperatingSystem\", \"AutoHealingTarget\", \"TerminationPolicy\", \"UnhealthyDuration\", \"ClusterOrientation\", \"FallbackToOnDemand\",",
+									"        \"PreferredSpotTypes\", \"TargetScalingPolicys\", \"AMIAutoBackupFrequency\", \"HealthCheckGracePeriod\", \"SimpleUpScalingPolicys\",",
+									"        \"SimpleDownScalingPolicys\", \"PreferredAvailabilityZones\"];",
+									"    let aws_properties = [\"Tags\", \"ImageId\", \"Tenancy\", \"PublicIp\", \"UserData\", \"IAMRoleArn\", \"Monitoring\", \"IAMRoleName\",",
+									"        \"KeyPairName\", \"EbsOptimized\", \"OnDemandType\", \"SecurityGroupsIds\", \"AddMonitoringAgent\", \"AssociateIpv6Address\"];",
+									"",
+									"    let result = pm.response.json().results;",
+									"    property_list.forEach(prop => {",
+									"        pm.expect(result).to.have.property(prop);",
+									"        if (prop == \"spotainer_config\") {",
+									"            let configs = result[prop];",
+									"            spot_config.forEach(key => {",
+									"                pm.expect(configs).to.have.property(key);",
+									"            });",
+									"",
+									"        } else if (prop == \"aws_config\") {",
+									"            let configs = result[prop];",
+									"            aws_properties.forEach(key => {",
+									"                pm.expect(configs).to.have.property(key);",
+									"            });",
+									"        }",
+									"    })",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"instance_list\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/spotainers/get_instance_status/",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainers",
+								"get_instance_status",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [

@@ -639,6 +639,164 @@
 			]
 		},
 		{
+			"name": "Templates",
+			"item": [
+				{
+					"name": "Create Analy Cloud Formation Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"has template_name, template_url\", function () {",
+									"    pm.expect(pm.response.json()).to.have.all.keys('template_name','template_url');",
+									"});",
+									"",
+									"pm.test(\"name is correct\", function () {",
+									"    pm.expect(pm.response.json().template_name).to.eql('analyzer-role');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set('bucketName', 'stompycursingapore')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{test_access}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/cloudformation-templates/analyzer-role?s3_bucket={{bucketName}}&account_id={{test_user_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"cloudformation-templates",
+								"analyzer-role"
+							],
+							"query": [
+								{
+									"key": "s3_bucket",
+									"value": "{{bucketName}}"
+								},
+								{
+									"key": "account_id",
+									"value": "{{test_user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Spotainer Cloud Formation Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"has template_name, template_url\", function () {",
+									"    pm.expect(pm.response.json()).to.have.all.keys('template_name','template_url');",
+									"});",
+									"",
+									"pm.test(\"name is correct\", function () {",
+									"    pm.expect(pm.response.json().template_name).to.eql('spotainer-role');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set('bucketName', 'stompycursingapore')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{test_access}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_user}}/cloudformation-templates/spotainer-role?account_id={{test_user_id}}",
+							"host": [
+								"{{host_user}}"
+							],
+							"path": [
+								"cloudformation-templates",
+								"spotainer-role"
+							],
+							"query": [
+								{
+									"key": "s3_bucket",
+									"value": "{{bucketName}}",
+									"disabled": true
+								},
+								{
+									"key": "account_id",
+									"value": "{{test_user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Connect but oh fail",
 			"item": [
 				{
@@ -859,10 +1017,10 @@
 									"    pm.expect(pm.response).to.be.clientError;",
 									"});",
 									"",
-									"pm.test(\"Arn are place holders is False\", function () {",
-									"    pm.expect(pm.response.json().analyzer_arn).to.eql(['Invalid ARN']);",
-									"    pm.expect(pm.response.json().spotainer_arn).to.eql(['Invalid ARN']);",
-									"});",
+									"// pm.test(\"Arn are place holders is False\", function () {",
+									"//     pm.expect(pm.response.json().analyzer_arn).to.eql(['Invalid ARN']);",
+									"//     pm.expect(pm.response.json().spotainer_arn).to.eql(['Invalid ARN']);",
+									"// });",
 									"",
 									""
 								],
@@ -1783,7 +1941,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"",
 									"pm.test('Status is 200', () => {",
 									"    pm.expect(pm.response).to.have.status(200);",
 									"});",

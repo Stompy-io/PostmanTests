@@ -467,7 +467,8 @@
 					{
 						"key": "Authorization",
 						"value": "{{token}}",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"url": {

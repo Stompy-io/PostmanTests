@@ -1,17 +1,76 @@
 {
 	"info": {
-		"_postman_id": "29e41816-3892-4b15-89f7-a32cc8abc66a",
-		"name": "Reset Too Slow",
+		"_postman_id": "2270533e-d222-4944-85db-6658da3818e0",
+		"name": "Register Existed",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sent Code Reset",
+			"name": "Fields Check Email Existed",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.eql(400);",
+							"});",
+							"",
+							"pm.test('error is Email Alread Exist', ()=>{",
+							"    pm.expect(pm.response.json().error).to.eql('Email Alread Exist!');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_user}}/auth/users/fields_check/?field_value={{reset_test_email}}",
+					"host": [
+						"{{host_user}}"
+					],
+					"path": [
+						"auth",
+						"users",
+						"fields_check",
+						""
+					],
+					"query": [
+						{
+							"key": "field_value",
+							"value": "{{reset_test_email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sent Code Register Existed Has No Catch",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// const test_mail_pairs = pm.collectionVariables.get('test_mail_pairs');",
+							"// const index = Math.floor(Math.random()*(test_mail_pairs.length));",
+							"// const namespace = test_mail_pairs[index][0];",
+							"// pm.environment.set('test_email_namespace', namespace);",
+							"// pm.environment.set('test_email_api_key', test_mail_pairs[index][1]);",
+							"// const email = namespace+\".\" + pm.variables.replaceIn('{{$guid}}') +'.temp'+ pm.variables.get(\"test_email_domain\");",
+							"// pm.environment.set(\"currentEmail\", email);",
 							"pm.environment.set(\"timeStamp\", pm.variables.replaceIn('{{$timestamp}}').concat('000'));"
 						],
 						"type": "text/javascript"
@@ -25,8 +84,8 @@
 							"    pm.expect(pm.response.code).to.equal(200);",
 							"});",
 							"",
-							"pm.test(\"result is success\", ()=>{",
-							"    pm.expect(pm.response.json().results).to.eql('The Email has been sent successfully！');",
+							"pm.test(\"result is email sent success\", ()=>{",
+							"    pm.expect(pm.response.json().results).to.equal('The Email has been sent successfully！');",
 							"})"
 						],
 						"type": "text/javascript"
@@ -37,7 +96,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host_user}}/auth/users/send_code/?email_to={{reset_test_email}}&operation=resetPwd",
+					"raw": "{{host_user}}/auth/users/send_code/?email_to={{reset_test_email}}&operation=register",
 					"host": [
 						"{{host_user}}"
 					],
@@ -54,7 +113,7 @@
 						},
 						{
 							"key": "operation",
-							"value": "resetPwd"
+							"value": "register"
 						}
 					]
 				}
@@ -130,25 +189,29 @@
 			"response": []
 		},
 		{
-			"name": "Reset Password Time Out",
+			"name": "Register Existed",
 			"event": [
 				{
-					"listen": "prerequest",
+					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.environment.set('currentPassword', pm.variables.replaceIn('{{$randomPassword}}'));",
-							"setTimeout(function(){}, 600001);"
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.eql(400);",
+							"});",
+							"",
+							"pm.test('error is Email Alread Exist', ()=>{",
+							"    pm.expect(pm.response.json().email).to.eql(['Email Already Exists!']);",
+							"})"
 						],
 						"type": "text/javascript"
 					}
 				},
 				{
-					"listen": "test",
+					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"pm.test(\"non_field_errors is Verify Code Does Not Match\", ()=>{",
-							"    pm.expect(pm.response.json().non_field_errors).to.equal('Verify Code Does Not Match!');",
-							"})"
+							"pm.environment.set(\"first_name\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+							"pm.environment.set('currentPassword', pm.variables.replaceIn('{{$randomPassword}}'))"
 						],
 						"type": "text/javascript"
 					}
@@ -161,10 +224,9 @@
 					"mode": "formdata",
 					"formdata": [
 						{
-							"key": "username",
-							"value": "{{username}}",
-							"type": "text",
-							"disabled": true
+							"key": "first_name",
+							"value": "{{first_name}}",
+							"type": "text"
 						},
 						{
 							"key": "organization",
@@ -173,7 +235,7 @@
 						},
 						{
 							"key": "email",
-							"value": "{{currentEmail}}",
+							"value": "{{reset_test_email}}",
 							"type": "text"
 						},
 						{
@@ -194,14 +256,14 @@
 					]
 				},
 				"url": {
-					"raw": "{{host_user}}/auth/users/reset_password/",
+					"raw": "{{host_user}}/auth/users/register/",
 					"host": [
 						"{{host_user}}"
 					],
 					"path": [
 						"auth",
 						"users",
-						"reset_password",
+						"register",
 						""
 					]
 				}
