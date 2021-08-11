@@ -37,6 +37,8 @@ function run_tests(){
 
     newman run C2_Create\ Spotainer.postman_collection.json  -e ${1}.postman_environment.json -d region_code.csv -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs
 
+    newman run C2_Spot\ Scores.postman_collection.json  -e ${1}.postman_environment.json -d region_code.csv -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs
+
     newman run No\ Auth\ No\ Access.postman_collection.json  -e ${1}.postman_environment.json -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs
 
     newman run Register\ Existed.postman_collection.json  -e ${1}.postman_environment.json -r htmlextra --reporter-htmlextra-export ./${1}_results/ --reporter-htmlextra-logs

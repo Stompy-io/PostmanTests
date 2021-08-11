@@ -1585,7 +1585,7 @@
 									"    pm.expect(pm.response.json().spotainer_arn).to.eql(pm.environment.get('spotARN'));",
 									"",
 									"});",
-									"pm.environment.set('test_caid', pm.response.json().id)"
+									""
 								],
 								"type": "text/javascript"
 							}

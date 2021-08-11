@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "64b817e9-ffd6-47ab-8fa0-4349f18a94b3",
+		"_postman_id": "b5e82a91-7b47-4d9a-b959-5fbf6dd0ce33",
 		"name": "C2_Create Spotainer",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -85,117 +85,6 @@
 			"name": "With Auth",
 			"item": [
 				{
-					"name": "Get Regions",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// const default_no_access = ['me-south-1', 'af-south-1', 'ap-east-1', ' eu-south-1']",
-									"// if (default_no_access.includes(pm.request.url.query.toObject().region_code)) {",
-									"//     pm.test('Status is 400', () => {",
-									"//         pm.expect(pm.response).to.have.status(400);",
-									"//     });",
-									"//     pm.test('results is parameter error', () => {",
-									"//         pm.expect(pm.response.json().error).to.eql('Parameters Error! Detail: An error occurred (AuthFailure) when calling the DescribeVpcs operation: AWS was not able to validate the provided access credentials');",
-									"//     });",
-									"",
-									"// } else {",
-									"//     pm.test('Status is 200', () => {",
-									"//         pm.expect(pm.response).to.have.status(200);",
-									"//     });",
-									"",
-									"//     pm.test('Has VpcId', () => {",
-									"//         let results_list = pm.response.json().results;",
-									"//         results_list.forEach(data => {",
-									"//             pm.expect(data).to.have.property('VpcId');",
-									"//         })",
-									"//     });",
-									"",
-									"//     let checkDuplicatesFromList = (list, target_prop) => {",
-									"//         let store = new Set();",
-									"//         list.forEach(data => {",
-									"//             pm.expect(store.has(data[target_prop]),\"No \"+data[target_prop] +'existed' ).to.be.false;",
-									"//             store.add((data[target_prop]))",
-									"//         });",
-									"//     };",
-									"",
-									"//     pm.test('has no duplicates', () => {",
-									"//         checkDuplicatesFromList(pm.response.json().results, 'VpcId');",
-									"//     });",
-									"// }"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// const REGION_MAP = {",
-									"//     'US East (N. Virginia)': 'us-east-1',",
-									"//     'Canada (Central)': 'ca-central-1',",
-									"//     'Asia Pacific (Mumbai)': 'ap-south-1',",
-									"//     'US West (Oregon)': 'us-west-2',",
-									"//     'Asia Pacific (Seoul)': 'ap-northeast-2',",
-									"//     'US West (N. California)': 'us-west-1',",
-									"//     'US East (Ohio)': 'us-east-2',",
-									"//     'EU (Ireland)': 'eu-west-1',",
-									"//     'South America (Sao Paulo)': 'sa-east-1',",
-									"//     'Asia Pacific (Tokyo)': 'ap-northeast-1',",
-									"//     'EU (London)': 'eu-west-2',",
-									"//     'Asia Pacific (Sydney)': 'ap-southeast-2',",
-									"//     'EU (Milan)': 'eu-south-1',",
-									"//     'EU (Paris)': 'eu-west-3',",
-									"//     'EU (Stockholm)': 'eu-north-1',",
-									"//     'Middle East (Bahrain)': 'me-south-1',",
-									"//     'EU (Frankfurt)': 'eu-central-1',",
-									"//     'Asia Pacific (Singapore)': 'ap-southeast-1',",
-									"//     'Africa (Cape Town)': 'af-south-1',",
-									"//     'Asia Pacific (Hong Kong)': 'ap-east-1',",
-									"//     'Asia Pacific (Osaka)': 'ap-northeast-3',",
-									"//     // 'AWS GovCloud (US)': None",
-									"// }",
-									"",
-									"// function randomValue(obj) {",
-									"//     let keys = Object.keys(obj);",
-									"//     return obj[keys[ Math.floor( keys.length * Math.random())]];",
-									"// };",
-									"",
-									"// let region_code = randomValue(REGION_MAP);",
-									"// console.log(region_code);",
-									"// pm.environment.set('region_code',region_code);",
-									"// pm.environment.set('region_code','ap-southeast-1');",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host_aws}}/spotainers/get_regions/?caid={{cloud_account_id}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"spotainers",
-								"get_regions",
-								""
-							],
-							"query": [
-								{
-									"key": "caid",
-									"value": "{{cloud_account_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get VPCs",
 					"event": [
 						{
@@ -266,17 +155,19 @@
 									"        })",
 									"    });",
 									"",
-									"    let checkDuplicatesFromList = (list, target_prop) => {",
-									"        let store = new Set();",
-									"        list.forEach(data => {",
-									"            pm.expect(store.has(data[target_prop]),\"No \"+data[target_prop] +'existed' ).to.be.false;",
-									"            store.add((data[target_prop]))",
-									"        });",
-									"    };",
 									"",
 									"    pm.test('has no duplicates', () => {",
-									"        checkDuplicatesFromList(pm.response.json().results, 'VpcId');",
+									"        let results = pm.response.json().results;",
+									"        let vpc_id_list = [];",
+									"        results.forEach(item => {",
+									"            let id = item.VpcId;",
+									"            pm.expect(vpc_id_list.includes(id)).to.be.false;",
+									"            vpc_id_list.push(id);",
+									"        });",
+									"        let index = Math.floor(Math.random()* vpc_id_list.length);",
+									"        pm.environment.set('VpcId', vpc_id_list[index]);",
 									"    });",
+									"",
 									"}"
 								],
 								"type": "text/javascript"
@@ -293,12 +184,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_vpcs",
 								""
 							],
@@ -332,12 +223,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_vpcs",
 										""
 									],
@@ -409,12 +300,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_vpcs/?caid={{cloud_account_id}}&region_code=ap-east-1",
+									"raw": "{{host_aws}}/spotainer/get_vpcs/?caid={{cloud_account_id}}&region_code=ap-east-1",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_vpcs",
 										""
 									],
@@ -553,22 +444,23 @@
 									"    }",
 									"",
 									"    pm.test('results has ZoneName, ZoneId', () => {",
-									"        let property_list = ['ZoneName', 'ZoneId'];",
+									"        let property_list = ['ZoneName', 'ZonenId'];",
 									"        listHaveProperty(pm.response.json().results, property_list);",
 									"",
 									"    });",
 									"",
-									"    let checkDuplicatesFromList = (list, target_prop) => {",
-									"        let store = new Set();",
-									"        list.forEach(data => {",
-									"            pm.expect(store.has(data[target_prop])).to.be.false;",
-									"            store.add((data[target_prop]))",
+									"     pm.test('has no duplicates', () => {",
+									"        let results = pm.response.json().results;",
+									"        let zone_name_list = [];",
+									"        results.forEach(item => {",
+									"            let zone_name = item.ZoneName;",
+									"            pm.expect(zone_name_list.includes(zone_name)).to.be.false;",
+									"            zone_name_list.push(zone_name);",
 									"        });",
-									"    };",
-									"",
-									"    pm.test('has no duplicates', () => {",
-									"        checkDuplicatesFromList(pm.response.json().results, 'ZoneId');",
+									"        ",
+									"        pm.environment.set('AZNameList', zone_name_list);",
 									"    });",
+									"   ",
 									"}"
 								],
 								"type": "text/javascript"
@@ -596,12 +488,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_availability_zones/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_availability_zones/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_availability_zones",
 								""
 							],
@@ -630,12 +522,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_availability_zones/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_availability_zones/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_availability_zones",
 										""
 									],
@@ -708,12 +600,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_availability_zones/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_availability_zones/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_availability_zones",
 										""
 									],
@@ -859,6 +751,27 @@
 									"    pm.test('has no duplicates', () => {",
 									"        checkDuplicatesFromList(pm.response.json().results, 'SubnetId');",
 									"    });",
+									"",
+									"    pm.test('has one subnet for each Zone', () => {",
+									"        let results = pm.response.json().results;",
+									"        let az_subnet_dict = {};",
+									"        let all_az_name = pm.environment.get('AZNameList');",
+									"        let result_index = 0;",
+									"        while(all_az_name.length>0 && result_index<results.length){",
+									"            let item = results[result_index];",
+									"            let az_name = item.AvailabilityZone;",
+									"            let subnet_id = item.SubnetId;",
+									"            if(all_az_name.includes(az_name)){",
+									"                az_subnet_dict[az_name] = [subnet_id];",
+									"                let az_index = all_az_name.indexOf(az_name);",
+									"                all_az_name.splice(az_index,1);",
+									"            }",
+									"            result_index++;",
+									"        }",
+									"        pm.expect(all_az_name.length).to.equal(0);",
+									"",
+									"        pm.environment.set('az_subnet_dict', JSON.stringify(az_subnet_dict));",
+									"    });",
 									"}"
 								],
 								"type": "text/javascript"
@@ -876,12 +789,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_subnets/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_subnets/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_subnets",
 								""
 							],
@@ -910,12 +823,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_subnets/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_subnets/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_subnets",
 										""
 									],
@@ -988,12 +901,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_subnets/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_subnets/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_subnets",
 										""
 									],
@@ -1143,6 +1056,21 @@
 									"    pm.test('has no duplicates', () => {",
 									"        checkDuplicatesFromList(pm.response.json().results, 'GroupId');",
 									"    });",
+									"",
+									"    pm.test('has one sg for selected vpc', () => {",
+									"        let results = pm.response.json().results;",
+									"        let selected_vpc_id = pm.environment.get('VpcId');",
+									"        let isMatch = false;",
+									"        for (let item of results) {",
+									"",
+									"            if (selected_vpc_id == item[\"VpcId\"]) {",
+									"                pm.environment.set('sg_id', item.GroupId);",
+									"                isMatch = true;",
+									"                break;",
+									"            }",
+									"        }",
+									"        pm.expect(isMatch).to.be.true;",
+									"    });",
 									"}"
 								],
 								"type": "text/javascript"
@@ -1160,12 +1088,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_security_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_security_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_security_groups",
 								""
 							],
@@ -1194,12 +1122,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_security_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_security_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_security_groups",
 										""
 									],
@@ -1272,12 +1200,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_security_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_security_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_security_groups",
 										""
 									],
@@ -1431,6 +1359,13 @@
 									"",
 									"    pm.test('has no duplicates', () => {",
 									"        checkDuplicatesFromList(pm.response.json().results, 'KeyPairId');",
+									"        if(pm.response.json().results.length>0){",
+									"            let random_index = Math.floor(Math.random() * pm.response.json().results.length);",
+									"            ",
+									"            pm.environment.set('KeyPairName',pm.response.json().results[random_index].KeyName)",
+									"        }else{",
+									"            pm.environment.set('KeyPairName',\"\");",
+									"        }",
 									"    });",
 									"}"
 								],
@@ -1458,12 +1393,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_key_pairs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_key_pairs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_key_pairs",
 								""
 							],
@@ -1492,12 +1427,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_key_pairs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_key_pairs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_key_pairs",
 										""
 									],
@@ -1570,12 +1505,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_key_pairs/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_key_pairs/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_key_pairs",
 										""
 									],
@@ -1728,6 +1663,12 @@
 									"",
 									"    pm.test('has no duplicates', () => {",
 									"        checkDuplicatesFromList(pm.response.json().results, 'AllocationId');",
+									"        if(pm.response.json().results.length>0){",
+									"            let random_index = Math.floor(Math.random() * pm.response.json().results.length);",
+									"            pm.environment.set('ElasticIp',pm.response.json().results[random_index].PublicIp)",
+									"        }else{",
+									"             pm.environment.set('ElasticIp',null);",
+									"        }",
 									"    });",
 									"",
 									"}"
@@ -1757,12 +1698,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_elastic_addresses/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_elastic_addresses/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_elastic_addresses",
 								""
 							],
@@ -1796,12 +1737,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_elastic_addresses/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_elastic_addresses/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_elastic_addresses",
 										""
 									],
@@ -1874,12 +1815,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_elastic_addresses/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_elastic_addresses/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_elastic_addresses",
 										""
 									],
@@ -2014,6 +1955,12 @@
 									"            let property_list = ['TargetGroupName', 'VpcId'];",
 									"            listHaveProperty(pm.response.json().results, property_list);",
 									"        });",
+									"    if(pm.response.json().results.length>0){",
+									"        let random_index = Math.floor(Math.random() * pm.response.json().results.length);",
+									"        pm.environment.set(\"LoadBalancerName\",  pm.response.json().results[random_index].TargetGroupName);",
+									"    }else{",
+									"         pm.environment.set(\"LoadBalancerName\", null);",
+									"    }",
 									"}"
 								],
 								"type": "text/javascript"
@@ -2031,12 +1978,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_target_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_target_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_target_groups",
 								""
 							],
@@ -2051,7 +1998,7 @@
 								},
 								{
 									"key": "region_code",
-									"value": "ap-southeast-2",
+									"value": "ca-central-1",
 									"disabled": true
 								}
 							]
@@ -2071,12 +2018,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_target_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_target_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_target_groups",
 										""
 									],
@@ -2184,12 +2131,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_target_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_target_groups/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_target_groups",
 										""
 									],
@@ -2300,6 +2247,14 @@
 									"    pm.test('has no duplicates', () => {",
 									"        checkDuplicatesFromList(pm.response.json().results, 'RoleId');",
 									"    });",
+									"     if(pm.response.json().results.length>0){",
+									"        let random_index = Math.floor(Math.random() * pm.response.json().results.length);",
+									"        pm.environment.set(\"IAMRoleName\",  pm.response.json().results[random_index].RoleName);",
+									"        pm.environment.set(\"IAMRoleArn\",  pm.response.json().results[random_index].Arn);",
+									"    }else{",
+									"        pm.environment.set(\"IAMRoleName\", null);",
+									"        pm.environment.set(\"IAMRoleArn\",  null);",
+									"    }",
 									"}"
 								],
 								"type": "text/javascript"
@@ -2317,12 +2272,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_iam_roles/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_iam_roles/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_iam_roles",
 								""
 							],
@@ -2357,12 +2312,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_iam_roles/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_iam_roles/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_iam_roles",
 										""
 									],
@@ -2470,12 +2425,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_iam_roles/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_iam_roles/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_iam_roles",
 										""
 									],
@@ -2604,12 +2559,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_instance_types/?region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_instance_types/?region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_instance_types",
 								""
 							],
@@ -2633,12 +2588,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_instance_types/?region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_instance_types/?region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_instance_types",
 										""
 									],
@@ -2705,12 +2660,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_instance_types/?region_code=errer&spot=true",
+									"raw": "{{host_aws}}/spotainer/get_instance_types/?region_code=errer&spot=true",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_instance_types",
 										""
 									],
@@ -2839,12 +2794,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_instance_types/?region_code={{region_code}}&spot=true",
+							"raw": "{{host_aws}}/spotainer/get_instance_types/?region_code={{region_code}}&spot=true",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_instance_types",
 								""
 							],
@@ -2872,12 +2827,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_instance_types/?region_code={{region_code}}&spot=true",
+									"raw": "{{host_aws}}/spotainer/get_instance_types/?region_code={{region_code}}&spot=true",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_instance_types",
 										""
 									],
@@ -2943,12 +2898,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_instance_types/?region_code=errer&spot=true",
+									"raw": "{{host_aws}}/spotainer/get_instance_types/?region_code=errer&spot=true",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_instance_types",
 										""
 									],
@@ -3011,101 +2966,6 @@
 					]
 				},
 				{
-					"name": "Get Spot Types Copy",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status is 200', () => {",
-									"    pm.expect(pm.response).to.be.ok;",
-									"});",
-									"",
-									"pm.test('Has results', () => {",
-									"    pm.expect(pm.response.json()).to.have.property('results');",
-									"});",
-									"",
-									"if (pm.response.json().results != null) {",
-									"",
-									"    pm.test('region match', () => {",
-									"        pm.expect(pm.response.json().results.Region).to.equal(pm.request.url.query.toObject().region_code)",
-									"    });",
-									"    const all_keys_list = ['linux', \"rhel\", \"suse\", \"windows\", \"Region\"]",
-									"",
-									"    pm.test('results has expected keys', () => {",
-									"        pm.expect(pm.response.json().results, 'Nooo we need all the product types').to.have.all.keys(all_keys_list);",
-									"    });",
-									"    let spot_array = [];",
-									"    all_keys_list.pop();",
-									"    pm.test('results has expected properties', () => {",
-									"        for (let system of all_keys_list) {",
-									"            pm.response.json().results[system].forEach((item) => {",
-									"                pm.expect(item).to.have.all.keys({",
-									"                    \"Memory\": \"976 GiB\",",
-									"                    \"VCPU\": \"64\",",
-									"                    \"Storage\": \"1 x 1920 SSD\",",
-									"                    \"InstanceFamily\": \"Memory optimized\",",
-									"                    \"InstanceType\": \"x1.16xlarge\"",
-									"                });",
-									"                let spot_type = item.InstanceType;",
-									"                if (!spot_array.includes(spot_type)) {",
-									"                    spot_array.push(spot_type);",
-									"                }",
-									"            });",
-									"        }",
-									"    });",
-									"",
-									"    pm.environment.set('all_spot_list', spot_array);",
-									"",
-									"",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host_aws}}/spotainers/get_aws_spot_types/?region_code={{region_code}}&caid={{cloua}}",
-							"host": [
-								"{{host_aws}}"
-							],
-							"path": [
-								"spotainers",
-								"get_aws_spot_types",
-								""
-							],
-							"query": [
-								{
-									"key": "region_code",
-									"value": "{{region_code}}"
-								},
-								{
-									"key": "caid",
-									"value": "{{cloua}}"
-								},
-								{
-									"key": "region_code",
-									"value": "af-south-1",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get Common Images",
 					"event": [
 						{
@@ -3136,6 +2996,10 @@
 									"        });",
 									"    }",
 									"",
+									"    let os_list = ['linux', \"rhel\", \"suse\", \"windows\"]",
+									"    let index = Math.floor(Math.random() * os_list.length);",
+									"    let system = os_list[index]",
+									"    pm.environment.set('system',system );",
 									"",
 									"    pm.test('results has expected properties, and has no duplicates', () => {",
 									"        let keys_dict = {",
@@ -3147,19 +3011,24 @@
 									"            \"os_code\": \"centos\"",
 									"        };",
 									"        let imageIdArray = [];",
-									"",
+									"        let x86_image_found = false;",
 									"        for (let service in results) {",
 									"            listHaveAllKeys(results[service], keys_dict);",
 									"            results[service].forEach(element => {",
 									"                if (element.imageId64 != undefined) {",
 									"                    imageIdArray.push(element.imageId64);",
+									"                    if (!x86_image_found && service == system) {",
+									"                        x86_image_found = true;",
+									"                        pm.environment.set('x86_image_id', element.imageId64);",
+									"                        pm.environment.set()",
+									"                    }",
 									"                }",
 									"                if (element.imageIdArm != undefined) {",
 									"                    imageIdArray.push(element.imageIdArm);",
 									"                }",
 									"            })",
 									"        }",
-									"       ",
+									"",
 									"        if (imageIdArray.length != 0) {",
 									"            let random_index = Math.floor(Math.random() * imageIdArray.length);",
 									"            pm.environment.set('image_id', imageIdArray[random_index]);",
@@ -3192,12 +3061,12 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_common_images/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/spotainer/get_common_images/?caid={{cloud_account_id}}&region_code={{region_code}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_common_images",
 								""
 							],
@@ -3231,12 +3100,12 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_common_images/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/get_common_images/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_common_images",
 										""
 									],
@@ -3348,12 +3217,12 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id={{image_id}}",
+							"raw": "{{host_aws}}/spotainer/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id={{image_id}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"valid_image_id",
 								""
 							],
@@ -3396,12 +3265,12 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id={{image_id}}",
+									"raw": "{{host_aws}}/spotainer/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id={{image_id}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"valid_image_id",
 										""
 									],
@@ -3505,12 +3374,12 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id=ami-012d44a21cdc6962e15545212esdf",
+							"raw": "{{host_aws}}/spotainer/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id=ami-012d44a21cdc6962e15545212esdf",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"valid_image_id",
 								""
 							],
@@ -3553,12 +3422,12 @@
 									"formdata": []
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id=ami-012d44a21cdc6962e",
+									"raw": "{{host_aws}}/spotainer/valid_image_id/?caid={{cloud_account_id}}&region_code={{region_code}}&image_id=ami-012d44a21cdc6962e",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"valid_image_id",
 										""
 									],
@@ -3672,13 +3541,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"let image_archi_list =['x86_64', 'arm64'];",
-									"let im_index = Math.floor(Math.random()*2);",
-									"pm.environment.set('image_archi', image_archi_list[im_index]);",
-									"let all_spot_list = pm.environment.get('all_spot_list');",
-									"let sp_index = Math.floor(Math.random()* (all_spot_list.length-3));",
-									"let spot_list = all_spot_list.slice(sp_index, sp_index+3);",
-									"pm.environment.set('spot_list', JSON.stringify(spot_list));",
+									"",
 									""
 								],
 								"type": "text/javascript"
@@ -3720,12 +3583,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=x86_64&spot_list=[\"t3.nano\"]",
+							"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=x86_64&spot_list=[\"t3.nano\",\"t3.micro\"]",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"valid_spot_architecture",
 								""
 							],
@@ -3740,21 +3603,11 @@
 								},
 								{
 									"key": "image_architecture",
-									"value": "{{image_archi}}",
-									"disabled": true
-								},
-								{
-									"key": "spot_list",
-									"value": "{{spot_list}}",
-									"disabled": true
-								},
-								{
-									"key": "image_architecture",
 									"value": "x86_64"
 								},
 								{
 									"key": "spot_list",
-									"value": "[\"t3.nano\"]"
+									"value": "[\"t3.nano\",\"t3.micro\"]"
 								}
 							]
 						}
@@ -3766,12 +3619,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=x86_64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
+									"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=x86_64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"valid_spot_architecture",
 										""
 									],
@@ -3928,12 +3781,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=arm64&spot_list=[\"t3.nano\"]",
+							"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=arm64&spot_list=[\"t3.nano\"]",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"valid_spot_architecture",
 								""
 							],
@@ -3964,12 +3817,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=arm64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
+									"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=arm64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"valid_spot_architecture",
 										""
 									],
@@ -4131,12 +3984,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture={{image_archi}}&spot_list={{spot_list}}",
+							"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture={{image_archi}}&spot_list={{spot_list}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"valid_spot_architecture",
 								""
 							],
@@ -4172,12 +4025,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=x86_64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
+									"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=x86_64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"valid_spot_architecture",
 										""
 									],
@@ -4251,12 +4104,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=arm64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
+									"raw": "{{host_aws}}/spotainer/valid_spot_architecture/?caid={{cloud_account_id}}&region_code={{region_code}}&image_architecture=arm64&spot_list=[\"t3.nano\",\"t3a.nano\"]",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"valid_spot_architecture",
 										""
 									],
@@ -4333,10 +4186,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"let os_list =['linux', \"rhel\", \"suse\", \"windows\"]",
-									"let index = Math.floor(Math.random()*os_list.length);",
-									"pm.environment.set('system', os_list[index]);",
-									"pm.environment.set('region_code', 'eu-south-1')"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -4401,12 +4251,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_spot_score/",
+							"raw": "{{host_aws}}/spotainer/get_spot_score/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_spot_score",
 								""
 							],
@@ -4440,12 +4290,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_spot_score/",
+									"raw": "{{host_aws}}/spotainer/get_spot_score/",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_spot_score",
 										""
 									],
@@ -4584,12 +4434,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_spot_score/",
+							"raw": "{{host_aws}}/spotainer/get_spot_score/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_spot_score",
 								""
 							]
@@ -4611,12 +4461,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_spot_score/",
+									"raw": "{{host_aws}}/spotainer/get_spot_score/",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_spot_score",
 										""
 									]
@@ -4793,12 +4643,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_spot_score/",
+							"raw": "{{host_aws}}/spotainer/get_spot_score/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"get_spot_score",
 								""
 							]
@@ -4820,12 +4670,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/get_spot_score/",
+									"raw": "{{host_aws}}/spotainer/get_spot_score/",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"get_spot_score",
 										""
 									]
@@ -4929,6 +4779,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.environment.set('created_timestamp', pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"console.log(pm.variables.replaceIn(\"{{$timestamp}}\"));",
 									"pm.test('Status is 200', () => {",
 									"    pm.response.to.be.ok;",
 									"});",
@@ -4948,7 +4800,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"name\": \"{{$randomProduct}}\",\n    \"region_code\": \"{{region_code}}\",\n    \"CapacityUnit\": \"123\",\n    \"CapacityTarget\": \"3\",\n    \"CapacityMin\": \"1\",\n    \"CapacityMax\": \"5\",\n    \"CapacityKey\": \"on_demand_count\",\n    \"CapacityValue\": \"3\",\n    \"ClusterOrientation\": \"balanced\",\n    \"DrainingTimeout\": \"300\",\n    \"FallbackToOnDemand\": false,\n    \"VPC\": \"123\",\n    \"OperatingSystem\": \"{{system}}\",\n    \"OnDemandType\": \"t3.nano\",\n    \"SubNets\": {\n        \"AZ_ID\": [\n            \"SubNetID\"\n        ],\n        \"AZ_ID1\": [\n            \"SubNetID\"\n        ],\n        \"AZ_ID2\": [\n            \"SubNetID\"\n        ]\n    },\n    \"SpotTypes\": [\n        \"t3.nano\",\n        \"t4.nano\"\n    ],\n    \"ImageId\": \"imagetid\",\n    \"SecurityGroupsIds\": [\n        \"\"\n    ],\n    \"KeyPairName\": \"kyleMaster\",\n    \"PublicIp\": \"PublicIpid\",\n    \"AddMonitoringAgent\": false\n}",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"name\": \"{{$randomProduct}}\",\n    \"region_code\": \"{{region_code}}\",\n    \"CapacityUnit\": \"Instance\",\n    \"CapacityTarget\": \"2\",\n    \"CapacityMin\": \"1\",\n    \"CapacityMax\": \"3\",\n    \"CapacityKey\": \"instances\",\n    \"CapacityValue\": \"100\",\n    \"ClusterOrientation\": \"Balanced\",\n    \"DrainingTimeout\": \"120\",\n    \"FallbackToOnDemand\": true,\n    \"VPC\": \"{{VpcId}}\",\n    \"OperatingSystem\": \"{{system}}\",\n    \"OnDemandType\": \"t3.nano\",\n    \"AvailabilityZones\": \"{{AZNameList}}\",\n    \"SubNets\": {{az_subnet_dict}},\n    \"SpotTypes\": [\n        \"t3.nano\",\n        \"t3.micro\"\n    ],\n    \"ImageId\": \"{{x86_image_id}}\",\n    \"SecurityGroupsIds\": [\n        \"{{sg_id}}\"\n    ],\n    \"KeyPairName\": \"{{KeyPairName}}\",\n    \"PublicIp\": \"IP3\",\n    \"AddMonitoringAgent\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4956,11 +4808,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/",
+							"raw": "{{host_aws}}/spotainer/spotainers/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
+								"spotainer",
 								"spotainers",
 								""
 							]
@@ -4982,12 +4835,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/",
+									"raw": "{{host_aws}}/spotainer/",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										""
 									]
 								}
@@ -5095,11 +4948,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/{{spotainer_id_1}}/?caid={{cloud_account_id}}",
+							"raw": "{{host_aws}}/spotainer/spotainers/{{spotainer_id_1}}/?caid={{cloud_account_id}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
+								"spotainer",
 								"spotainers",
 								"{{spotainer_id_1}}",
 								""
@@ -5129,12 +4983,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/51/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"raw": "{{host_aws}}/spotainer/51/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"51",
 										""
 									],
@@ -5205,12 +5059,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host_aws}}/spotainers/51/?caid={{cloud_account_id}}&spotainer_id=51",
+									"raw": "{{host_aws}}/spotainer/51/?caid={{cloud_account_id}}&spotainer_id=51",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"51",
 										""
 									],
@@ -5278,6 +5132,389 @@
 					]
 				},
 				{
+					"name": "Get One Spotainer's Instances",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(pm.variables.replaceIn(\"{{$timestamp}}\"));",
+									"",
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"let listHaveAllKeys = (list, dict) => {",
+									"    list.forEach(data => {",
+									"        pm.expect(data).to.have.all.keys(dict);",
+									"    });",
+									"}",
+									"",
+									"pm.test('results has expected properties', () => {",
+									"    let keys_dict = {",
+									"        \"AmiLaunchIndex\": 0,",
+									"        \"ImageId\": \"ami-0e5182fad1edfaa68\",",
+									"        \"InstanceId\": \"i-0f29a0dea24168a8c\",",
+									"        \"InstanceType\": \"t3.nano\",",
+									"        \"KeyName\": \"noelmac\",",
+									"        \"LaunchTime\": \"2021-08-04T10:56:13Z\",",
+									"        \"PrivateDnsName\": \"\",",
+									"        \"ProductCodes\": [],",
+									"        \"PublicDnsName\": \"\",",
+									"        \"StateTransitionReason\": \"User initiated (2021-08-05 02:51:39 GMT)\",",
+									"        \"Architecture\": \"x86_64\",",
+									"        \"BlockDeviceMappings\": [],",
+									"        \"ClientToken\": \"830a59c2-db79-4746-8210-72943454310a\",",
+									"        \"EbsOptimized\": false,",
+									"        \"EnaSupport\": true,",
+									"        \"Hypervisor\": \"xen\",",
+									"        \"InstanceLifecycle\": \"spot\",",
+									"        \"NetworkInterfaces\": [],",
+									"        \"RootDeviceName\": \"/dev/xvda\",",
+									"        \"RootDeviceType\": \"ebs\",",
+									"        \"SecurityGroups\": [],",
+									"        \"SpotInstanceRequestId\": \"sir-xhnp8d8j\",",
+									"        \"Tags\": [",
+									"            {",
+									"                \"Key\": \"Stompy_account_id\",",
+									"                \"Value\": \"17\"",
+									"            },",
+									"            {",
+									"                \"Key\": \"Stompy_aws_ec2_Spotainer_id\",",
+									"                \"Value\": \"270\"",
+									"            },",
+									"            {",
+									"                \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",",
+									"                \"Value\": \"Stompy_spotainer\"",
+									"            },",
+									"            {",
+									"                \"Key\": \"Stompy_aws_ec2_Spotainer_name\",",
+									"                \"Value\": \"test-instance-info-xj\"",
+									"            }",
+									"        ],",
+									"        \"VirtualizationType\": \"hvm\",",
+									"        \"Monitoring.State\": \"disabled\",",
+									"        \"Placement.AvailabilityZone\": \"ap-southeast-1a\",",
+									"        \"Placement.GroupName\": \"\",",
+									"        \"Placement.Tenancy\": \"default\",",
+									"        \"State.Code\": 48,",
+									"        \"State.Name\": \"terminated\",",
+									"        \"StateReason.Code\": \"Client.UserInitiatedShutdown\",",
+									"        \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",",
+									"        \"CpuOptions.CoreCount\": 1,",
+									"        \"CpuOptions.ThreadsPerCore\": 2,",
+									"        \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",",
+									"        \"HibernationOptions.Configured\": false,",
+									"        \"MetadataOptions.State\": \"pending\",",
+									"        \"MetadataOptions.HttpTokens\": \"optional\",",
+									"        \"MetadataOptions.HttpPutResponseHopLimit\": 1,",
+									"        \"MetadataOptions.HttpEndpoint\": \"enabled\",",
+									"        \"EnclaveOptions.Enabled\": false",
+									"    };",
+									"    listHaveAllKeys(pm.response.json().results, keys_dict);",
+									"});",
+									"",
+									"",
+									"pm.test('has no duplicates', () => {",
+									"    let instance_id_list = []",
+									"    pm.response.json().results.forEach(data => {",
+									"        let id = data.InstanceId;",
+									"        pm.expect(instance_id_list.includes(id)).to.be.false;",
+									"        instance_id_list.push(id);",
+									"    });",
+									"    pm.environment.set('instance_list', JSON.stringify(instance_id_list))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(()=>{}, 60000)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/spotainer/get_instances/?region_code={{region_code}}&spotainer_id={{spotainer_id_1}}&caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainer",
+								"get_instances",
+								""
+							],
+							"query": [
+								{
+									"key": "region_code",
+									"value": "{{region_code}}"
+								},
+								{
+									"key": "spotainer_id",
+									"value": "{{spotainer_id_1}}"
+								},
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get One Spotainer Instances",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainer/get_instances/?caid=17&region_code=ap-southeast-1&spotainer_id=270",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainer",
+										"get_instances",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "17"
+										},
+										{
+											"key": "region_code",
+											"value": "ap-southeast-1"
+										},
+										{
+											"key": "spotainer_id",
+											"value": "270"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 04 Aug 2021 03:41:44 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "10266"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": [\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-0c7694189ac2fa7ce\",\n            \"InstanceType\": \"t3.nano\",\n            \"KeyName\": \"xujiatest\",\n            \"LaunchTime\": \"2021-08-02T11:04:25Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:23:18 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"93a81949-7990-4db0-b753-aa2259476a33\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-d7v6bp3g\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"\",\n            \"PublicIpAddress\": \"\",\n            \"SubnetId\": \"\",\n            \"VpcId\": \"\",\n            \"SourceDestCheck\": \"\"\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-0ef884211b0da7782\",\n            \"InstanceType\": \"t3.nano\",\n            \"KeyName\": \"noelmac\",\n            \"LaunchTime\": \"2021-08-03T04:11:10Z\",\n            \"PrivateDnsName\": \"ip-172-31-25-182.ap-southeast-1.compute.internal\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"ec2-54-255-233-129.ap-southeast-1.compute.amazonaws.com\",\n            \"StateTransitionReason\": \"\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [\n                {\n                    \"DeviceName\": \"/dev/xvda\",\n                    \"Ebs\": {\n                        \"AttachTime\": \"2021-08-03T04:11:10Z\",\n                        \"DeleteOnTermination\": true,\n                        \"Status\": \"attached\",\n                        \"VolumeId\": \"vol-0c5df5bc58a108b83\"\n                    }\n                }\n            ],\n            \"ClientToken\": \"6387b32b-fc84-450d-9a93-795b32aa4950\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"\",\n            \"NetworkInterfaces\": [\n                {\n                    \"Association\": {\n                        \"IpOwnerId\": \"amazon\",\n                        \"PublicDnsName\": \"ec2-54-255-233-129.ap-southeast-1.compute.amazonaws.com\",\n                        \"PublicIp\": \"54.255.233.129\"\n                    },\n                    \"Attachment\": {\n                        \"AttachTime\": \"2021-08-03T04:11:10Z\",\n                        \"AttachmentId\": \"eni-attach-00d91c3b5d2d8118d\",\n                        \"DeleteOnTermination\": true,\n                        \"DeviceIndex\": 0,\n                        \"Status\": \"attached\",\n                        \"NetworkCardIndex\": 0\n                    },\n                    \"Description\": \"\",\n                    \"Groups\": [\n                        {\n                            \"GroupName\": \"default\",\n                            \"GroupId\": \"sg-1af9c86f\"\n                        }\n                    ],\n                    \"Ipv6Addresses\": [],\n                    \"MacAddress\": \"02:f5:d6:88:03:f8\",\n                    \"NetworkInterfaceId\": \"eni-02f1ebc7be67e51de\",\n                    \"OwnerId\": \"263078123597\",\n                    \"PrivateDnsName\": \"ip-172-31-25-182.ap-southeast-1.compute.internal\",\n                    \"PrivateIpAddress\": \"172.31.25.182\",\n                    \"PrivateIpAddresses\": [\n                        {\n                            \"Association\": {\n                                \"IpOwnerId\": \"amazon\",\n                                \"PublicDnsName\": \"ec2-54-255-233-129.ap-southeast-1.compute.amazonaws.com\",\n                                \"PublicIp\": \"54.255.233.129\"\n                            },\n                            \"Primary\": true,\n                            \"PrivateDnsName\": \"ip-172-31-25-182.ap-southeast-1.compute.internal\",\n                            \"PrivateIpAddress\": \"172.31.25.182\"\n                        }\n                    ],\n                    \"SourceDestCheck\": true,\n                    \"Status\": \"in-use\",\n                    \"SubnetId\": \"subnet-f2ac7994\",\n                    \"VpcId\": \"vpc-8110f1e7\",\n                    \"InterfaceType\": \"interface\"\n                }\n            ],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [\n                {\n                    \"GroupName\": \"default\",\n                    \"GroupId\": \"sg-1af9c86f\"\n                }\n            ],\n            \"SpotInstanceRequestId\": \"\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 16,\n            \"State.Name\": \"running\",\n            \"StateReason.Code\": \"\",\n            \"StateReason.Message\": \"\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"applied\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"172.31.25.182\",\n            \"PublicIpAddress\": \"54.255.233.129\",\n            \"SubnetId\": \"subnet-f2ac7994\",\n            \"VpcId\": \"vpc-8110f1e7\",\n            \"SourceDestCheck\": true\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-0638b5c15b5cb7064\",\n            \"InstanceType\": \"t2.micro\",\n            \"KeyName\": \"noelmac\",\n            \"LaunchTime\": \"2021-08-03T04:11:18Z\",\n            \"PrivateDnsName\": \"ip-172-31-16-71.ap-southeast-1.compute.internal\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"ec2-52-77-212-75.ap-southeast-1.compute.amazonaws.com\",\n            \"StateTransitionReason\": \"\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [\n                {\n                    \"DeviceName\": \"/dev/xvda\",\n                    \"Ebs\": {\n                        \"AttachTime\": \"2021-08-03T04:11:19Z\",\n                        \"DeleteOnTermination\": true,\n                        \"Status\": \"attached\",\n                        \"VolumeId\": \"vol-03a91e0e88906eed9\"\n                    }\n                }\n            ],\n            \"ClientToken\": \"c0b8fd7f-2099-49c3-9b3e-7964db7c3ae9\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"\",\n            \"NetworkInterfaces\": [\n                {\n                    \"Association\": {\n                        \"IpOwnerId\": \"amazon\",\n                        \"PublicDnsName\": \"ec2-52-77-212-75.ap-southeast-1.compute.amazonaws.com\",\n                        \"PublicIp\": \"52.77.212.75\"\n                    },\n                    \"Attachment\": {\n                        \"AttachTime\": \"2021-08-03T04:11:18Z\",\n                        \"AttachmentId\": \"eni-attach-0f1874d8ca80ab829\",\n                        \"DeleteOnTermination\": true,\n                        \"DeviceIndex\": 0,\n                        \"Status\": \"attached\",\n                        \"NetworkCardIndex\": 0\n                    },\n                    \"Description\": \"\",\n                    \"Groups\": [\n                        {\n                            \"GroupName\": \"default\",\n                            \"GroupId\": \"sg-1af9c86f\"\n                        }\n                    ],\n                    \"Ipv6Addresses\": [],\n                    \"MacAddress\": \"02:0e:23:d8:d5:f4\",\n                    \"NetworkInterfaceId\": \"eni-064dbe5960ce2f62e\",\n                    \"OwnerId\": \"263078123597\",\n                    \"PrivateDnsName\": \"ip-172-31-16-71.ap-southeast-1.compute.internal\",\n                    \"PrivateIpAddress\": \"172.31.16.71\",\n                    \"PrivateIpAddresses\": [\n                        {\n                            \"Association\": {\n                                \"IpOwnerId\": \"amazon\",\n                                \"PublicDnsName\": \"ec2-52-77-212-75.ap-southeast-1.compute.amazonaws.com\",\n                                \"PublicIp\": \"52.77.212.75\"\n                            },\n                            \"Primary\": true,\n                            \"PrivateDnsName\": \"ip-172-31-16-71.ap-southeast-1.compute.internal\",\n                            \"PrivateIpAddress\": \"172.31.16.71\"\n                        }\n                    ],\n                    \"SourceDestCheck\": true,\n                    \"Status\": \"in-use\",\n                    \"SubnetId\": \"subnet-f2ac7994\",\n                    \"VpcId\": \"vpc-8110f1e7\",\n                    \"InterfaceType\": \"interface\"\n                }\n            ],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [\n                {\n                    \"GroupName\": \"default\",\n                    \"GroupId\": \"sg-1af9c86f\"\n                }\n            ],\n            \"SpotInstanceRequestId\": \"\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 16,\n            \"State.Name\": \"running\",\n            \"StateReason.Code\": \"\",\n            \"StateReason.Message\": \"\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"applied\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"172.31.16.71\",\n            \"PublicIpAddress\": \"52.77.212.75\",\n            \"SubnetId\": \"subnet-f2ac7994\",\n            \"VpcId\": \"vpc-8110f1e7\",\n            \"SourceDestCheck\": true\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-088b74133370c2c6d\",\n            \"InstanceType\": \"t2.micro\",\n            \"KeyName\": \"noelmac\",\n            \"LaunchTime\": \"2021-08-03T04:11:22Z\",\n            \"PrivateDnsName\": \"ip-172-31-17-131.ap-southeast-1.compute.internal\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"ec2-13-229-79-143.ap-southeast-1.compute.amazonaws.com\",\n            \"StateTransitionReason\": \"\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [\n                {\n                    \"DeviceName\": \"/dev/xvda\",\n                    \"Ebs\": {\n                        \"AttachTime\": \"2021-08-03T04:11:23Z\",\n                        \"DeleteOnTermination\": true,\n                        \"Status\": \"attached\",\n                        \"VolumeId\": \"vol-0cd7ef6fe5826837c\"\n                    }\n                }\n            ],\n            \"ClientToken\": \"6f306e1d-82ca-46db-9824-9811e0176c3d\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"\",\n            \"NetworkInterfaces\": [\n                {\n                    \"Association\": {\n                        \"IpOwnerId\": \"amazon\",\n                        \"PublicDnsName\": \"ec2-13-229-79-143.ap-southeast-1.compute.amazonaws.com\",\n                        \"PublicIp\": \"13.229.79.143\"\n                    },\n                    \"Attachment\": {\n                        \"AttachTime\": \"2021-08-03T04:11:22Z\",\n                        \"AttachmentId\": \"eni-attach-05ca08bc130c596fb\",\n                        \"DeleteOnTermination\": true,\n                        \"DeviceIndex\": 0,\n                        \"Status\": \"attached\",\n                        \"NetworkCardIndex\": 0\n                    },\n                    \"Description\": \"\",\n                    \"Groups\": [\n                        {\n                            \"GroupName\": \"default\",\n                            \"GroupId\": \"sg-1af9c86f\"\n                        }\n                    ],\n                    \"Ipv6Addresses\": [],\n                    \"MacAddress\": \"02:28:58:1b:91:76\",\n                    \"NetworkInterfaceId\": \"eni-0cfe273a95387553c\",\n                    \"OwnerId\": \"263078123597\",\n                    \"PrivateDnsName\": \"ip-172-31-17-131.ap-southeast-1.compute.internal\",\n                    \"PrivateIpAddress\": \"172.31.17.131\",\n                    \"PrivateIpAddresses\": [\n                        {\n                            \"Association\": {\n                                \"IpOwnerId\": \"amazon\",\n                                \"PublicDnsName\": \"ec2-13-229-79-143.ap-southeast-1.compute.amazonaws.com\",\n                                \"PublicIp\": \"13.229.79.143\"\n                            },\n                            \"Primary\": true,\n                            \"PrivateDnsName\": \"ip-172-31-17-131.ap-southeast-1.compute.internal\",\n                            \"PrivateIpAddress\": \"172.31.17.131\"\n                        }\n                    ],\n                    \"SourceDestCheck\": true,\n                    \"Status\": \"in-use\",\n                    \"SubnetId\": \"subnet-f2ac7994\",\n                    \"VpcId\": \"vpc-8110f1e7\",\n                    \"InterfaceType\": \"interface\"\n                }\n            ],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [\n                {\n                    \"GroupName\": \"default\",\n                    \"GroupId\": \"sg-1af9c86f\"\n                }\n            ],\n            \"SpotInstanceRequestId\": \"\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 16,\n            \"State.Name\": \"running\",\n            \"StateReason.Code\": \"\",\n            \"StateReason.Message\": \"\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"applied\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"172.31.17.131\",\n            \"PublicIpAddress\": \"13.229.79.143\",\n            \"SubnetId\": \"subnet-f2ac7994\",\n            \"VpcId\": \"vpc-8110f1e7\",\n            \"SourceDestCheck\": true\n        }\n    ]\n}"
+						},
+						{
+							"name": "Get All Spotainer Instances",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainer/get_instances/?caid=15&region_code=ap-southeast-1",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainer",
+										"get_instances",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "15"
+										},
+										{
+											"key": "region_code",
+											"value": "ap-southeast-1"
+										},
+										{
+											"key": "spotainer_id",
+											"value": "270",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 04 Aug 2021 03:44:36 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "6177"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": [\n        {\n            \"AmiLaunchIndex\": 2,\n            \"ImageId\": \"ami-0adfdaea54d40922b\",\n            \"InstanceId\": \"i-0bee136fa032190ff\",\n            \"InstanceType\": \"m1.small\",\n            \"KeyName\": \"runze\",\n            \"LaunchTime\": \"2021-08-03T06:47:26Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:24:18 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"eb321dcf-b153-4871-b25d-0139c82d9c3d\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-rt2p9zij\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"targetScaling\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"273\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        },\n        {\n            \"AmiLaunchIndex\": 1,\n            \"ImageId\": \"ami-0adfdaea54d40922b\",\n            \"InstanceId\": \"i-0fb4f35556aa62a59\",\n            \"InstanceType\": \"m1.small\",\n            \"KeyName\": \"runze\",\n            \"LaunchTime\": \"2021-08-03T06:47:26Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:25:59 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"eb321dcf-b153-4871-b25d-0139c82d9c3d\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-4vt69z7g\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"targetScaling\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"273\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        },\n        {\n            \"AmiLaunchIndex\": 1,\n            \"ImageId\": \"ami-00bd7cc070262f111\",\n            \"InstanceId\": \"i-04529fd4d30205c29\",\n            \"InstanceType\": \"m5a.24xlarge\",\n            \"KeyName\": \"xujiatest\",\n            \"LaunchTime\": \"2021-08-02T09:58:27Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:15:02 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"a2ba8219-ce77-4fa3-a954-7bb62450273b\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-15spb5ik\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"textsimple\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"269\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1b\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 48,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-00bd7cc070262f111\",\n            \"InstanceId\": \"i-0f3ea611f0c7936c1\",\n            \"InstanceType\": \"m5a.24xlarge\",\n            \"KeyName\": \"xujiatest\",\n            \"LaunchTime\": \"2021-08-03T05:16:48Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:15:02 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"0a141169-5717-4e80-b1c3-a380b914bf57\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-48zebttk\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"textsimple\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"269\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1b\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 48,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get One Spotainer Instance Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"let listHaveAllKeys = (list, dict) => {",
+									"        list.forEach(data => {",
+									"            pm.expect(data).to.have.all.keys(dict);",
+									"        });",
+									"    }",
+									"",
+									"    pm.test('results has expected properties', () => {",
+									"        let keys_dict =          {",
+									"            \"AvailabilityZone\": \"ap-southeast-1c\",",
+									"            \"InstanceId\": \"i-0fc0c8ed838580196\",",
+									"            \"InstanceState.Code\": 16,",
+									"            \"InstanceState.Name\": \"running\",",
+									"            \"InstanceStatus.Details\": [",
+									"                {",
+									"                    \"Name\": \"reachability\",",
+									"                    \"Status\": \"passed\"",
+									"                }",
+									"            ],",
+									"            \"InstanceStatus.Status\": \"ok\",",
+									"            \"SystemStatus.Details\": [",
+									"                {",
+									"                    \"Name\": \"reachability\",",
+									"                    \"Status\": \"passed\"",
+									"                }",
+									"            ],",
+									"            \"SystemStatus.Status\": \"ok\"",
+									"        };",
+									"        listHaveAllKeys(pm.response.json().results, keys_dict);",
+									"    });",
+									"",
+									"",
+									"    let checkDuplicatesFromList = (list, target_prop) => {",
+									"        let store = new Set();",
+									"        list.forEach(data => {",
+									"            pm.expect(store.has(data[target_prop])).to.be.false;",
+									"            store.add((data[target_prop]))",
+									"        });",
+									"    };",
+									"",
+									"    pm.test('has no duplicates', () => {",
+									"        checkDuplicatesFromList(pm.response.json().results, 'InstanceId');",
+									"    });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"region_code\": \"{{region_code}}\",\n    \"instance_list\": [\"i-0fc0c8ed838580196\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/spotainer/get_instance_status/",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainer",
+								"get_instance_status",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete Spotainer1",
 					"event": [
 						{
@@ -5314,12 +5551,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/{{spotainer_id_1}}/",
+							"raw": "{{host_aws}}/spotainer/{{spotainer_id_1}}/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
+								"spotainer",
 								"{{spotainer_id_1}}",
 								""
 							]
@@ -5341,12 +5578,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/27/",
+									"raw": "{{host_aws}}/spotainer/27/",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"27",
 										""
 									]
@@ -5399,7 +5636,7 @@
 					]
 				},
 				{
-					"name": "Create Spotainer Full",
+					"name": "Create Spotainer More Configs",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -5433,7 +5670,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"name\": \"test_spotainer\",\n    \"region_code\": \"ap-southeast-1\",\n        \"CapacityUnit\": \"123\",\n        \"CapacityTarget\": \"3\",\n        \"CapacityMin\": \"1\",\n        \"CapacityMax\": \"5\",\n        \"CapacityKey\": \"on_demand_count\",\n        \"CapacityValue\": \"3\",\n        \"ClusterOrientation\": \"balanced\",\n        \"DrainingTimeout\": \"300\",\n        \"FallbackToOnDemand\": false,\n        \"VPC\": \"123\",\n        \"OperatingSystem\": \"linux\",\n        \"SubNets\": {\n            \"AZ_ID\": [\n                \"SubNetID\"\n            ],\n            \"AZ_ID1\": [\n                \"SubNetID\"\n            ],\n            \"AZ_ID2\": [\n                \"SubNetID\"\n            ]\n        },\n        \"SpotTypes\": [\n            \"t3.nano\",\n            \"t4.nano\"\n        ],\n        \"PreferredAvailabilityZones\": [],\n        \"PreferredSpotTypes\": [],\n        \"ElasticIps\": [],\n        \"AMIAutoBackup\": null,\n        \"AMIAutoBackupFrequency\": null,\n        \"ShutDownScript\": null,\n        \"LoadBalancers\": [],\n        \"AutoHealingTarget\": null,\n        \"HealthCheckGracePeriod\": null,\n        \"UnhealthyDuration\": null,\n        \"TargetScalingPolicys\": [],\n        \"SimpleUpScalingPolicys\": [\n            {\n                \"number\": 1,\n                \"activeNames\": [\n                    \"1\"\n                ],\n                \"input\": \"UP Scaling Policy 1\",\n                \"SourceValue\": \"AWS Cloud Watch\",\n                \"AutoScaleValue\": \"ASG Average CPU Utilization\",\n                \"Threshold\": \"58\",\n                \"ThresholdUnit\": \"percent\",\n                \"ActionValue\": \"Add\",\n                \"Amount\": \"12\",\n                \"DimensionsData\": [],\n                \"advanced\": {\n                    \"StatisticValue\": \"average\",\n                    \"OperatorValue\": \">=\",\n                    \"ForInput\": \"1\",\n                    \"PeriodValue\": \"5 minutes\",\n                    \"CooldownInput\": \"300\"\n                }\n            }\n        ],\n        \"SimpleDownScalingPolicys\": [\n            {\n                \"number\": 1,\n                \"activeNames\": [\n                    \"1\"\n                ],\n                \"input\": \"DOWN Scaling Policy 1\",\n                \"SourceValue\": \"AWS Cloud Watch\",\n                \"AutoScaleValue\": \"ASG Average CPU Utilization\",\n                \"Threshold\": \"69\",\n                \"ThresholdUnit\": \"percent\",\n                \"ActionValue\": \"Remove\",\n                \"Amount\": \"233\",\n                \"DimensionsData\": [],\n                \"advanced\": {\n                    \"StatisticValue\": \"average\",\n                    \"OperatorValue\": \"<\",\n                    \"ForInput\": \"1\",\n                    \"PeriodValue\": \"5 minutes\",\n                    \"CooldownInput\": \"300\"\n                }\n            }\n        ],\n        \"TerminationPolicy\": null,\n        \"Schedulings\": [],\n        \"OnDemandType\": \"t3.nano\",\n        \"ImageId\": \"imagetid\",\n        \"Tags\": [\n            {\n                \"Key\": \"Stompy_account_id\",\n                \"Value\": 2\n            },\n            {\n                \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                \"Value\": 49\n            },\n            {\n                \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                \"Value\": \"test_spotainer\"\n            },\n            {\n                \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                \"Value\": \"Stompy_spotainer\"\n            }\n        ],\n        \"SecurityGroupsIds\": [\n            \"SecurityGroupsIds1\"\n        ],\n        \"KeyPairName\": \"kyleMaster\",\n        \"IAMRoleArn\": null,\n        \"IAMRoleName\": null,\n        \"PublicIp\": \"PublicIpid\",\n        \"Tenancy\": null,\n        \"EbsOptimized\": true,\n        \"Monitoring\": false,\n        \"AssociateIpv6Address\": null,\n        \"UserData\": null,\n        \"AddMonitoringAgent\":false\n}",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"name\": \"{{$randomProduct}}\",\n    \"region_code\": \"{{region_code}}\",\n    \"CapacityUnit\": \"Instance\",\n    \"CapacityTarget\": \"2\",\n    \"CapacityMin\": \"1\",\n    \"CapacityMax\": \"3\",\n    \"CapacityKey\": \"instances\",\n    \"CapacityValue\": \"100\",\n    \"ClusterOrientation\": \"Balanced\",\n    \"DrainingTimeout\": \"120\",\n    \"FallbackToOnDemand\": true,\n    \"VPC\": \"{{VpcId}}\",\n    \"OperatingSystem\": \"{{system}}\",\n    \"OnDemandType\": \"t3.nano\",\n    \"AvailabilityZones\": \"{{AZNameList}}\",\n    \"SubNets\": {{az_subnet_dict}},\n    \"SpotTypes\": [\n        \"t3.nano\",\n        \"t3.micro\"\n    ],\n    \"ElasticIps\": [\n        \"{{ElasticIp}}\"\n    ],\n    \"LoadBalancers\": [\n        \"{{LoadBalancerName}}\"\n    ],\n    \"ImageId\": \"{{x86_image_id}}\",\n    \"SecurityGroupsIds\": [\n        \"{{sg_id}}\"\n    ],\n    \"KeyPairName\": \"{{KeyPairName}}\",\n    \"IAMRoleArn\": \"{{IAMRoleArn}}\",\n    \"IAMRoleName\": \"{{IAMRoleName}}\",\n    \"PublicIp\": \"IP3\",\n    \"AddMonitoringAgent\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5441,11 +5678,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/",
+							"raw": "{{host_aws}}/spotainer/spotainers/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
+								"spotainer",
 								"spotainers",
 								""
 							]
@@ -5454,6 +5692,75 @@
 					"response": [
 						{
 							"name": "Full Parameters",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"caid\": 2,\n    \"name\": \"test_spotainer\",\n    \"region_code\": \"ap-southeast-1\",\n        \"CapacityUnit\": \"123\",\n        \"CapacityTarget\": \"3\",\n        \"CapacityMin\": \"1\",\n        \"CapacityMax\": \"5\",\n        \"CapacityKey\": \"on_demand_count\",\n        \"CapacityValue\": \"3\",\n        \"ClusterOrientation\": \"balanced\",\n        \"DrainingTimeout\": \"300\",\n        \"FallbackToOnDemand\": false,\n        \"VPC\": \"123\",\n        \"OperatingSystem\": \"linux\",\n        \"SubNets\": {\n            \"AZ_ID\": [\n                \"SubNetID\"\n            ],\n            \"AZ_ID1\": [\n                \"SubNetID\"\n            ],\n            \"AZ_ID2\": [\n                \"SubNetID\"\n            ]\n        },\n        \"SpotTypes\": [\n            \"t3.nano\",\n            \"t4.nano\"\n        ],\n        \"PreferredAvailabilityZones\": [],\n        \"PreferredSpotTypes\": [],\n        \"ElasticIps\": [],\n        \"AMIAutoBackup\": null,\n        \"AMIAutoBackupFrequency\": null,\n        \"ShutDownScript\": null,\n        \"LoadBalancers\": [],\n        \"AutoHealingTarget\": null,\n        \"HealthCheckGracePeriod\": null,\n        \"UnhealthyDuration\": null,\n        \"TargetScalingPolicys\": [],\n        \"SimpleUpScalingPolicys\": [],\n        \"SimpleDownScalingPolicys\": [],\n        \"TerminationPolicy\": null,\n        \"Schedulings\": [],\n        \"OnDemandType\": \"t3.nano\",\n        \"ImageId\": \"imagetid\",\n        \"Tags\": [\n            {\n                \"Key\": \"Stompy_account_id\",\n                \"Value\": 2\n            },\n            {\n                \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                \"Value\": 49\n            },\n            {\n                \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                \"Value\": \"test_spotainer\"\n            },\n            {\n                \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                \"Value\": \"Stompy_spotainer\"\n            }\n        ],\n        \"SecurityGroupsIds\": [\n            \"SecurityGroupsIds1\"\n        ],\n        \"KeyPairName\": \"kyleMaster\",\n        \"IAMRoleArn\": null,\n        \"IAMRoleName\": null,\n        \"PublicIp\": \"PublicIpid\",\n        \"Tenancy\": null,\n        \"EbsOptimized\": true,\n        \"Monitoring\": false,\n        \"AssociateIpv6Address\": null,\n        \"UserData\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_aws}}/spotainers/",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainers",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 23 Jul 2021 05:55:52 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, DELETE, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "60"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": \"Successful Create Spotainer.\",\n    \"spotainer_id\": 51\n}"
+						},
+						{
+							"name": "Full Parameters Copy",
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
@@ -5588,11 +5895,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/?caid={{cloud_account_id}}",
+							"raw": "{{host_aws}}/spotainer/spotainers/?caid={{cloud_account_id}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
+								"spotainer",
 								"spotainers",
 								""
 							],
@@ -5615,121 +5923,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "urlencoded",
-									"urlencoded": [
-										{
-											"key": "caid",
-											"value": "{{cloud_account_id}}",
-											"type": "text"
-										},
-										{
-											"key": "region_code",
-											"value": "{{region_code}}",
-											"type": "text"
-										},
-										{
-											"key": "name",
-											"value": "test_spotainer",
-											"type": "text"
-										},
-										{
-											"key": "capacity_unit",
-											"value": "123",
-											"type": "text"
-										},
-										{
-											"key": "capacity_target",
-											"value": "3",
-											"type": "text"
-										},
-										{
-											"key": "capacity_max",
-											"value": "5",
-											"type": "text"
-										},
-										{
-											"key": "capacity_min",
-											"value": "1",
-											"type": "text"
-										},
-										{
-											"key": "capacity_key",
-											"value": "on_demand_count",
-											"type": "text"
-										},
-										{
-											"key": "capacity_value",
-											"value": "3",
-											"type": "text"
-										},
-										{
-											"key": "cluster_orientation",
-											"value": "balanced",
-											"type": "text"
-										},
-										{
-											"key": "draining_timeout",
-											"value": "300",
-											"type": "text"
-										},
-										{
-											"key": "fallback_to_on_demand",
-											"value": "true",
-											"type": "text"
-										},
-										{
-											"key": "vpc",
-											"value": "123",
-											"type": "text"
-										},
-										{
-											"key": "operating_system",
-											"value": "linux",
-											"type": "text"
-										},
-										{
-											"key": "on_demand_type",
-											"value": "t3.nano",
-											"type": "text"
-										},
-										{
-											"key": "availability_zones",
-											"value": "[\"123\",\"123\"]",
-											"type": "text"
-										},
-										{
-											"key": "subnet_ids",
-											"value": "[\"123\",\"123\"]",
-											"type": "text"
-										},
-										{
-											"key": "spot_types",
-											"value": "[\"t3.nano\",\"t4.nano\"]",
-											"type": "text"
-										},
-										{
-											"key": "image_id",
-											"value": "ami-012d44a21cdc6962e",
-											"type": "text"
-										},
-										{
-											"key": "security_groups_ids",
-											"value": "[\"123\",\"456\"]",
-											"type": "text"
-										},
-										{
-											"key": "key_pair_name",
-											"value": "kyleMaster",
-											"type": "text"
-										},
-										{
-											"key": "public_ip",
-											"value": "1",
-											"type": "text"
-										}
-									]
-								},
 								"url": {
 									"raw": "{{host_aws}}/spotainers/?caid={{cloud_account_id}}&region_code={{region_code}}",
 									"host": [
@@ -5805,143 +5998,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "urlencoded",
-									"urlencoded": [
-										{
-											"key": "caid",
-											"value": "{{cloud_account_id}}",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "region_code",
-											"value": "{{region_code}}",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "name",
-											"value": "test_spotainer",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "capacity_unit",
-											"value": "123",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "capacity_target",
-											"value": "3",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "capacity_max",
-											"value": "5",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "capacity_min",
-											"value": "1",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "capacity_key",
-											"value": "on_demand_count",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "capacity_value",
-											"value": "3",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "cluster_orientation",
-											"value": "balanced",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "draining_timeout",
-											"value": "300",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "fallback_to_on_demand",
-											"value": "true",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "vpc",
-											"value": "123",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "operating_system",
-											"value": "linux",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "on_demand_type",
-											"value": "t3.nano",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "availability_zones",
-											"value": "[\"123\",\"123\"]",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "subnet_ids",
-											"value": "[\"123\",\"123\"]",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "spot_types",
-											"value": "[\"t3.nano\",\"t4.nano\"]",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "image_id",
-											"value": "ami-012d44a21cdc6962e",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "security_groups_ids",
-											"value": "[\"123\",\"456\"]",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "key_pair_name",
-											"value": "kyleMaster",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "public_ip",
-											"value": "1",
-											"type": "text",
-											"disabled": true
-										}
-									]
-								},
 								"url": {
 									"raw": "{{host_aws}}/spotainers/?caid={{cloud_account_id}}&region_code=sdfs",
 									"host": [
@@ -6082,11 +6138,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/{{spotainer_id_2}}/",
+							"raw": "{{host_aws}}/spotainer/spotainers/{{spotainer_id_2}}/",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
+								"spotainer",
 								"spotainers",
 								"{{spotainer_id_2}}",
 								""
@@ -6109,12 +6166,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{host_aws}}/spotainers/27/",
+									"raw": "{{host_aws}}/spotainer/27/",
 									"host": [
 										"{{host_aws}}"
 									],
 									"path": [
-										"spotainers",
+										"spotainer",
 										"27",
 										""
 									]
@@ -6167,7 +6224,384 @@
 					]
 				},
 				{
-					"name": "Get Instances",
+					"name": "Get All Instances",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"let listHaveAllKeys = (list, dict) => {",
+									"    list.forEach(data => {",
+									"        pm.expect(data).to.have.all.keys(dict);",
+									"    });",
+									"}",
+									"",
+									"pm.test('results has expected properties', () => {",
+									"    let keys_dict = {",
+									"        \"AmiLaunchIndex\": 0,",
+									"        \"ImageId\": \"ami-0e5182fad1edfaa68\",",
+									"        \"InstanceId\": \"i-0f29a0dea24168a8c\",",
+									"        \"InstanceType\": \"t3.nano\",",
+									"        \"KeyName\": \"noelmac\",",
+									"        \"LaunchTime\": \"2021-08-04T10:56:13Z\",",
+									"        \"PrivateDnsName\": \"\",",
+									"        \"ProductCodes\": [],",
+									"        \"PublicDnsName\": \"\",",
+									"        \"StateTransitionReason\": \"User initiated (2021-08-05 02:51:39 GMT)\",",
+									"        \"Architecture\": \"x86_64\",",
+									"        \"BlockDeviceMappings\": [],",
+									"        \"ClientToken\": \"830a59c2-db79-4746-8210-72943454310a\",",
+									"        \"EbsOptimized\": false,",
+									"        \"EnaSupport\": true,",
+									"        \"Hypervisor\": \"xen\",",
+									"        \"InstanceLifecycle\": \"spot\",",
+									"        \"NetworkInterfaces\": [],",
+									"        \"RootDeviceName\": \"/dev/xvda\",",
+									"        \"RootDeviceType\": \"ebs\",",
+									"        \"SecurityGroups\": [],",
+									"        \"SpotInstanceRequestId\": \"sir-xhnp8d8j\",",
+									"        \"Tags\": [",
+									"            {",
+									"                \"Key\": \"Stompy_account_id\",",
+									"                \"Value\": \"17\"",
+									"            },",
+									"            {",
+									"                \"Key\": \"Stompy_aws_ec2_Spotainer_id\",",
+									"                \"Value\": \"270\"",
+									"            },",
+									"            {",
+									"                \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",",
+									"                \"Value\": \"Stompy_spotainer\"",
+									"            },",
+									"            {",
+									"                \"Key\": \"Stompy_aws_ec2_Spotainer_name\",",
+									"                \"Value\": \"test-instance-info-xj\"",
+									"            }",
+									"        ],",
+									"        \"VirtualizationType\": \"hvm\",",
+									"        \"Monitoring.State\": \"disabled\",",
+									"        \"Placement.AvailabilityZone\": \"ap-southeast-1a\",",
+									"        \"Placement.GroupName\": \"\",",
+									"        \"Placement.Tenancy\": \"default\",",
+									"        \"State.Code\": 48,",
+									"        \"State.Name\": \"terminated\",",
+									"        \"StateReason.Code\": \"Client.UserInitiatedShutdown\",",
+									"        \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",",
+									"        \"CpuOptions.CoreCount\": 1,",
+									"        \"CpuOptions.ThreadsPerCore\": 2,",
+									"        \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",",
+									"        \"HibernationOptions.Configured\": false,",
+									"        \"MetadataOptions.State\": \"pending\",",
+									"        \"MetadataOptions.HttpTokens\": \"optional\",",
+									"        \"MetadataOptions.HttpPutResponseHopLimit\": 1,",
+									"        \"MetadataOptions.HttpEndpoint\": \"enabled\",",
+									"        \"EnclaveOptions.Enabled\": false",
+									"    };",
+									"    listHaveAllKeys(pm.response.json().results, keys_dict);",
+									"});",
+									"",
+									"",
+									"pm.test('has no duplicates', () => {",
+									"    let instance_id_list = []",
+									"    pm.response.json().results.forEach(data => {",
+									"        let id = data.InstanceId;",
+									"        pm.expect(instance_id_list.includes(id)).to.be.false;",
+									"        instance_id_list.push(id);",
+									"    });",
+									"    pm.environment.set('instance_list', JSON.stringify(instance_id_list))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/spotainer/get_instances/?region_code={{region_code}}&caid={{cloud_account_id}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainer",
+								"get_instances",
+								""
+							],
+							"query": [
+								{
+									"key": "region_code",
+									"value": "{{region_code}}"
+								},
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get One Spotainer Instances",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainer/get_instances/?caid=17&region_code=ap-southeast-1&spotainer_id=270",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainer",
+										"get_instances",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "17"
+										},
+										{
+											"key": "region_code",
+											"value": "ap-southeast-1"
+										},
+										{
+											"key": "spotainer_id",
+											"value": "270"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 04 Aug 2021 03:41:44 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "10266"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": [\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-0c7694189ac2fa7ce\",\n            \"InstanceType\": \"t3.nano\",\n            \"KeyName\": \"xujiatest\",\n            \"LaunchTime\": \"2021-08-02T11:04:25Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:23:18 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"93a81949-7990-4db0-b753-aa2259476a33\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-d7v6bp3g\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"\",\n            \"PublicIpAddress\": \"\",\n            \"SubnetId\": \"\",\n            \"VpcId\": \"\",\n            \"SourceDestCheck\": \"\"\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-0ef884211b0da7782\",\n            \"InstanceType\": \"t3.nano\",\n            \"KeyName\": \"noelmac\",\n            \"LaunchTime\": \"2021-08-03T04:11:10Z\",\n            \"PrivateDnsName\": \"ip-172-31-25-182.ap-southeast-1.compute.internal\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"ec2-54-255-233-129.ap-southeast-1.compute.amazonaws.com\",\n            \"StateTransitionReason\": \"\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [\n                {\n                    \"DeviceName\": \"/dev/xvda\",\n                    \"Ebs\": {\n                        \"AttachTime\": \"2021-08-03T04:11:10Z\",\n                        \"DeleteOnTermination\": true,\n                        \"Status\": \"attached\",\n                        \"VolumeId\": \"vol-0c5df5bc58a108b83\"\n                    }\n                }\n            ],\n            \"ClientToken\": \"6387b32b-fc84-450d-9a93-795b32aa4950\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"\",\n            \"NetworkInterfaces\": [\n                {\n                    \"Association\": {\n                        \"IpOwnerId\": \"amazon\",\n                        \"PublicDnsName\": \"ec2-54-255-233-129.ap-southeast-1.compute.amazonaws.com\",\n                        \"PublicIp\": \"54.255.233.129\"\n                    },\n                    \"Attachment\": {\n                        \"AttachTime\": \"2021-08-03T04:11:10Z\",\n                        \"AttachmentId\": \"eni-attach-00d91c3b5d2d8118d\",\n                        \"DeleteOnTermination\": true,\n                        \"DeviceIndex\": 0,\n                        \"Status\": \"attached\",\n                        \"NetworkCardIndex\": 0\n                    },\n                    \"Description\": \"\",\n                    \"Groups\": [\n                        {\n                            \"GroupName\": \"default\",\n                            \"GroupId\": \"sg-1af9c86f\"\n                        }\n                    ],\n                    \"Ipv6Addresses\": [],\n                    \"MacAddress\": \"02:f5:d6:88:03:f8\",\n                    \"NetworkInterfaceId\": \"eni-02f1ebc7be67e51de\",\n                    \"OwnerId\": \"263078123597\",\n                    \"PrivateDnsName\": \"ip-172-31-25-182.ap-southeast-1.compute.internal\",\n                    \"PrivateIpAddress\": \"172.31.25.182\",\n                    \"PrivateIpAddresses\": [\n                        {\n                            \"Association\": {\n                                \"IpOwnerId\": \"amazon\",\n                                \"PublicDnsName\": \"ec2-54-255-233-129.ap-southeast-1.compute.amazonaws.com\",\n                                \"PublicIp\": \"54.255.233.129\"\n                            },\n                            \"Primary\": true,\n                            \"PrivateDnsName\": \"ip-172-31-25-182.ap-southeast-1.compute.internal\",\n                            \"PrivateIpAddress\": \"172.31.25.182\"\n                        }\n                    ],\n                    \"SourceDestCheck\": true,\n                    \"Status\": \"in-use\",\n                    \"SubnetId\": \"subnet-f2ac7994\",\n                    \"VpcId\": \"vpc-8110f1e7\",\n                    \"InterfaceType\": \"interface\"\n                }\n            ],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [\n                {\n                    \"GroupName\": \"default\",\n                    \"GroupId\": \"sg-1af9c86f\"\n                }\n            ],\n            \"SpotInstanceRequestId\": \"\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 16,\n            \"State.Name\": \"running\",\n            \"StateReason.Code\": \"\",\n            \"StateReason.Message\": \"\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"applied\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"172.31.25.182\",\n            \"PublicIpAddress\": \"54.255.233.129\",\n            \"SubnetId\": \"subnet-f2ac7994\",\n            \"VpcId\": \"vpc-8110f1e7\",\n            \"SourceDestCheck\": true\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-0638b5c15b5cb7064\",\n            \"InstanceType\": \"t2.micro\",\n            \"KeyName\": \"noelmac\",\n            \"LaunchTime\": \"2021-08-03T04:11:18Z\",\n            \"PrivateDnsName\": \"ip-172-31-16-71.ap-southeast-1.compute.internal\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"ec2-52-77-212-75.ap-southeast-1.compute.amazonaws.com\",\n            \"StateTransitionReason\": \"\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [\n                {\n                    \"DeviceName\": \"/dev/xvda\",\n                    \"Ebs\": {\n                        \"AttachTime\": \"2021-08-03T04:11:19Z\",\n                        \"DeleteOnTermination\": true,\n                        \"Status\": \"attached\",\n                        \"VolumeId\": \"vol-03a91e0e88906eed9\"\n                    }\n                }\n            ],\n            \"ClientToken\": \"c0b8fd7f-2099-49c3-9b3e-7964db7c3ae9\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"\",\n            \"NetworkInterfaces\": [\n                {\n                    \"Association\": {\n                        \"IpOwnerId\": \"amazon\",\n                        \"PublicDnsName\": \"ec2-52-77-212-75.ap-southeast-1.compute.amazonaws.com\",\n                        \"PublicIp\": \"52.77.212.75\"\n                    },\n                    \"Attachment\": {\n                        \"AttachTime\": \"2021-08-03T04:11:18Z\",\n                        \"AttachmentId\": \"eni-attach-0f1874d8ca80ab829\",\n                        \"DeleteOnTermination\": true,\n                        \"DeviceIndex\": 0,\n                        \"Status\": \"attached\",\n                        \"NetworkCardIndex\": 0\n                    },\n                    \"Description\": \"\",\n                    \"Groups\": [\n                        {\n                            \"GroupName\": \"default\",\n                            \"GroupId\": \"sg-1af9c86f\"\n                        }\n                    ],\n                    \"Ipv6Addresses\": [],\n                    \"MacAddress\": \"02:0e:23:d8:d5:f4\",\n                    \"NetworkInterfaceId\": \"eni-064dbe5960ce2f62e\",\n                    \"OwnerId\": \"263078123597\",\n                    \"PrivateDnsName\": \"ip-172-31-16-71.ap-southeast-1.compute.internal\",\n                    \"PrivateIpAddress\": \"172.31.16.71\",\n                    \"PrivateIpAddresses\": [\n                        {\n                            \"Association\": {\n                                \"IpOwnerId\": \"amazon\",\n                                \"PublicDnsName\": \"ec2-52-77-212-75.ap-southeast-1.compute.amazonaws.com\",\n                                \"PublicIp\": \"52.77.212.75\"\n                            },\n                            \"Primary\": true,\n                            \"PrivateDnsName\": \"ip-172-31-16-71.ap-southeast-1.compute.internal\",\n                            \"PrivateIpAddress\": \"172.31.16.71\"\n                        }\n                    ],\n                    \"SourceDestCheck\": true,\n                    \"Status\": \"in-use\",\n                    \"SubnetId\": \"subnet-f2ac7994\",\n                    \"VpcId\": \"vpc-8110f1e7\",\n                    \"InterfaceType\": \"interface\"\n                }\n            ],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [\n                {\n                    \"GroupName\": \"default\",\n                    \"GroupId\": \"sg-1af9c86f\"\n                }\n            ],\n            \"SpotInstanceRequestId\": \"\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 16,\n            \"State.Name\": \"running\",\n            \"StateReason.Code\": \"\",\n            \"StateReason.Message\": \"\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"applied\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"172.31.16.71\",\n            \"PublicIpAddress\": \"52.77.212.75\",\n            \"SubnetId\": \"subnet-f2ac7994\",\n            \"VpcId\": \"vpc-8110f1e7\",\n            \"SourceDestCheck\": true\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-0e5182fad1edfaa68\",\n            \"InstanceId\": \"i-088b74133370c2c6d\",\n            \"InstanceType\": \"t2.micro\",\n            \"KeyName\": \"noelmac\",\n            \"LaunchTime\": \"2021-08-03T04:11:22Z\",\n            \"PrivateDnsName\": \"ip-172-31-17-131.ap-southeast-1.compute.internal\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"ec2-13-229-79-143.ap-southeast-1.compute.amazonaws.com\",\n            \"StateTransitionReason\": \"\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [\n                {\n                    \"DeviceName\": \"/dev/xvda\",\n                    \"Ebs\": {\n                        \"AttachTime\": \"2021-08-03T04:11:23Z\",\n                        \"DeleteOnTermination\": true,\n                        \"Status\": \"attached\",\n                        \"VolumeId\": \"vol-0cd7ef6fe5826837c\"\n                    }\n                }\n            ],\n            \"ClientToken\": \"6f306e1d-82ca-46db-9824-9811e0176c3d\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"\",\n            \"NetworkInterfaces\": [\n                {\n                    \"Association\": {\n                        \"IpOwnerId\": \"amazon\",\n                        \"PublicDnsName\": \"ec2-13-229-79-143.ap-southeast-1.compute.amazonaws.com\",\n                        \"PublicIp\": \"13.229.79.143\"\n                    },\n                    \"Attachment\": {\n                        \"AttachTime\": \"2021-08-03T04:11:22Z\",\n                        \"AttachmentId\": \"eni-attach-05ca08bc130c596fb\",\n                        \"DeleteOnTermination\": true,\n                        \"DeviceIndex\": 0,\n                        \"Status\": \"attached\",\n                        \"NetworkCardIndex\": 0\n                    },\n                    \"Description\": \"\",\n                    \"Groups\": [\n                        {\n                            \"GroupName\": \"default\",\n                            \"GroupId\": \"sg-1af9c86f\"\n                        }\n                    ],\n                    \"Ipv6Addresses\": [],\n                    \"MacAddress\": \"02:28:58:1b:91:76\",\n                    \"NetworkInterfaceId\": \"eni-0cfe273a95387553c\",\n                    \"OwnerId\": \"263078123597\",\n                    \"PrivateDnsName\": \"ip-172-31-17-131.ap-southeast-1.compute.internal\",\n                    \"PrivateIpAddress\": \"172.31.17.131\",\n                    \"PrivateIpAddresses\": [\n                        {\n                            \"Association\": {\n                                \"IpOwnerId\": \"amazon\",\n                                \"PublicDnsName\": \"ec2-13-229-79-143.ap-southeast-1.compute.amazonaws.com\",\n                                \"PublicIp\": \"13.229.79.143\"\n                            },\n                            \"Primary\": true,\n                            \"PrivateDnsName\": \"ip-172-31-17-131.ap-southeast-1.compute.internal\",\n                            \"PrivateIpAddress\": \"172.31.17.131\"\n                        }\n                    ],\n                    \"SourceDestCheck\": true,\n                    \"Status\": \"in-use\",\n                    \"SubnetId\": \"subnet-f2ac7994\",\n                    \"VpcId\": \"vpc-8110f1e7\",\n                    \"InterfaceType\": \"interface\"\n                }\n            ],\n            \"RootDeviceName\": \"/dev/xvda\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [\n                {\n                    \"GroupName\": \"default\",\n                    \"GroupId\": \"sg-1af9c86f\"\n                }\n            ],\n            \"SpotInstanceRequestId\": \"\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"270\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"test-instance-info-xj\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"17\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 16,\n            \"State.Name\": \"running\",\n            \"StateReason.Code\": \"\",\n            \"StateReason.Message\": \"\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"applied\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false,\n            \"PrivateIpAddress\": \"172.31.17.131\",\n            \"PublicIpAddress\": \"13.229.79.143\",\n            \"SubnetId\": \"subnet-f2ac7994\",\n            \"VpcId\": \"vpc-8110f1e7\",\n            \"SourceDestCheck\": true\n        }\n    ]\n}"
+						},
+						{
+							"name": "Get All Spotainer Instances",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainer/get_instances/?caid=15&region_code=ap-southeast-1",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainer",
+										"get_instances",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "15"
+										},
+										{
+											"key": "region_code",
+											"value": "ap-southeast-1"
+										},
+										{
+											"key": "spotainer_id",
+											"value": "270",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 04 Aug 2021 03:44:36 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "6177"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": [\n        {\n            \"AmiLaunchIndex\": 2,\n            \"ImageId\": \"ami-0adfdaea54d40922b\",\n            \"InstanceId\": \"i-0bee136fa032190ff\",\n            \"InstanceType\": \"m1.small\",\n            \"KeyName\": \"runze\",\n            \"LaunchTime\": \"2021-08-03T06:47:26Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:24:18 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"eb321dcf-b153-4871-b25d-0139c82d9c3d\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-rt2p9zij\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"targetScaling\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"273\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        },\n        {\n            \"AmiLaunchIndex\": 1,\n            \"ImageId\": \"ami-0adfdaea54d40922b\",\n            \"InstanceId\": \"i-0fb4f35556aa62a59\",\n            \"InstanceType\": \"m1.small\",\n            \"KeyName\": \"runze\",\n            \"LaunchTime\": \"2021-08-03T06:47:26Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:25:59 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"eb321dcf-b153-4871-b25d-0139c82d9c3d\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-4vt69z7g\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"targetScaling\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"273\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1a\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 1,\n            \"CpuOptions.ThreadsPerCore\": 1,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        },\n        {\n            \"AmiLaunchIndex\": 1,\n            \"ImageId\": \"ami-00bd7cc070262f111\",\n            \"InstanceId\": \"i-04529fd4d30205c29\",\n            \"InstanceType\": \"m5a.24xlarge\",\n            \"KeyName\": \"xujiatest\",\n            \"LaunchTime\": \"2021-08-02T09:58:27Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:15:02 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"a2ba8219-ce77-4fa3-a954-7bb62450273b\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-15spb5ik\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"textsimple\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"269\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1b\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 48,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        },\n        {\n            \"AmiLaunchIndex\": 0,\n            \"ImageId\": \"ami-00bd7cc070262f111\",\n            \"InstanceId\": \"i-0f3ea611f0c7936c1\",\n            \"InstanceType\": \"m5a.24xlarge\",\n            \"KeyName\": \"xujiatest\",\n            \"LaunchTime\": \"2021-08-03T05:16:48Z\",\n            \"PrivateDnsName\": \"\",\n            \"ProductCodes\": [],\n            \"PublicDnsName\": \"\",\n            \"StateTransitionReason\": \"User initiated (2021-08-04 03:15:02 GMT)\",\n            \"Architecture\": \"x86_64\",\n            \"BlockDeviceMappings\": [],\n            \"ClientToken\": \"0a141169-5717-4e80-b1c3-a380b914bf57\",\n            \"EbsOptimized\": false,\n            \"EnaSupport\": true,\n            \"Hypervisor\": \"xen\",\n            \"InstanceLifecycle\": \"spot\",\n            \"NetworkInterfaces\": [],\n            \"RootDeviceName\": \"/dev/sda1\",\n            \"RootDeviceType\": \"ebs\",\n            \"SecurityGroups\": [],\n            \"SpotInstanceRequestId\": \"sir-48zebttk\",\n            \"Tags\": [\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_name\",\n                    \"Value\": \"textsimple\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_created_by\",\n                    \"Value\": \"Stompy_spotainer\"\n                },\n                {\n                    \"Key\": \"Stompy_account_id\",\n                    \"Value\": \"15\"\n                },\n                {\n                    \"Key\": \"Stompy_aws_ec2_Spotainer_id\",\n                    \"Value\": \"269\"\n                }\n            ],\n            \"VirtualizationType\": \"hvm\",\n            \"Monitoring.State\": \"disabled\",\n            \"Placement.AvailabilityZone\": \"ap-southeast-1b\",\n            \"Placement.GroupName\": \"\",\n            \"Placement.Tenancy\": \"default\",\n            \"State.Code\": 48,\n            \"State.Name\": \"terminated\",\n            \"StateReason.Code\": \"Client.UserInitiatedShutdown\",\n            \"StateReason.Message\": \"Client.UserInitiatedShutdown: User initiated shutdown\",\n            \"CpuOptions.CoreCount\": 48,\n            \"CpuOptions.ThreadsPerCore\": 2,\n            \"CapacityReservationSpecification.CapacityReservationPreference\": \"open\",\n            \"HibernationOptions.Configured\": false,\n            \"MetadataOptions.State\": \"pending\",\n            \"MetadataOptions.HttpTokens\": \"optional\",\n            \"MetadataOptions.HttpPutResponseHopLimit\": 1,\n            \"MetadataOptions.HttpEndpoint\": \"enabled\",\n            \"EnclaveOptions.Enabled\": false\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Instance Status",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"let listHaveAllKeys = (list, dict) => {",
+									"        list.forEach(data => {",
+									"            pm.expect(data).to.have.all.keys(dict);",
+									"        });",
+									"    }",
+									"",
+									"    pm.test('results has expected properties', () => {",
+									"        let keys_dict =          {",
+									"            \"AvailabilityZone\": \"ap-southeast-1c\",",
+									"            \"InstanceId\": \"i-0fc0c8ed838580196\",",
+									"            \"InstanceState.Code\": 16,",
+									"            \"InstanceState.Name\": \"running\",",
+									"            \"InstanceStatus.Details\": [",
+									"                {",
+									"                    \"Name\": \"reachability\",",
+									"                    \"Status\": \"passed\"",
+									"                }",
+									"            ],",
+									"            \"InstanceStatus.Status\": \"ok\",",
+									"            \"SystemStatus.Details\": [",
+									"                {",
+									"                    \"Name\": \"reachability\",",
+									"                    \"Status\": \"passed\"",
+									"                }",
+									"            ],",
+									"            \"SystemStatus.Status\": \"ok\"",
+									"        };",
+									"        listHaveAllKeys(pm.response.json().results, keys_dict);",
+									"    });",
+									"",
+									"",
+									"    let checkDuplicatesFromList = (list, target_prop) => {",
+									"        let store = new Set();",
+									"        list.forEach(data => {",
+									"            pm.expect(store.has(data[target_prop])).to.be.false;",
+									"            store.add((data[target_prop]))",
+									"        });",
+									"    };",
+									"",
+									"    pm.test('has no duplicates', () => {",
+									"        checkDuplicatesFromList(pm.response.json().results, 'InstanceId');",
+									"    });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"region_code\": \"{{region_code}}\"\n    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_aws}}/spotainer/get_instance_status/",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainer",
+								"get_instance_status",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Spotainer Cost",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -6223,13 +6657,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_instances/?caid={{cloud_account_id}}&region_code={{region_code}}",
+							"raw": "{{host_aws}}/logs/?caid={{cloud_account_id}}&spotainer_id={{spotainer_id_1}}",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
-								"get_instances",
+								"logs",
 								""
 							],
 							"query": [
@@ -6238,8 +6671,8 @@
 									"value": "{{cloud_account_id}}"
 								},
 								{
-									"key": "region_code",
-									"value": "{{region_code}}"
+									"key": "spotainer_id",
+									"value": "{{spotainer_id_1}}"
 								}
 							]
 						}
@@ -6247,7 +6680,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Instance Status",
+					"name": "Get All Auto Scaling Group",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -6267,31 +6700,25 @@
 									"});",
 									"",
 									"pm.test('results has expected keys', () => {",
-									"    let property_list = [\"id\", \"caid\", \"name\", \"region_code\", \"created_at\", \"updated_at\", \"spotainer_config\", \"aws_config\", \"is_deleted\"];",
-									"    let spot_config = [\"VPC\", \"SubNets\", \"SpotTypes\", \"ElasticIps\", \"CapacityKey\", \"CapacityMax\", \"CapacityMin\", \"Schedulings\",",
-									"        \"CapacityUnit\", \"AMIAutoBackup\", \"CapacityValue\", \"LoadBalancers\", \"CapacityTarget\", \"ShutDownScript\", \"DrainingTimeout\",",
-									"        \"OperatingSystem\", \"AutoHealingTarget\", \"TerminationPolicy\", \"UnhealthyDuration\", \"ClusterOrientation\", \"FallbackToOnDemand\",",
-									"        \"PreferredSpotTypes\", \"TargetScalingPolicys\", \"AMIAutoBackupFrequency\", \"HealthCheckGracePeriod\", \"SimpleUpScalingPolicys\",",
-									"        \"SimpleDownScalingPolicys\", \"PreferredAvailabilityZones\"];",
-									"    let aws_properties = [\"Tags\", \"ImageId\", \"Tenancy\", \"PublicIp\", \"UserData\", \"IAMRoleArn\", \"Monitoring\", \"IAMRoleName\",",
-									"        \"KeyPairName\", \"EbsOptimized\", \"OnDemandType\", \"SecurityGroupsIds\", \"AddMonitoringAgent\", \"AssociateIpv6Address\"];",
+									"    let property_list = [\"AutoScalingGroupName\", \"AutoScalingGroupARN\", \"MinSize\", \"MaxSize\", \"DesiredCapacity\", \"DefaultCooldown\", \"AvailabilityZones\", \"LoadBalancerNames\", \"TargetGroupARNs\", \"HealthCheckType\", \"HealthCheckGracePeriod\", \"Instances\", \"CreatedTime\", \"SuspendedProcesses\", \"VPCZoneIdentifier\", \"EnabledMetrics\", \"Tags\", \"TerminationPolicies\", \"NewInstancesProtectedFromScaleIn\", \"ServiceLinkedRoleARN\", \"CapacityRebalance\", \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId\", \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateName\", \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.Version\", \"MixedInstancesPolicy.LaunchTemplate.Overrides\", \"MixedInstancesPolicy.InstancesDistribution.OnDemandAllocationStrategy\", \"MixedInstancesPolicy.InstancesDistribution.OnDemandBaseCapacity\", \"MixedInstancesPolicy.InstancesDistribution.OnDemandPercentageAboveBaseCapacity\", \"MixedInstancesPolicy.InstancesDistribution.SpotAllocationStrategy\"];",
+									"    let instance_props = [\"InstanceId\", \"InstanceType\", \"AvailabilityZone\", \"LifecycleState\", \"HealthStatus\", \"LaunchTemplate\", \"ProtectedFromScaleIn\"]",
+									"    ",
+									"    for (let result of pm.response.json().results) {",
+									"        property_list.forEach(prop => {",
+									"            pm.expect(result).to.have.property(prop);",
+									"            if (prop == \"Instances\") {",
+									"                console.log(result[prop]);",
+									"                for (let instance of result[prop]) {",
+									"                    instance_props.forEach(key => {",
+									"                        pm.expect(instance).to.have.property(key);",
+									"                    });",
+									"               }",
 									"",
-									"    let result = pm.response.json().results;",
-									"    property_list.forEach(prop => {",
-									"        pm.expect(result).to.have.property(prop);",
-									"        if (prop == \"spotainer_config\") {",
-									"            let configs = result[prop];",
-									"            spot_config.forEach(key => {",
-									"                pm.expect(configs).to.have.property(key);",
-									"            });",
-									"",
-									"        } else if (prop == \"aws_config\") {",
-									"            let configs = result[prop];",
-									"            aws_properties.forEach(key => {",
-									"                pm.expect(configs).to.have.property(key);",
-									"            });",
-									"        }",
-									"    })",
+									"            }",
+									"        })",
+									"    }",
+									"    let random_index = Math.floor(Math.random() * pm.response.json().results.length);",
+									"    pm.environment.set(\"AutoScalingGroupName\",  pm.response.json().results[random_index].AutoScalingGroupName);",
 									"",
 									"});"
 								],
@@ -6300,30 +6727,263 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"caid\": {{cloud_account_id}},\n    \"region_code\": {{region_code}},\n    \"instance_list\": []\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{host_aws}}/spotainers/get_instance_status/",
+							"raw": "{{host_aws}}/spotainer/get_auto_scaling_group/?caid={{cloud_account_id}}&region_code={{region_code}}&group_name=jenkins-spot",
 							"host": [
 								"{{host_aws}}"
 							],
 							"path": [
-								"spotainers",
-								"get_instance_status",
+								"spotainer",
+								"get_auto_scaling_group",
 								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "region_code",
+									"value": "{{region_code}}"
+								},
+								{
+									"key": "group_name",
+									"value": "jenkins-spot"
+								}
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get ALL Auto Scaling Group",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainer/get_auto_scaling_group/?caid={{cloud_account_id}}&region_code={{region_code}}",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainer",
+										"get_auto_scaling_group",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "{{cloud_account_id}}"
+										},
+										{
+											"key": "region_code",
+											"value": "{{region_code}}"
+										},
+										{
+											"key": "group_name",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 09 Aug 2021 09:06:32 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1878"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": [\n        {\n            \"AutoScalingGroupName\": \"jenkins-spot\",\n            \"AutoScalingGroupARN\": \"arn:aws:autoscaling:ap-southeast-1:263078123597:autoScalingGroup:32ae05b2-f16b-4280-ab44-3480ba5cdc07:autoScalingGroupName/jenkins-spot\",\n            \"MinSize\": 0,\n            \"MaxSize\": 3,\n            \"DesiredCapacity\": 0,\n            \"DefaultCooldown\": 300,\n            \"AvailabilityZones\": [\n                \"ap-southeast-1a\",\n                \"ap-southeast-1c\",\n                \"ap-southeast-1b\"\n            ],\n            \"LoadBalancerNames\": [],\n            \"TargetGroupARNs\": [],\n            \"HealthCheckType\": \"EC2\",\n            \"HealthCheckGracePeriod\": 300,\n            \"Instances\": [\n                {\n                    \"InstanceId\": \"i-0f838f5a382e3a2af\",\n                    \"InstanceType\": \"t3.medium\",\n                    \"AvailabilityZone\": \"ap-southeast-1b\",\n                    \"LifecycleState\": \"InService\",\n                    \"HealthStatus\": \"Healthy\",\n                    \"LaunchTemplate\": {\n                        \"LaunchTemplateId\": \"lt-066220f3ca8b903a9\",\n                        \"LaunchTemplateName\": \"jenkins-spot\",\n                        \"Version\": \"6\"\n                    },\n                    \"ProtectedFromScaleIn\": true\n                }\n            ],\n            \"CreatedTime\": \"2021-07-20T09:02:21.619000Z\",\n            \"SuspendedProcesses\": [],\n            \"VPCZoneIdentifier\": \"subnet-f4c848ad,subnet-f2ac7994,subnet-394fb571\",\n            \"EnabledMetrics\": [],\n            \"Tags\": [],\n            \"TerminationPolicies\": [\n                \"Default\"\n            ],\n            \"NewInstancesProtectedFromScaleIn\": true,\n            \"ServiceLinkedRoleARN\": \"arn:aws:iam::263078123597:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling\",\n            \"CapacityRebalance\": true,\n            \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId\": \"lt-066220f3ca8b903a9\",\n            \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateName\": \"jenkins-spot\",\n            \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.Version\": \"$Latest\",\n            \"MixedInstancesPolicy.LaunchTemplate.Overrides\": [\n                {\n                    \"InstanceType\": \"t3.small\"\n                },\n                {\n                    \"InstanceType\": \"t3.medium\"\n                }\n            ],\n            \"MixedInstancesPolicy.InstancesDistribution.OnDemandAllocationStrategy\": \"prioritized\",\n            \"MixedInstancesPolicy.InstancesDistribution.OnDemandBaseCapacity\": 0,\n            \"MixedInstancesPolicy.InstancesDistribution.OnDemandPercentageAboveBaseCapacity\": 0,\n            \"MixedInstancesPolicy.InstancesDistribution.SpotAllocationStrategy\": \"capacity-optimized\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get One Auto Scaling Group",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"});",
+									"",
+									"pm.test('results has expected keys', () => {",
+									"    let property_list = [\"AutoScalingGroupName\", \"AutoScalingGroupARN\", \"MinSize\", \"MaxSize\", \"DesiredCapacity\", \"DefaultCooldown\", \"AvailabilityZones\", \"LoadBalancerNames\", \"TargetGroupARNs\", \"HealthCheckType\", \"HealthCheckGracePeriod\", \"Instances\", \"CreatedTime\", \"SuspendedProcesses\", \"VPCZoneIdentifier\", \"EnabledMetrics\", \"Tags\", \"TerminationPolicies\", \"NewInstancesProtectedFromScaleIn\", \"ServiceLinkedRoleARN\", \"CapacityRebalance\", \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId\", \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateName\", \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.Version\", \"MixedInstancesPolicy.LaunchTemplate.Overrides\", \"MixedInstancesPolicy.InstancesDistribution.OnDemandAllocationStrategy\", \"MixedInstancesPolicy.InstancesDistribution.OnDemandBaseCapacity\", \"MixedInstancesPolicy.InstancesDistribution.OnDemandPercentageAboveBaseCapacity\", \"MixedInstancesPolicy.InstancesDistribution.SpotAllocationStrategy\"];",
+									"    let instance_props = [\"InstanceId\", \"InstanceType\", \"AvailabilityZone\", \"LifecycleState\", \"HealthStatus\", \"LaunchTemplate\", \"ProtectedFromScaleIn\"]",
+									"",
+									"    for (let result of pm.response.json().results) {",
+									"        property_list.forEach(prop => {",
+									"            pm.expect(result).to.have.property(prop);",
+									"            if (prop == \"Instances\") {",
+									"                console.log(result[prop]);",
+									"                for (let instance of result[prop]) {",
+									"                    instance_props.forEach(key => {",
+									"                        pm.expect(instance).to.have.property(key);",
+									"                    });",
+									"               }",
+									"",
+									"            }",
+									"        })",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_aws}}/spotainer/get_auto_scaling_group/?caid={{cloud_account_id}}&region_code={{region_code}}&group_name={{AutoScalingGroupName}}",
+							"host": [
+								"{{host_aws}}"
+							],
+							"path": [
+								"spotainer",
+								"get_auto_scaling_group",
+								""
+							],
+							"query": [
+								{
+									"key": "caid",
+									"value": "{{cloud_account_id}}"
+								},
+								{
+									"key": "region_code",
+									"value": "{{region_code}}"
+								},
+								{
+									"key": "group_name",
+									"value": "{{AutoScalingGroupName}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get ONE Auto Scaling Group",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_aws}}/spotainer/get_auto_scaling_group/?caid={{cloud_account_id}}&region_code={{region_code}}&group_name=jenkins-spot",
+									"host": [
+										"{{host_aws}}"
+									],
+									"path": [
+										"spotainer",
+										"get_auto_scaling_group",
+										""
+									],
+									"query": [
+										{
+											"key": "caid",
+											"value": "{{cloud_account_id}}"
+										},
+										{
+											"key": "region_code",
+											"value": "{{region_code}}"
+										},
+										{
+											"key": "group_name",
+											"value": "jenkins-spot"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 09 Aug 2021 09:28:29 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.6.5"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1878"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"results\": [\n        {\n            \"AutoScalingGroupName\": \"jenkins-spot\",\n            \"AutoScalingGroupARN\": \"arn:aws:autoscaling:ap-southeast-1:263078123597:autoScalingGroup:32ae05b2-f16b-4280-ab44-3480ba5cdc07:autoScalingGroupName/jenkins-spot\",\n            \"MinSize\": 0,\n            \"MaxSize\": 3,\n            \"DesiredCapacity\": 0,\n            \"DefaultCooldown\": 300,\n            \"AvailabilityZones\": [\n                \"ap-southeast-1a\",\n                \"ap-southeast-1c\",\n                \"ap-southeast-1b\"\n            ],\n            \"LoadBalancerNames\": [],\n            \"TargetGroupARNs\": [],\n            \"HealthCheckType\": \"EC2\",\n            \"HealthCheckGracePeriod\": 300,\n            \"Instances\": [\n                {\n                    \"InstanceId\": \"i-0f838f5a382e3a2af\",\n                    \"InstanceType\": \"t3.medium\",\n                    \"AvailabilityZone\": \"ap-southeast-1b\",\n                    \"LifecycleState\": \"InService\",\n                    \"HealthStatus\": \"Healthy\",\n                    \"LaunchTemplate\": {\n                        \"LaunchTemplateId\": \"lt-066220f3ca8b903a9\",\n                        \"LaunchTemplateName\": \"jenkins-spot\",\n                        \"Version\": \"6\"\n                    },\n                    \"ProtectedFromScaleIn\": true\n                }\n            ],\n            \"CreatedTime\": \"2021-07-20T09:02:21.619000Z\",\n            \"SuspendedProcesses\": [],\n            \"VPCZoneIdentifier\": \"subnet-f4c848ad,subnet-f2ac7994,subnet-394fb571\",\n            \"EnabledMetrics\": [],\n            \"Tags\": [],\n            \"TerminationPolicies\": [\n                \"Default\"\n            ],\n            \"NewInstancesProtectedFromScaleIn\": true,\n            \"ServiceLinkedRoleARN\": \"arn:aws:iam::263078123597:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling\",\n            \"CapacityRebalance\": true,\n            \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId\": \"lt-066220f3ca8b903a9\",\n            \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateName\": \"jenkins-spot\",\n            \"MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.Version\": \"$Latest\",\n            \"MixedInstancesPolicy.LaunchTemplate.Overrides\": [\n                {\n                    \"InstanceType\": \"t3.small\"\n                },\n                {\n                    \"InstanceType\": \"t3.medium\"\n                }\n            ],\n            \"MixedInstancesPolicy.InstancesDistribution.OnDemandAllocationStrategy\": \"prioritized\",\n            \"MixedInstancesPolicy.InstancesDistribution.OnDemandBaseCapacity\": 0,\n            \"MixedInstancesPolicy.InstancesDistribution.OnDemandPercentageAboveBaseCapacity\": 0,\n            \"MixedInstancesPolicy.InstancesDistribution.SpotAllocationStrategy\": \"capacity-optimized\"\n        }\n    ]\n}"
+						}
+					]
 				}
 			],
 			"event": [
